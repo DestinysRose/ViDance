@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.sample.vidance.Dashboard"
+    tools:showIn="@layout/activity_dashboard"
+    android:background="#FFEAB5"
+    >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="4dp"
+        tools:layout_editor_absoluteY="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom|center"
+            android:layout_weight="1"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="5dp"
+                android:orientation="vertical">
+
+
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:paddingBottom="2dp"
+                    android:scaleType="fitCenter"
+                    app:srcCompat="@drawable/ic_vidance" />
+
+                <TextView
+                    android:id="@+id/catcafe"
+                    android:layout_width="match_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="2"
+                    android:gravity="center"
+                    android:text="A Dance &amp; Learn"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/catcafe"
+                    android:layout_width="match_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="2"
+                    android:gravity="center"
+                    android:text="For Special Children"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/btnNotifications"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/button_dashed_border"
+                android:padding="1dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@mipmap/ic_mail" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom|center"
+            android:layout_weight="1"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="8dp">
+
+            <ImageButton
+                android:id="@+id/btnGallery"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/button_dashed_border"
+                android:paddingTop="5dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@mipmap/ic_gallery" />
+
+            <ImageButton
+                android:id="@+id/btnRecord"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/button_dashed_border"
+                android:paddingTop="1dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@mipmap/ic_camera" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom|center"
+            android:layout_weight="1"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="8dp">
+
+            <ImageButton
+                android:id="@+id/btnInput"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/button_dashed_border"
+                android:paddingLeft="3dp"
+                android:paddingTop="4dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@mipmap/ic_record" />
+
+            <ImageButton
+                android:id="@+id/btnTarget"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/button_dashed_border"
+                android:padding="1dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@mipmap/ic_target" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom|center"
+            android:layout_weight="1"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="8dp">
+
+            <ImageButton
+                android:id="@+id/btnReport"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/button_dashed_border"
+                android:scaleType="fitCenter"
+                android:paddingTop="1dp"
+                app:srcCompat="@mipmap/ic_report"
+                />
+
+            <ImageButton
+                android:id="@+id/btnSetting"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:paddingTop="1dp"
+                android:layout_weight="1"
+                android:background="@drawable/button_dashed_border"
+                android:scaleType="fitCenter"
+                app:srcCompat="@mipmap/ic_settings" />
+
+        </LinearLayout>
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

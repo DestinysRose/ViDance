@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+
+
+        <Spinner
+            android:id="@+id/spinner1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:entries="@array/behaviour_arrays"
+            android:prompt="@string/behaviour_prompt"
+            />
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/severity" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radioButton1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/severity_mild" />
+
+                <RadioButton
+                    android:id="@+id/radioButton2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/severity_moderate" />
+
+                <RadioButton
+                    android:id="@+id/radioButton3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/severity_severe" />
+
+        </LinearLayout>
+</LinearLayout>
