@@ -1,7 +1,12 @@
 package com.sample.vidance;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 
 /**
@@ -10,11 +15,15 @@ import android.widget.Spinner;
 
 public class Behaviours extends Features {
     private Spinner spinner1;
+    private RadioGroup radioGroup;
+    private RadioButton radioButton;
+
 
     @Override
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_features);
+        addListenerOnButton();
         addListenerOnSpinnerItemSelection();
     }
 
@@ -23,31 +32,28 @@ public class Behaviours extends Features {
         spinner1.setOnItemSelectedListener(new CustomOnItemSelectedListener());
     }
 
-
-    /** Code sample to receive values
-
     // get the selected dropdown list value
     public void addListenerOnButton() {
 
         spinner1 = (Spinner) findViewById(R.id.spinner1);
-        spinner2 = (Spinner) findViewById(R.id.spinner2);
-        btnSubmit = (Button) findViewById(R.id.btnSubmit);
+        Button btnUpdate = (Button) findViewById(R.id.updateBehaviour);
+        radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
 
-        btnSubmit.setOnClickListener(new OnClickListener() {
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-
-                Toast.makeText(MyAndroidAppActivity.this,
+                int selectedId = radioGroup.getCheckedRadioButtonId();
+                radioButton = (RadioButton) findViewById(selectedId);
+                Toast.makeText(Behaviours.this,
                         "OnClickListener : " +
                                 "\nSpinner 1 : "+ String.valueOf(spinner1.getSelectedItem()) +
-                                "\nSpinner 2 : "+ String.valueOf(spinner2.getSelectedItem()),
-                        Toast.LENGTH_SHORT).show();
+                                // get selected radio button from radioGroup
+                                radioButton.getText(),
+                                Toast.LENGTH_SHORT).show();
             }
-
         });
      }
-     **/
 
 }
 
