@@ -19,6 +19,8 @@ public class Features extends AppCompatActivity {
     private ViewFlipper vf;
     private TextView tv;
     private int addques;
+    private View toggle;
+    private View toggle2;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -72,45 +74,28 @@ public class Features extends AppCompatActivity {
         vf = (ViewFlipper) findViewById(R.id.vf);
         vf.setDisplayedChild(vfValue);
         if (intValue == 2){
-            Button btnClick = (Button) findViewById(R.id.addBehaviour);
-            tv = (TextView) findViewById(R.id.limitReached);
-            tv.setVisibility(View.INVISIBLE);
-            btnClick.setVisibility(View.VISIBLE);
-            //Hide all questions on default
-            for (int i = 2; i <= 20; i++) {
-                String string1 = "question"+String.valueOf(i);
-                tv.setVisibility(View.INVISIBLE);
-                int resID = getResources().getIdentifier(string1, "id",getPackageName());
-                View v = (View) findViewById(resID);
-                v.setVisibility(View.GONE);
-            }
-            addques = 2;
-            //Add question on click
-            btnClick.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    if (addques == 20) { //When maximum questions is reached
-                        Button btnHide = (Button) findViewById(R.id.addBehaviour);
-                        btnHide.setVisibility(View.GONE);
-                        tv.setVisibility(View.VISIBLE);
-                    }
-                    else{
-                        String string1 = "question" + String.valueOf(addques);
-                        int resID = getResources().getIdentifier(string1, "id", getPackageName());
-                        v = (View) findViewById(resID);
-                        v.setVisibility(View.VISIBLE);
-                        addques++;
-                    }
-                }
-            });
+            toggleSeverity();
+            addQuestions();
         }
         //Receive input and update content appropriately
         mTextMessage = (TextView) findViewById(R.id.message);
         String message = getIntent().getStringExtra("SELECTED_ACTIVITY");
         mTextMessage.setText(message);
-        //Set Font
+        //Set Font Cat Cafe
         String fontPath = "fonts/CatCafe.ttf";
         Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
         mTextMessage.setTypeface(tf);
+        //Set Font James Farjardo
+        fontPath = "fonts/James_Fajardo.ttf";
+        tf = Typeface.createFromAsset(getAssets(), fontPath);
+        Button mText = (Button) findViewById(R.id.toggleView);
+        mText.setTypeface(tf);
+        mText = (Button) findViewById(R.id.addBehaviour);
+        mText.setTypeface(tf);
+        mText = (Button) findViewById(R.id.delBehaviour);
+        mText.setTypeface(tf);
+        mText = (Button) findViewById(R.id.updateBehaviour);
+        mText.setTypeface(tf);
     }
 
     @Override
@@ -152,8 +137,59 @@ public class Features extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-
         return true;
+    }
+    public void toggleSeverity() {
+        toggle = findViewById(R.id.severity_info);
+        toggle.setVisibility(View.GONE);
+        toggle2 = findViewById(R.id.questions);
+        toggle2.setVisibility(View.VISIBLE);
+        Button btnToggle = (Button) findViewById(R.id.toggleView);
+        btnToggle.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                toggle = findViewById(R.id.severity_info);
+                toggle2 = findViewById(R.id.questions);
+                if (toggle.getVisibility() == View.GONE) {
+                    toggle.setVisibility(View.VISIBLE);
+                    toggle2.setVisibility(View.GONE);
+                } else {
+                    toggle.setVisibility(View.GONE);
+                    toggle2.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+    }
 
+    public void addQuestions() {
+        Button btnClick = (Button) findViewById(R.id.addBehaviour);
+        tv = (TextView) findViewById(R.id.limitReached);
+        tv.setVisibility(View.INVISIBLE);
+        btnClick.setVisibility(View.VISIBLE);
+        //Hide all questions on default
+        for (int i = 2; i <= 20; i++) {
+            String string1 = "question"+String.valueOf(i);
+            tv.setVisibility(View.INVISIBLE);
+            int resID = getResources().getIdentifier(string1, "id",getPackageName());
+            View v = (View) findViewById(resID);
+            v.setVisibility(View.GONE);
+        }
+        addques = 2;
+        //Add question on click
+        btnClick.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                if (addques == 20) { //When maximum questions is reached
+                    Button btnHide = (Button) findViewById(R.id.addBehaviour);
+                    btnHide.setVisibility(View.GONE);
+                    tv.setVisibility(View.VISIBLE);
+                }
+                else{
+                    String string1 = "question" + String.valueOf(addques);
+                    int resID = getResources().getIdentifier(string1, "id", getPackageName());
+                    v = (View) findViewById(resID);
+                    v.setVisibility(View.VISIBLE);
+                    addques++;
+                }
+            }
+        });
     }
 }
