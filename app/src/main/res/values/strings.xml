@@ -26,10 +26,16 @@
     <string name="action_logout">Logout</string>
 
     <!-- Input Form -->
-    <string name="severity">Severity</string>
+    <string name="input_instructions">Select a behaviour, severity and date shown. For more information on severity click the button below:</string>
+    <string name="severity">Select Severity:</string>
     <string name="severity_mild">Mild</string>
     <string name="severity_moderate">Moderate</string>
     <string name="severity_severe">Severe</string>
+    <string name="show_severity">Show Severity Information</string>
+    <string name="hide_severity">Hide Severity Information</string>
+    <string name="behaviour">Select Behaviour:</string>
+
+
 
     <!-- List of Behaviours -->
     <string name="behaviour_prompt">Select an observed behaviour</string>

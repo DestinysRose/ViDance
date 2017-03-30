@@ -9,7 +9,7 @@
         android:id="@+id/instructions"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Select a behaviour, severity and date shown. For more information on severity click the button below:"
+        android:text="@string/input_instructions"
         android:paddingLeft="10dp"/>
 
     <Button
@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/button_rounded_red"
-        android:text="Show/Hide Severity Information"
+        android:text="@string/show_severity"
         android:textColor="#FFFFFF"
         android:textSize="20sp" />
 
