@@ -1,7 +1,12 @@
 <resources>
+
+    <!-- Global -->
     <string name="app_name">ViDance</string>
+    <string name="placeholder">placeholder</string>
 
-
+    <!-- Camera -->
+    <string name="camera_record">Record video</string>
+    <string name="camera_send">Send video</string>
 
     <!-- Titles -->
     <string name="title_activity_features">Features</string>
@@ -20,11 +25,17 @@
     <string name="action_about">About</string>
     <string name="action_logout">Logout</string>
 
-    <!-- Form -->
-    <string name="severity">Severity</string>
+    <!-- Input Form -->
+    <string name="input_instructions">Select a behaviour, severity and date shown. For more information on severity click the button below:</string>
+    <string name="severity">Select Severity:</string>
     <string name="severity_mild">Mild</string>
     <string name="severity_moderate">Moderate</string>
     <string name="severity_severe">Severe</string>
+    <string name="show_severity">Show Severity Information</string>
+    <string name="hide_severity">Hide Severity Information</string>
+    <string name="behaviour">Select Behaviour:</string>
+
+
 
     <!-- List of Behaviours -->
     <string name="behaviour_prompt">Select an observed behaviour</string>
@@ -50,4 +61,28 @@
         <item>Waving or shaking arms</item>
         <item>Yelling and screaming</item>
     </string-array>
+
+    <!-- Behaviour Severity Information -->
+    <string name="severity_info">
+        For self injurious behaviours:
+        \n \n
+        Definition: Self-injurious behavior (SIB) causes damage to the person’s own body; i.e., damage has either already occurred, or it must be expected if the behavior remained untreated. SIBs occur repeatedly in the same way over and over again, and they are characteristic for that person. (So on the list I gave you, that would be until "teeth grinding")
+        \n \n
+        Mild - Behavior occurs but does not inflict significant damage on the individual (e.g., temporary reddening of the skin, very light bruising).
+        \n \n
+        Moderate - Behavior may inflict moderate damage on the individual (e.g., moderate bruising, scratching through the skin, repeatedly picking scabs.
+        \n \n
+        Severe - Behavior may inflict moderate to severe damage on the individual (e.g. biting through the skin, eye gouging, fracturing bones) minor or major medical intervention required.
+        \n \n
+        \n
+        For stereotyped behaviours:
+        \n \n
+        Definition: Stereotyped behaviors look unusual, strange, or inappropriate to the average person. They are voluntary acts that occur repeatedly in the same way over and over again, and they are characteristic for that person. However, they do NOT cause physical damage.
+        \n \n
+        Mild - Does not get upset if interrupted, does not get in the way of ongoing events
+        \n \n
+        Moderate - May exhibit distress if interrupted, sometimes gets in the way of ongoing events
+        \n \n
+        Severe - Exhibits much distress if interrupted, gets in the way of ongoing events
+    </string>
 </resources>

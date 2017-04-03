@@ -9,13 +9,17 @@
         android:id="@+id/instructions"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Select a behaviour, severity and date shown. For more information on severity click the button below:"
+        android:text="@string/input_instructions"
         android:paddingLeft="10dp"/>
-    <ToggleButton
-        android:id="@+id/toggleButton"
+
+    <Button
+        android:id="@+id/toggleView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Severity Information" />
+        android:background="@drawable/button_rounded_red"
+        android:text="@string/show_severity"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -26,105 +30,13 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
-                <include
-                    android:id="@+id/question1"
-                    layout="@layout/resource_questions" />
+            <include
+                android:id="@+id/severity_info"
+                layout="@layout/resource_severityinfo" />
 
-                <include
-                    android:id="@+id/question2"
-                    layout="@layout/resource_questions"/>
-
-                <include
-                    android:id="@+id/question3"
-                    layout="@layout/resource_questions" />
-
-                <include
-                    android:id="@+id/question4"
-                    layout="@layout/resource_questions" />
-
-                <include
-                    android:id="@+id/question5"
-                    layout="@layout/resource_questions" />
-
-                <include
-                    android:id="@+id/question6"
-                    layout="@layout/resource_questions" />
-
-                <include
-                    android:id="@+id/question7"
-                    layout="@layout/resource_questions" />
-
-                <include
-                    android:id="@+id/question8"
-                    layout="@layout/resource_questions" />
-
-                <include
-                    android:id="@+id/question9"
-                    layout="@layout/resource_questions" />
-
-                <include
-                    android:id="@+id/question10"
-                    layout="@layout/resource_questions" />
-
-                <include
-                    android:id="@+id/question11"
-                    layout="@layout/resource_questions" />
-
-                <include
-                    android:id="@+id/question12"
-                    layout="@layout/resource_questions" />
-
-                <include
-                    android:id="@+id/question13"
-                    layout="@layout/resource_questions" />
-
-                <include
-                    android:id="@+id/question14"
-                    layout="@layout/resource_questions" />
-
-                <include
-                    android:id="@+id/question15"
-                    layout="@layout/resource_questions" />
-
-                <include
-                    android:id="@+id/question16"
-                    layout="@layout/resource_questions" />
-
-                <include
-                    android:id="@+id/question17"
-                    layout="@layout/resource_questions" />
-
-                <include
-                    android:id="@+id/question18"
-                    layout="@layout/resource_questions" />
-
-                <include
-                    android:id="@+id/question19"
-                    layout="@layout/resource_questions" />
-
-                <include
-                    android:id="@+id/question20"
-                    layout="@layout/resource_questions" />
-
-            <Button
-                android:id="@+id/addBehaviour"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Add more Behaviours"
-                android:onClick="onClickAdd"/>
-
-            <Button
-                android:id="@+id/updateBehaviour"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Update Behaviours" />
-
-            <TextView
-                android:id="@+id/limitReached"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="All Behaviours have been listed"
-                />
+            <include
+                android:id="@+id/questions"
+                layout="@layout/content_questions"/>
 
         </LinearLayout>
     </ScrollView>

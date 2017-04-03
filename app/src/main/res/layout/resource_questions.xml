@@ -3,18 +3,22 @@
     android:orientation="vertical" android:layout_width="fill_parent"
     android:layout_height="wrap_content">
 
-
-        <Spinner
-            android:id="@+id/spinner1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="10dp"
-            android:entries="@array/behaviour_arrays"
-            android:prompt="@string/behaviour_prompt"
-            />
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/behaviour" />
+    <Spinner
+        android:id="@+id/spinner1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/behaviour_arrays"
+        android:paddingTop="10dp"
+        android:prompt="@string/behaviour_prompt"
+        android:spinnerMode="dialog" />
 
         <TextView
-            android:id="@+id/textView6"
+            android:id="@+id/textView7"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/severity" />
@@ -24,11 +28,20 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:id="@+id/radioGroup"
+                android:checkedButton="@+id/radioButton1"
+                android:orientation="horizontal">
+
                 <RadioButton
                     android:id="@+id/radioButton1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:checked="false"
                     android:text="@string/severity_mild" />
 
                 <RadioButton
@@ -44,6 +57,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/severity_severe" />
+            </RadioGroup>
 
         </LinearLayout>
 </LinearLayout>
