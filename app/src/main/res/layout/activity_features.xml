@@ -37,7 +37,6 @@
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp">
 
-                    <include layout="@layout/content_record"/>
                     <include layout="@layout/content_input"/>
                     <include layout="@layout/content_target"/>
                     <include layout="@layout/content_report"/>

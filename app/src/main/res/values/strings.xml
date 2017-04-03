@@ -5,8 +5,8 @@
     <string name="placeholder">placeholder</string>
 
     <!-- Camera -->
-    <string name="capture_button">Capture Image From Camera</string>
-    <string name="desc">capture image place holder</string>
+    <string name="camera_record">Record video</string>
+    <string name="camera_send">Send video</string>
 
     <!-- Titles -->
     <string name="title_activity_features">Features</string>

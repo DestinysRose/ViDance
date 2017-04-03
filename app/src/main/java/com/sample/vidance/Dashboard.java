@@ -11,6 +11,10 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+/**
+ * Created by Michelle on 22/3/2017.
+ */
+
 public class Dashboard extends AppCompatActivity {
 
     @Override
@@ -45,6 +49,7 @@ public class Dashboard extends AppCompatActivity {
         imgBtn2.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(Dashboard.this, Features.class);
+                intent.putExtra("SELECTED_ITEM", 0);
                 intent.putExtra("SELECTED_ACTIVITY", "Gallery");
                 startActivity(intent);
             }
@@ -53,10 +58,7 @@ public class Dashboard extends AppCompatActivity {
         ImageButton imgBtn3 = (ImageButton) findViewById(R.id.btnRecord);
         imgBtn3.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(Dashboard.this, Features.class);
-                intent.putExtra("SELECTED_ITEM", 1);
-                intent.putExtra("SELECTED_ACTIVITY", "Record Session");
-                intent.putExtra("SELECTED_CONTENT", 0);
+                Intent intent = new Intent(Dashboard.this, Record.class);
                 startActivity(intent);
             }
         });
@@ -67,7 +69,7 @@ public class Dashboard extends AppCompatActivity {
                 Intent intent = new Intent(Dashboard.this, Features.class);
                 intent.putExtra("SELECTED_ITEM", 2);
                 intent.putExtra("SELECTED_ACTIVITY", "Update Behaviours");
-                intent.putExtra("SELECTED_CONTENT", 1);
+                intent.putExtra("SELECTED_CONTENT", 0);
                 startActivity(intent);
             }
         });
@@ -78,7 +80,7 @@ public class Dashboard extends AppCompatActivity {
                 Intent intent = new Intent(Dashboard.this, Features.class);
                 intent.putExtra("SELECTED_ITEM", 3);
                 intent.putExtra("SELECTED_ACTIVITY", "Target Behaviours");
-                intent.putExtra("SELECTED_CONTENT", 2);
+                intent.putExtra("SELECTED_CONTENT", 1);
                 startActivity(intent);
             }
         });
@@ -89,7 +91,7 @@ public class Dashboard extends AppCompatActivity {
                 Intent intent = new Intent(Dashboard.this, Features.class);
                 intent.putExtra("SELECTED_ITEM", 4);
                 intent.putExtra("SELECTED_ACTIVITY", "Generate Reports");
-                intent.putExtra("SELECTED_CONTENT", 3);
+                intent.putExtra("SELECTED_CONTENT", 2);
                 startActivity(intent);
             }
         });

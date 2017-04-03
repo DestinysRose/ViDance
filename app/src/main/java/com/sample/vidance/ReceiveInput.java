@@ -5,8 +5,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
-public class ReceiveInput extends AppCompatActivity {
+/**
+ * Created by Michelle on 30/3/2017.
+ */
 
+public class ReceiveInput extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

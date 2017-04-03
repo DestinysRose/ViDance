@@ -16,6 +16,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 
+/**
+ * Created by Michelle on 22/3/2017.
+ */
+
 public class Features extends AppCompatActivity {
 
     private TextView mTextMessage;
@@ -37,23 +41,22 @@ public class Features extends AppCompatActivity {
                     startActivity(intent);
                     return true;
                 case R.id.navigation_record:
-                    mTextMessage.setText(R.string.title_record);
-                    vf.setVisibility(View.VISIBLE); //ONLY USE visible or invisible when you want to hide children by default
-                    vf.setDisplayedChild(0); //OTHERWISE, use this to direct [according to index] which child is loaded //Can use this to pass values
+                    intent = new Intent(Features.this, Record.class); //Record page
+                    startActivity(intent);
                     return true;
                 case R.id.navigation_input:
                     mTextMessage.setText(R.string.title_input);
-                    vf.setVisibility(View.VISIBLE);
-                    vf.setDisplayedChild(1);
+                    vf.setVisibility(View.VISIBLE); //ONLY USE visible or invisible when you want to hide children by default
+                    vf.setDisplayedChild(0); //OTHERWISE, use this to direct [according to index] which child is loaded //Can use this to pass values
                     return true;
                 case R.id.navigation_target:
                     mTextMessage.setText(R.string.title_target);
-                    vf.setDisplayedChild(2);
+                    vf.setDisplayedChild(1);
                     return true;
                 case R.id.navigation_report:
                     mTextMessage.setText(R.string.title_report);
                     vf.setVisibility(View.INVISIBLE);
-                    vf.setDisplayedChild(3);
+                    vf.setDisplayedChild(2);
                     return true;
             }
             return false;
