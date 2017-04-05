@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--List of Severities -->
+    <string-array name="severity_arrays">
+        <item>Mild</item>
+        <item>Moderate</item>
+        <item>Severe</item>
+    </string-array>
+
+    <!-- List of Behaviours -->
+    <string name="behaviour_prompt">Select an observed behaviour</string>
+    <string-array name="behaviour_arrays">
+        <item>Bizarre body postures</item>
+        <item>Body hitting (expect for the head) with any body part</item>
+        <item>Clapping hands (inappropriately)</item>
+        <item>Gazing at hands or objects</item>
+        <item>Grimacing</item>
+        <item>Hair pulling (tearing out patches of hair)</item>
+        <item>Head hitting</item>
+        <item>Inserting objects in nose, ears, anus, etc.</item>
+        <item>Manipulating (e.g. twirling, spinning) objects</item>
+        <item>Pacing, jumping, bouncing, running</item>
+        <item>Pica (ingesting non-food items)</item>
+        <item>Repetitive hand and/or finger movements</item>
+        <item>Rocking, repetitive body movements</item>
+        <item>Rubbing self</item>
+        <item>Self-biting</item>
+        <item>Self-scratching</item>
+        <item>Sniffing objects, own body</item>
+        <item>Teeth grinding (while awake)</item>
+        <item>Waving or shaking arms</item>
+        <item>Yelling and screaming</item>
+    </string-array>
+</resources>

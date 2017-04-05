@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Contains IDs for Update Behaviours page. If more items are added, please increase the values of i and k in Update.java -->
+
+<resources>
+    <!-- Question Layouts -->
+    <item type="id" name="question1" />
+    <item type="id" name="question2" />
+    <item type="id" name="question3" />
+    <item type="id" name="question4" />
+    <item type="id" name="question5" />
+    <item type="id" name="question6" />
+    <item type="id" name="question7" />
+    <item type="id" name="question8" />
+    <item type="id" name="question9" />
+    <item type="id" name="question10" />
+    <item type="id" name="question11" />
+    <item type="id" name="question12" />
+    <item type="id" name="question13" />
+    <item type="id" name="question14" />
+    <item type="id" name="question15" />
+    <item type="id" name="question16" />
+    <item type="id" name="question17" />
+    <item type="id" name="question18" />
+    <item type="id" name="question19" />
+    <item type="id" name="question20" />
+
+    <!-- Radio Groups -->
+    <item type="id" name="radioGroup1" />
+    <item type="id" name="radioGroup2" />
+    <item type="id" name="radioGroup3" />
+    <item type="id" name="radioGroup4" />
+    <item type="id" name="radioGroup5" />
+    <item type="id" name="radioGroup6" />
+    <item type="id" name="radioGroup7" />
+    <item type="id" name="radioGroup8" />
+    <item type="id" name="radioGroup9" />
+    <item type="id" name="radioGroup10" />
+    <item type="id" name="radioGroup11" />
+    <item type="id" name="radioGroup12" />
+    <item type="id" name="radioGroup13" />
+    <item type="id" name="radioGroup14" />
+    <item type="id" name="radioGroup15" />
+    <item type="id" name="radioGroup16" />
+    <item type="id" name="radioGroup17" />
+    <item type="id" name="radioGroup18" />
+    <item type="id" name="radioGroup19" />
+    <item type="id" name="radioGroup20" />
+
+</resources>

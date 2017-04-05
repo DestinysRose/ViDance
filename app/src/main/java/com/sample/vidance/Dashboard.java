@@ -66,7 +66,7 @@ public class Dashboard extends AppCompatActivity {
         ImageButton imgBtn4 = (ImageButton) findViewById(R.id.btnInput);
         imgBtn4.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(Dashboard.this, Features.class);
+                Intent intent = new Intent(Dashboard.this, Update.class);
                 intent.putExtra("SELECTED_ITEM", 2);
                 intent.putExtra("SELECTED_ACTIVITY", "Update Behaviours");
                 intent.putExtra("SELECTED_CONTENT", 0);
@@ -89,9 +89,10 @@ public class Dashboard extends AppCompatActivity {
         imgBtn6.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(Dashboard.this, Features.class);
+                /**
                 intent.putExtra("SELECTED_ITEM", 4);
                 intent.putExtra("SELECTED_ACTIVITY", "Generate Reports");
-                intent.putExtra("SELECTED_CONTENT", 2);
+                intent.putExtra("SELECTED_CONTENT", 2); **/
                 startActivity(intent);
             }
         });
