@@ -81,13 +81,13 @@ public class Record extends AppCompatActivity {
             int duration = Toast.LENGTH_SHORT;
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
-            // Prompt user to send video
+            //Pompt user to send video
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Record.this);
-            // set title
+            //Set title
             alertDialogBuilder.setTitle("Upload video");
-            // set dialog message
+            //Set dialog message
             alertDialogBuilder
-                    .setMessage("Are you sure you want to send the recorded video to the instructor for viewing?")
+                    .setMessage("Do you wish to send the recorded video to the instructor for viewing?")
                     .setCancelable(false)
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
@@ -108,9 +108,9 @@ public class Record extends AppCompatActivity {
                                 dialog.cancel();
                             }
                         });
-            // create alert dialog
+            //Create alert dialog
             AlertDialog alertDialog = alertDialogBuilder.create();
-            // show it
+            //Show it
             alertDialog.show();
         }
         else {
@@ -172,15 +172,13 @@ public class Record extends AppCompatActivity {
             Intent intent = new Intent(Record.this, Features.class);
             switch (item.getItemId()) {
                 case R.id.navigation_dashboard:
-                    intent = new Intent(Record.this, Dashboard.class);
-                    intent.putExtra("SELECTED_ITEM", 0);
-                    intent.putExtra("SELECTED_ACTIVITY", "Notifications");
-                    startActivity(intent);
+                    finish();
                     return true;
                 case R.id.navigation_record:
                     //Do Nothing
                     return true;
                 case R.id.navigation_input:
+                    finish();
                     intent = new Intent(Record.this, Update.class);
                     intent.putExtra("SELECTED_ITEM", 2);
                     intent.putExtra("SELECTED_ACTIVITY", "Update Behaviours");
@@ -188,12 +186,14 @@ public class Record extends AppCompatActivity {
                     startActivity(intent);
                     return true;
                 case R.id.navigation_target:
+                    finish();
                     intent.putExtra("SELECTED_ITEM", 3);
                     intent.putExtra("SELECTED_ACTIVITY", "Target Behaviours");
                     intent.putExtra("SELECTED_CONTENT", 1);
                     startActivity(intent);
                     return true;
                 case R.id.navigation_report:
+                    finish();
                     intent.putExtra("SELECTED_ITEM", 4);
                     intent.putExtra("SELECTED_ACTIVITY", "Generate Reports");
                     intent.putExtra("SELECTED_CONTENT", 2);

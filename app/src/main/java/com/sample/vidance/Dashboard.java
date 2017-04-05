@@ -1,7 +1,9 @@
 package com.sample.vidance;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -10,12 +12,15 @@ import android.graphics.Typeface;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * Created by Michelle on 22/3/2017.
  */
 
 public class Dashboard extends AppCompatActivity {
+    private static final int TIME_LIMIT = 1500;
+    private static long backPressed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,9 +72,6 @@ public class Dashboard extends AppCompatActivity {
         imgBtn4.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(Dashboard.this, Update.class);
-                intent.putExtra("SELECTED_ITEM", 2);
-                intent.putExtra("SELECTED_ACTIVITY", "Update Behaviours");
-                intent.putExtra("SELECTED_CONTENT", 0);
                 startActivity(intent);
             }
         });
@@ -89,10 +91,9 @@ public class Dashboard extends AppCompatActivity {
         imgBtn6.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(Dashboard.this, Features.class);
-                /**
                 intent.putExtra("SELECTED_ITEM", 4);
                 intent.putExtra("SELECTED_ACTIVITY", "Generate Reports");
-                intent.putExtra("SELECTED_CONTENT", 2); **/
+                intent.putExtra("SELECTED_CONTENT", 2);
                 startActivity(intent);
             }
         });
@@ -147,8 +148,18 @@ public class Dashboard extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-
         return true;
+    }
 
+    @Override
+    public void onBackPressed() {
+        if(TIME_LIMIT + backPressed > System.currentTimeMillis()) {
+            super.onBackPressed(); //Close application on double back
+        }
+        else
+        {
+            Toast.makeText(getApplicationContext(), "Press BACK again to EXIT", Toast.LENGTH_SHORT).show();
+        }
+        backPressed = System.currentTimeMillis();
     }
 }

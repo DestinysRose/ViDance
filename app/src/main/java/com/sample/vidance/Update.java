@@ -38,7 +38,7 @@ public class Update extends AppCompatActivity {
         setContentView(R.layout.activity_update);
         //Navigation Bar set up
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.getMenu().getItem(1).setChecked(true);
+        navigation.getMenu().getItem(2).setChecked(true);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         //Receive input and update content appropriately
         mTextMessage = (TextView) findViewById(R.id.message);
@@ -74,12 +74,10 @@ public class Update extends AppCompatActivity {
             Intent intent = new Intent(Update.this, Features.class);
             switch (item.getItemId()) {
                 case R.id.navigation_dashboard:
-                    intent = new Intent(Update.this, Dashboard.class);
-                    intent.putExtra("SELECTED_ITEM", 0);
-                    intent.putExtra("SELECTED_ACTIVITY", "Notifications");
-                    startActivity(intent);
+                    finish();
                     return true;
                 case R.id.navigation_record:
+                    finish();
                     intent = new Intent(Update.this, Record.class);
                     intent.putExtra("SELECTED_ITEM", 0);
                     intent.putExtra("SELECTED_ACTIVITY", "Notifications");
@@ -89,12 +87,14 @@ public class Update extends AppCompatActivity {
                     //Do Nothing
                     return true;
                 case R.id.navigation_target:
+                    finish();
                     intent.putExtra("SELECTED_ITEM", 3);
                     intent.putExtra("SELECTED_ACTIVITY", "Target Behaviours");
                     intent.putExtra("SELECTED_CONTENT", 1);
                     startActivity(intent);
                     return true;
                 case R.id.navigation_report:
+                    finish();
                     intent.putExtra("SELECTED_ITEM", 4);
                     intent.putExtra("SELECTED_ACTIVITY", "Generate Reports");
                     intent.putExtra("SELECTED_CONTENT", 2);

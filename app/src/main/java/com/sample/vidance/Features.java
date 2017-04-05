@@ -24,10 +24,6 @@ public class Features extends AppCompatActivity {
 
     private TextView mTextMessage;
     private ViewFlipper vf;
-    private TextView tv;
-    private View toggle;
-    private View toggle2;
-    private String value;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -36,25 +32,26 @@ public class Features extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_dashboard:
-                    mTextMessage.setText(R.string.title_dashboard);
-                    Intent intent = new Intent(Features.this, Dashboard.class);
-                    startActivity(intent);
+                    finish();
                     return true;
                 case R.id.navigation_record:
-                    intent = new Intent(Features.this, Record.class); //Record Session page
+                    finish();
+                    Intent intent = new Intent(Features.this, Record.class); //Record Session page
                     startActivity(intent);
                     return true;
                 case R.id.navigation_input:
+                    finish();
                     intent = new Intent(Features.this, Update.class); //Update Behaviours page
                     startActivity(intent);
                     return true;
                 case R.id.navigation_target:
+                    finish();
                     mTextMessage.setText(R.string.title_target);
                     vf.setDisplayedChild(1);
                     return true;
                 case R.id.navigation_report:
+                    finish();
                     mTextMessage.setText(R.string.title_report);
-                    vf.setVisibility(View.INVISIBLE);
                     vf.setDisplayedChild(2);
                     return true;
             }
@@ -86,17 +83,7 @@ public class Features extends AppCompatActivity {
         String fontPath = "fonts/CatCafe.ttf";
         Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
         mTextMessage.setTypeface(tf);
-        //Set Font James Farjardo
-        fontPath = "fonts/James_Fajardo.ttf";
-        tf = Typeface.createFromAsset(getAssets(), fontPath);
-        Button mText = (Button) findViewById(R.id.toggleView);
-        mText.setTypeface(tf);
-        mText = (Button) findViewById(R.id.addBehaviour);
-        mText.setTypeface(tf);
-        mText = (Button) findViewById(R.id.delBehaviour);
-        mText.setTypeface(tf);
-        mText = (Button) findViewById(R.id.updateBehaviour);
-        mText.setTypeface(tf);
+
     }
 
     @Override
