@@ -1,9 +1,7 @@
 package com.sample.vidance;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -33,10 +31,12 @@ public class Dashboard extends AppCompatActivity {
         String fontPath = "fonts/CatCafe.ttf";
         // text view label
         TextView txtCat = (TextView) findViewById(R.id.catcafe);
+        TextView txtCat2 = (TextView) findViewById(R.id.catcafe2);
         // Loading Font Face
         Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
         // Applying font
         txtCat.setTypeface(tf);
+        txtCat2.setTypeface(tf);
 
         //Link to Notifications
         ImageButton imgBtn = (ImageButton) findViewById(R.id.btnNotifications);
@@ -158,7 +158,7 @@ public class Dashboard extends AppCompatActivity {
         }
         else
         {
-            Toast.makeText(getApplicationContext(), "Press BACK again to EXIT", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Press the 'Back' button again to exit.", Toast.LENGTH_SHORT).show();
         }
         backPressed = System.currentTimeMillis();
     }

@@ -1,13 +1,12 @@
 package com.sample.vidance;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * Created by Michelle on 30/3/2017.
@@ -23,6 +22,13 @@ public class ReceiveInput extends AppCompatActivity {
         TextView mTextMessage = (TextView) findViewById(R.id.input_results);
         String result = mIntent.getStringExtra("RESULT");
         mTextMessage.setText(result);
+        TextView title = (TextView) findViewById(R.id.title);
+        String text = mIntent.getStringExtra("TITLE") + "\n";
+        title.setText(text);
+        // Set font
+        String fontPath = "fonts/CatCafe.ttf";
+        Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
+        title.setTypeface(tf);
     }
     @Override
     public void onBackPressed() {
@@ -38,7 +44,8 @@ public class ReceiveInput extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int id) {
                         // if this button is clicked, close
                         // current activity
-                        Intent intent = new Intent(ReceiveInput.this, Dashboard.class);
+                        finish();
+                        Intent intent = new Intent(ReceiveInput.this, Update.class);
                         startActivity(intent);
                         dialog.cancel();
                     }

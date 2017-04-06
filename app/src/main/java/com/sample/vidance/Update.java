@@ -1,14 +1,20 @@
 package com.sample.vidance;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -16,7 +22,6 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ViewFlipper;
 
 
 /**
@@ -31,6 +36,10 @@ public class Update extends AppCompatActivity {
     private String value;
     private String arraySeverity[];
     private String arrayBehaviour[];
+    private String missing;
+    private Boolean validation;
+    private Typeface jf;
+    private Typeface cc;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,19 +54,19 @@ public class Update extends AppCompatActivity {
         mTextMessage.setText(R.string.title_input);
         //Set Font Cat Cafe
         String fontPath = "fonts/CatCafe.ttf";
-        Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
-        mTextMessage.setTypeface(tf);
+        cc = Typeface.createFromAsset(getAssets(), fontPath);
+        mTextMessage.setTypeface(cc);
         //Set Font James Farjardo
         fontPath = "fonts/James_Fajardo.ttf";
-        tf = Typeface.createFromAsset(getAssets(), fontPath);
+        jf = Typeface.createFromAsset(getAssets(), fontPath);
         Button mText = (Button) findViewById(R.id.toggleView);
-        mText.setTypeface(tf);
+        mText.setTypeface(jf);
         mText = (Button) findViewById(R.id.addBehaviour);
-        mText.setTypeface(tf);
+        mText.setTypeface(jf);
         mText = (Button) findViewById(R.id.delBehaviour);
-        mText.setTypeface(tf);
+        mText.setTypeface(jf);
         mText = (Button) findViewById(R.id.updateBehaviour);
-        mText.setTypeface(tf);
+        mText.setTypeface(jf);
         //Run functions for the form
         createQuestions();
         toggleSeverity();
@@ -158,22 +167,90 @@ public class Update extends AppCompatActivity {
 
         for (int k = 1; k <= 20; k++) {
 
+            // Set default fonts
+            String fontPath = "fonts/CatCafe.ttf";
+            cc = Typeface.createFromAsset(getAssets(), fontPath);
+            fontPath = "fonts/James_Fajardo.ttf";
+            jf = Typeface.createFromAsset(getAssets(), fontPath);
+
+            // Create child view to store questions
             LinearLayout childLayout = new LinearLayout(this);
             childLayout.setOrientation(LinearLayout.VERTICAL);
             String layoutID = "question" + String.valueOf(k);
             int qID = getResources().getIdentifier(layoutID, "id", getPackageName());
             childLayout.setId(qID);
 
-            // Create text view
+            // Create Text View
             TextView title = new TextView(this);
             title.setText("Behaviour " + k + ":");
-            String string1 = "bhv" + String.valueOf(k);
-            int tvID = getResources().getIdentifier(string1, "id", getPackageName());
+            String bhv = "bhv" + String.valueOf(k);
+            int tvID = getResources().getIdentifier(bhv, "id", getPackageName());
             title.setId(tvID);
+            title.setTypeface(jf);
+            title.setTextSize(32);
+            title.setTextColor(Color.parseColor("#504530"));
+            title.setPadding(10,0,0,0);
             childLayout.addView(title);
 
+            // Create Spinner
+            Spinner spinner = new Spinner(this, Spinner.MODE_DIALOG);
+            String bhvList = "bhvList" + String.valueOf(k);
+            int spinID = getResources().getIdentifier(bhvList, "id", getPackageName());
+            spinner.setId(spinID);
+            String[] bhvs = (arrayBehaviour); // Load array from arrays.xml
+            ArrayAdapter adapter= new ArrayAdapter(this, android.R.layout.select_dialog_item, bhvs);
+            spinner.setAdapter(adapter); // Set values
+
+            // Display 'Select a shown behaviour' on spinner by default and make sure its unable to be selected
+            final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, bhvs){
+                @Override
+                public boolean isEnabled(int position){
+                    if(position == 0)
+                    {
+                        return false; // Disable the first item from Spinner to be used for hint
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+
+                @Override // Shows the hint as grey when created
+                public View getView(int position, View convertView, ViewGroup parent) {
+                    View view = super.getDropDownView(position, convertView, parent);
+                    TextView tv = (TextView) view;
+                    if(position == 0){
+                        tv.setTextColor(Color.GRAY); // Set the hint text color gray
+                    }
+                    else {
+                        tv.setTextColor(Color.parseColor("#23C8B2")); // Set default font color
+                        tv.setTypeface(cc);
+                        tv.setTextSize(20);
+                    }
+                    return view;
+                }
+
+                @Override //Pop-up shows hint as a title
+                public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                    View view = super.getDropDownView(position, convertView, parent);
+                    TextView tv = (TextView) view;
+                    if(position == 0){
+                        tv.setTextColor(Color.parseColor("#F49E9D")); // Set the hint text color
+                        tv.setTypeface(jf);
+                        tv.setTextSize(32);
+                    }
+                    else {
+                        tv.setTextColor(Color.BLACK);
+                        tv.setTypeface(cc);
+                        tv.setTextSize(16);
+                    }
+                    return view;
+                }
+            };
+            spinner.setAdapter(spinnerArrayAdapter); // Set hint
+            childLayout.addView(spinner);
+
             //Create Radio Group and buttons within child view
-            //RadioButton rb = new RadioButton(this);
             final RadioButton[] rb = new RadioButton[3];
             final RadioGroup rg = new RadioGroup(this);
             rg.setOrientation(RadioGroup.HORIZONTAL);
@@ -183,7 +260,10 @@ public class Update extends AppCompatActivity {
             for (int i = 0; i < 3; i++) {
                 rb[i] = new RadioButton(this);
                 rg.addView(rb[i]);
-                rb[i].setText(arraySeverity[i]);
+                rb[i].setText(arraySeverity[i]); // Add array items into radio buttons
+                rb[i].setTypeface(cc);
+                rb[i].setTextSize(18);
+                rb[i].setTextColor(Color.parseColor("#6B5D40"));
             }
             childLayout.addView(rg);
             mLinearLayout.addView(childLayout);
@@ -291,42 +371,86 @@ public class Update extends AppCompatActivity {
                     RadioGroup rg = (RadioGroup) v.findViewById(rgID);
 
                     if (v.getVisibility() == View.VISIBLE) {
-                        String rb;
+                        // Get selected radio button value
                         int checked = rg.getCheckedRadioButtonId();
-                        int severeVal;
-                        if (checked > 1) {
-                            severeVal = checked - ((i - 1) * 3);
-                        }
-                        else
-                        {
-                            severeVal = checked;
-                        }
+                        RadioButton rb = (RadioButton) findViewById(checked);
 
-                        switch (severeVal) {
-                            case 1:
-                                rb = "Mild";
-                                break;
-                            case 2:
-                                rb = "Moderate";
-                                break;
-                            case 3:
-                                rb = "Severe";
-                                break;
-                            default:
-                                rb = "NULL";
-                                break;
+                        // Get selected spinner item
+                        String bhvList = "bhvList" + String.valueOf(i);
+                        int spinID = getResources().getIdentifier(bhvList, "id", getPackageName());
+                        Spinner spinner = (Spinner) findViewById(spinID);
+                        String bhv = spinner.getSelectedItem().toString();
+
+                        /** Validate information **/
+                        if(spinner.getSelectedItemPosition() == 0) { // If spinner is not selected
+                            missing = "Behaviour " + String.valueOf(i) + " not selected.";
+                            validation = false;
+                            break;
                         }
-                        if (value == "" || value == null) {
-                            value = "Behaviour " + String.valueOf(i) + " : " + "\n Severity: " + rb;
-                        } else {
-                            value = value + "\n\nBehaviour " + String.valueOf(i) + " : " + "\n Severity: " + rb;
+                        else if (rg.getCheckedRadioButtonId() == -1) { // If no radio button is checked
+                            missing = "Severity of behaviour " + String.valueOf(i) + ", \"" + bhv + "\" not selected.";
+                            validation = false;
+                            break;
+                        }
+                        else {
+                            if (value == "" || value == null) {
+                                value = "Behaviour " + String.valueOf(i) + " : " + bhv + "\nSeverity: " + rb.getText();
+                            } else {
+                                value = value + "\n\nBehaviour " + String.valueOf(i) + " : " + bhv + "\nSeverity: " + rb.getText();
+                            }
+                            validation = true;
                         }
                     }
+                    else
+                    {
+                        break;
+                    }
                 }
-                Intent intent = new Intent(Update.this, ReceiveInput.class);
-                intent.putExtra("RESULT", value);
-                startActivity(intent);
+                if (validation == true) {
+                    finish();
+                    Intent intent = new Intent(Update.this, ReceiveInput.class);
+                    intent.putExtra("TITLE", "Update Behaviours");
+                    intent.putExtra("RESULT", value);
+                    startActivity(intent);
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), missing, Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
+
+    @Override
+    public void onBackPressed() {
+        //Prompt user to send video
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Update.this);
+        //Set title
+        alertDialogBuilder.setTitle("Cancel?");
+        //Set dialog message
+        alertDialogBuilder
+                .setMessage("Are you sure you cancel your submission and go back?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // if this button is clicked, close
+                        // current activity
+                        finish();
+                        Intent intent = new Intent(Update.this, Dashboard.class);
+                        startActivity(intent);
+                        dialog.cancel();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // if this button is clicked, just close
+                        // the dialog box and do nothing
+                        dialog.cancel();
+                    }
+                });
+        //Create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        //Show it
+        alertDialog.show();
+    }
+
 }

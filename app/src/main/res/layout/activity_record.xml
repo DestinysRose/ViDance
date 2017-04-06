@@ -58,6 +58,7 @@
                 android:background="@color/navbar"
                 android:gravity="bottom"
                 app:menu="@menu/navigation" />
+
         </LinearLayout>
 
     </LinearLayout>

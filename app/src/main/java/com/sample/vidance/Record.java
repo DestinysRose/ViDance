@@ -93,12 +93,7 @@ public class Record extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int id) {
                                 // if this button is clicked, close
                                 // current activity
-                                Context context = getApplicationContext();
-                                CharSequence text = "Not yet implemented~";
-                                int duration = Toast.LENGTH_SHORT;
-                                Toast toast = Toast.makeText(context, text, duration);
-                                toast.show();
-                                dialog.cancel();
+                                Toast.makeText(getApplicationContext(), "Not yet implemented~", Toast.LENGTH_SHORT).show();
                             }
                         })
                     .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -114,11 +109,7 @@ public class Record extends AppCompatActivity {
             alertDialog.show();
         }
         else {
-            Context context = getApplicationContext();
-            CharSequence text = "Video not yet recorded, click 'Record Video' to record video!";
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
+            Toast.makeText(getApplicationContext(), "Video not yet recorded, click 'Record Video' to record video!", Toast.LENGTH_SHORT).show();
         }
     }
 

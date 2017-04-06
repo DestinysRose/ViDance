@@ -25,6 +25,28 @@
     <item type="id" name="question19" />
     <item type="id" name="question20" />
 
+    <!-- Spinners -->
+    <item type="id" name="bhvList1" />
+    <item type="id" name="bhvList2" />
+    <item type="id" name="bhvList3" />
+    <item type="id" name="bhvList4" />
+    <item type="id" name="bhvList5" />
+    <item type="id" name="bhvList6" />
+    <item type="id" name="bhvList7" />
+    <item type="id" name="bhvList8" />
+    <item type="id" name="bhvList9" />
+    <item type="id" name="bhvList10" />
+    <item type="id" name="bhvList11" />
+    <item type="id" name="bhvList12" />
+    <item type="id" name="bhvList13" />
+    <item type="id" name="bhvList14" />
+    <item type="id" name="bhvList15" />
+    <item type="id" name="bhvList16" />
+    <item type="id" name="bhvList17" />
+    <item type="id" name="bhvList18" />
+    <item type="id" name="bhvList19" />
+    <item type="id" name="bhvList20" />
+
     <!-- Radio Groups -->
     <item type="id" name="radioGroup1" />
     <item type="id" name="radioGroup2" />
@@ -46,5 +68,4 @@
     <item type="id" name="radioGroup18" />
     <item type="id" name="radioGroup19" />
     <item type="id" name="radioGroup20" />
-
 </resources>

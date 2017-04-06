@@ -10,6 +10,7 @@
     <!-- List of Behaviours -->
     <string name="behaviour_prompt">Select an observed behaviour</string>
     <string-array name="behaviour_arrays">
+        <item>SELECT A SHOWN BEHAVIOUR</item>
         <item>Bizarre body postures</item>
         <item>Body hitting (expect for the head) with any body part</item>
         <item>Clapping hands (inappropriately)</item>
