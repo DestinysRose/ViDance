@@ -29,6 +29,7 @@ public class ReceiveInput extends AppCompatActivity {
         String fontPath = "fonts/CatCafe.ttf";
         Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
         title.setTypeface(tf);
+        title.setTextSize(30);
     }
     @Override
     public void onBackPressed() {

@@ -1,6 +1,5 @@
 package com.sample.vidance;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -14,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -22,7 +22,6 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 /**
  * Created by Michelle on 31/3/2017.
@@ -269,7 +268,6 @@ public class Update extends AppCompatActivity {
             mLinearLayout.addView(childLayout);
         }
     }
-
     /** Toggle Severity Information **/
     public void toggleSeverity() {
         toggle = findViewById(R.id.severity_info);
@@ -317,6 +315,8 @@ public class Update extends AppCompatActivity {
                     v = findViewById(resID);
                     if (v.getVisibility() == View.GONE) {
                         v.setVisibility(View.VISIBLE);
+
+
                         break;
                     }
                     else if (i == 20 && v.getVisibility() == View.VISIBLE) { //When maximum questions is reached
@@ -329,6 +329,7 @@ public class Update extends AppCompatActivity {
         });
     }
 
+    /** Deletes Questions on press **/
     public void delQuestions() {
         Button btnClick = (Button) findViewById(R.id.delBehaviour);
         //Hide all questions on default
@@ -392,12 +393,27 @@ public class Update extends AppCompatActivity {
                             validation = false;
                             break;
                         }
-                        else {
-                            if (value == "" || value == null) {
-                                value = "Behaviour " + String.valueOf(i) + " : " + bhv + "\nSeverity: " + rb.getText();
-                            } else {
-                                value = value + "\n\nBehaviour " + String.valueOf(i) + " : " + bhv + "\nSeverity: " + rb.getText();
+                        else if (spinner.getSelectedItemPosition() > 0 && i > 1) { // Check if duplicate is selected
+
+                            for (int x = 1; x <= i; x++) {
+                                String bhvList2 = "bhvList" + String.valueOf(x);
+                                int spinID2 = getResources().getIdentifier(bhvList2, "id", getPackageName());
+                                Spinner spinner2 = (Spinner) findViewById(spinID2);
+                                if (x == i) {
+                                    value = value + "\n\nBehaviour " + String.valueOf(i) + " : " + bhv + "\nSeverity: " + rb.getText();
+                                    validation = true;
+                                    break;
+                                }
+                                else if (spinner.getSelectedItem() == spinner2.getSelectedItem())
+                                {
+                                    missing = "Behaviour " + String.valueOf(x) + " and Behaviour " + String.valueOf(i) + " are the same.";
+                                    validation = false;
+                                    break;
+                                }
                             }
+                        }
+                        else {
+                            value = "Behaviour " + String.valueOf(i) + " : " + bhv + "\nSeverity: " + rb.getText();
                             validation = true;
                         }
                     }
@@ -452,5 +468,4 @@ public class Update extends AppCompatActivity {
         //Show it
         alertDialog.show();
     }
-
 }
