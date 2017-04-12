@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 /**
@@ -28,10 +29,12 @@ public class Features extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.navigation_dashboard:
                     finish();
+                    Intent intent = new Intent(Features.this, Dashboard.class); //Return to Dashboard
+                    startActivity(intent);
                     return true;
                 case R.id.navigation_record:
                     finish();
-                    Intent intent = new Intent(Features.this, Record.class); //Record Session page
+                    intent = new Intent(Features.this, Record.class); //Record Session page
                     startActivity(intent);
                     return true;
                 case R.id.navigation_input:
@@ -121,5 +124,12 @@ public class Features extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+        Intent intent = new Intent(Features.this, Dashboard.class); // Return to Dashboard
+        startActivity(intent);
     }
 }

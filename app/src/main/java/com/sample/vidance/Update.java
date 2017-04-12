@@ -1,5 +1,7 @@
 package com.sample.vidance;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -13,32 +15,34 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by Michelle on 31/3/2017.
  */
 
-public class Update extends AppCompatActivity {
-    private TextView mTextMessage;
-    private TextView tv;
-    private View toggle;
-    private View toggle2;
-    private String value;
-    private String arraySeverity[];
-    private String arrayBehaviour[];
-    private String missing;
+public class Update extends AppCompatActivity implements View.OnClickListener {
+    private TextView mTextMessage,  tv;
+    private View toggle,  toggle2;
+    private String value, missing;
+    private String arraySeverity[], arrayBehaviour[];
+    Button btnDatePicker, btnTimePicker;
     private Boolean validation;
-    private Typeface jf;
-    private Typeface cc;
+    private Typeface jf, cc;
+    private int mYear, mMonth, mDay, mHour, mMinute;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,6 +70,20 @@ public class Update extends AppCompatActivity {
         mText.setTypeface(jf);
         mText = (Button) findViewById(R.id.updateBehaviour);
         mText.setTypeface(jf);
+        //Initialise date and time
+        Button btnDate = (Button) findViewById(R.id.setDate);
+        SimpleDateFormat date = new SimpleDateFormat("dd/MM/yyyy");
+        btnDate.setText(date.format(new Date()));
+        Button btnTime = (Button) findViewById(R.id.setTime);
+        SimpleDateFormat time = new SimpleDateFormat("hh:mm a");
+        btnTime.setText(time.format(new Date()));
+        //Set onClickListeners for date and time
+        //setTime();
+        btnDatePicker=(Button)findViewById(R.id.setDate);
+        btnTimePicker=(Button)findViewById(R.id.setTime);
+
+        btnDatePicker.setOnClickListener(this);
+        btnTimePicker.setOnClickListener(this);
         //Run functions for the form
         createQuestions();
         toggleSeverity();
@@ -83,6 +101,8 @@ public class Update extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.navigation_dashboard:
                     finish();
+                    intent = new Intent(Update.this, Dashboard.class); //Record Session page
+                    startActivity(intent);
                     return true;
                 case R.id.navigation_record:
                     finish();
@@ -339,6 +359,17 @@ public class Update extends AppCompatActivity {
                     String string1 = "question" + String.valueOf(i);
                     int resID = getResources().getIdentifier(string1, "id", getPackageName());
                     v = findViewById(resID);
+
+                    String string2 = "bhvList" + String.valueOf(i); //  Initialise spinner
+                    int spinID = getResources().getIdentifier(string2, "id", getPackageName());
+                    Spinner spinner = (Spinner) findViewById(spinID);
+                    spinner.setSelection(0);
+
+                    String string3 = "radioGroup" + String.valueOf(i);
+                    int rgID = getResources().getIdentifier(string3, "id", getPackageName());
+                    RadioGroup rg = (RadioGroup) findViewById(rgID);
+                    rg.clearCheck(); // Uncheck all radio buttons in the group
+
                     if (i == 20 && v.getVisibility() == View.VISIBLE)
                     {
                         //In-case max was reached then deleted
@@ -355,8 +386,8 @@ public class Update extends AppCompatActivity {
         });
     }
 
+    /** Sends values to confirmation page **/
     public void updateBehaviour() {
-
         Button btnClick = (Button) findViewById(R.id.updateBehaviour);
         //Hide all questions on default
 
@@ -413,7 +444,7 @@ public class Update extends AppCompatActivity {
                             }
                         }
                         else {
-                            value = "Behaviour " + String.valueOf(i) + " : " + bhv + "\nSeverity: " + rb.getText();
+                            value = "Date: " + btnDatePicker.getText() + "Time: " + btnTimePicker.getText() + "\n\nBehaviour " + String.valueOf(i) + " : " + bhv + "\nSeverity: " + rb.getText();
                             validation = true;
                         }
                     }
@@ -435,6 +466,46 @@ public class Update extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    public void onClick(View v) {
+        if (v == btnDatePicker) {
+            // Get Current Date
+            final Calendar c = Calendar.getInstance();
+            mYear = c.get(Calendar.YEAR);
+            mMonth = c.get(Calendar.MONTH);
+            mDay = c.get(Calendar.DAY_OF_MONTH);
+
+            DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+                    new DatePickerDialog.OnDateSetListener() {
+
+                        @Override
+                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                            btnDatePicker.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
+                        }
+                    }, mYear, mMonth, mDay);
+            datePickerDialog.show();
+        }
+        if (v == btnTimePicker) {
+            // Get Current Time
+            final Calendar c = Calendar.getInstance();
+            mHour = c.get(Calendar.HOUR_OF_DAY);
+            mMinute = c.get(Calendar.MINUTE);
+
+            // Launch Time Picker Dialog
+            TimePickerDialog timePickerDialog = new TimePickerDialog(this,
+                    new TimePickerDialog.OnTimeSetListener() {
+
+                        @Override //Set in 12Hour Format and include AM/PM
+                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                            int hour = hourOfDay % 12;
+                            btnTimePicker.setText(String.format("%02d:%02d %s", hour == 0 ? 12 : hour, minute, hourOfDay < 12 ? "am" : "pm"));
+                        }
+                    }, mHour, mMinute, false);
+            timePickerDialog.show();
+        }
+    }
+
 
     @Override
     public void onBackPressed() {

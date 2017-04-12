@@ -42,6 +42,7 @@ public class Dashboard extends AppCompatActivity {
         ImageButton imgBtn = (ImageButton) findViewById(R.id.btnNotifications);
         imgBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                finish();
                 Intent intent = new Intent(Dashboard.this, Features.class);
                 intent.putExtra("SELECTED_ITEM", 0);
                 intent.putExtra("SELECTED_ACTIVITY", "Notifications");
@@ -53,7 +54,8 @@ public class Dashboard extends AppCompatActivity {
         ImageButton imgBtn2 = (ImageButton) findViewById(R.id.btnGallery);
         imgBtn2.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(Dashboard.this, Features.class);
+                finish();
+                Intent intent = new Intent(Dashboard.this, Gallery.class);
                 intent.putExtra("SELECTED_ITEM", 0);
                 intent.putExtra("SELECTED_ACTIVITY", "Gallery");
                 startActivity(intent);
@@ -63,6 +65,7 @@ public class Dashboard extends AppCompatActivity {
         ImageButton imgBtn3 = (ImageButton) findViewById(R.id.btnRecord);
         imgBtn3.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                finish();
                 Intent intent = new Intent(Dashboard.this, Record.class);
                 startActivity(intent);
             }
@@ -71,6 +74,7 @@ public class Dashboard extends AppCompatActivity {
         ImageButton imgBtn4 = (ImageButton) findViewById(R.id.btnInput);
         imgBtn4.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                finish();
                 Intent intent = new Intent(Dashboard.this, Update.class);
                 startActivity(intent);
             }
@@ -79,6 +83,7 @@ public class Dashboard extends AppCompatActivity {
         ImageButton imgBtn5 = (ImageButton) findViewById(R.id.btnTarget);
         imgBtn5.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                finish();
                 Intent intent = new Intent(Dashboard.this, Features.class);
                 intent.putExtra("SELECTED_ITEM", 3);
                 intent.putExtra("SELECTED_ACTIVITY", "Target Behaviours");
@@ -90,6 +95,7 @@ public class Dashboard extends AppCompatActivity {
         ImageButton imgBtn6 = (ImageButton) findViewById(R.id.btnReport);
         imgBtn6.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                finish();
                 Intent intent = new Intent(Dashboard.this, Features.class);
                 intent.putExtra("SELECTED_ITEM", 4);
                 intent.putExtra("SELECTED_ACTIVITY", "Generate Reports");
@@ -101,6 +107,7 @@ public class Dashboard extends AppCompatActivity {
         ImageButton imgBtn7 = (ImageButton) findViewById(R.id.btnSetting);
         imgBtn7.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                finish();
                 Intent intent = new Intent(Dashboard.this, Features.class);
                 intent.putExtra("SELECTED_ACTIVITY", "Settings");
                 startActivity(intent);
@@ -121,26 +128,31 @@ public class Dashboard extends AppCompatActivity {
         Intent intent = new Intent(Dashboard.this, Features.class);
         switch(item.getItemId()) {
             case R.id.action_notifications:
+                finish();
                 intent.putExtra("SELECTED_ITEM", 0);
                 intent.putExtra("SELECTED_ACTIVITY", "Notifications");
                 startActivity(intent);
                 break;
             case R.id.action_settings:
+                finish();
                 intent.putExtra("SELECTED_ITEM", 0);
                 intent.putExtra("SELECTED_ACTIVITY", "Settings");
                 startActivity(intent);
                 break;
             case R.id.action_contact:
+                finish();
                 intent.putExtra("SELECTED_ITEM", 0);
                 intent.putExtra("SELECTED_ACTIVITY", "Contact");
                 startActivity(intent);
                 break;
             case R.id.action_about:
+                finish();
                 intent.putExtra("SELECTED_ITEM", 0);
                 intent.putExtra("SELECTED_ACTIVITY", "About");
                 startActivity(intent);
                 break;
             case R.id.action_help:
+                finish();
                 intent.putExtra("SELECTED_ITEM", 0);
                 intent.putExtra("SELECTED_ACTIVITY", "Help");
                 startActivity(intent);

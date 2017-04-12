@@ -1,12 +1,11 @@
 package com.sample.vidance;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AlertDialog;
@@ -17,6 +16,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by Michelle on 3/4/2017.
  */
@@ -25,9 +28,9 @@ import android.widget.Toast;
 public class Record extends AppCompatActivity {
 
     private Button btnRecord, btnSend;
-   // private VideoView vidView;
     private int ACTIVITY_START_CAMERA_APP = 0; //Initialise camera
     private Uri videoUri = null;
+    String CAPTURE_TITLE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,14 +50,29 @@ public class Record extends AppCompatActivity {
         btnRecord.setTypeface(tf);
         btnSend.setTypeface(tf);
 
-        //vidView = (VideoView) findViewById(R.id.videoView);
-        //vidView.setVisibility(View.GONE);
+        File dir = new File (Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES) + File.separator + "ViDance");
+        boolean success = true;
+        if (!dir.exists()) {
+            success = dir.mkdir();
+        }
+        if (success) {
+            // Folder exists
+        } else {
+            Toast.makeText(getApplicationContext(), "Unable to create folder for saving!", Toast.LENGTH_SHORT).show();
+        }
 
         btnRecord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent callVideoIntent = new Intent();
-                callVideoIntent.setAction(MediaStore.ACTION_VIDEO_CAPTURE);
+                // Set video name as date & time
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
+                CAPTURE_TITLE = sdf.format(new Date()) + ".mp4";
+
+
+                File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES) + File.separator + "ViDance", CAPTURE_TITLE);
+                Uri outputFileUri = Uri.fromFile(file);
+                Intent callVideoIntent = new Intent(android.provider.MediaStore.ACTION_VIDEO_CAPTURE);
+                callVideoIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, outputFileUri);
                 startActivityForResult(callVideoIntent, ACTIVITY_START_CAMERA_APP);
 
             }
@@ -63,25 +81,46 @@ public class Record extends AppCompatActivity {
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
+                if (videoUri != null) {
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Record.this);
+                    // set title
+                    alertDialogBuilder.setTitle("Upload video");
+                    // set dialog message
+                    alertDialogBuilder
+                            .setMessage("Are you sure you want to send the previously recorded video to the instructor for viewing?")
+                            .setCancelable(false)
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    // Send to database
+                                    Toast.makeText(getApplicationContext(), "Not yet implemented~", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    // Do Nothing
+                                    dialog.cancel();
+                                }
+                            });
+                    // create alert dialog
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    // show it
+                    alertDialog.show();
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), "Video not yet recorded, click 'Record Video' to record video!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
-
     }
 
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ACTIVITY_START_CAMERA_APP && resultCode == RESULT_OK) {
-            // vidView.setVisibility(View.VISIBLE); //Show videoView
             videoUri = data.getData();
-            // vidView.setVideoURI(videoUri); //Set video into videoView
-            Context context = getApplicationContext();
-            CharSequence text = "Video saved in: " + videoUri;
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-            //Pompt user to send video
+            sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, videoUri)); // Update to show video in gallery.
+
+            Toast.makeText(getApplicationContext(), "Video successfully saved!" , Toast.LENGTH_SHORT).show();
+            //Prompt user to send video
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Record.this);
             //Set title
             alertDialogBuilder.setTitle("Upload video");
@@ -91,15 +130,13 @@ public class Record extends AppCompatActivity {
                     .setCancelable(false)
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                // if this button is clicked, close
-                                // current activity
+                                // Send to database
                                 Toast.makeText(getApplicationContext(), "Not yet implemented~", Toast.LENGTH_SHORT).show();
                             }
                         })
                     .setNegativeButton("No", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                // if this button is clicked, just close
-                                // the dialog box and do nothing
+                                // Do Nothing
                                 dialog.cancel();
                             }
                         });
@@ -164,6 +201,8 @@ public class Record extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.navigation_dashboard:
                     finish();
+                    intent = new Intent(Record.this, Dashboard.class); //Record Session page
+                    startActivity(intent);
                     return true;
                 case R.id.navigation_record:
                     //Do Nothing
@@ -194,5 +233,10 @@ public class Record extends AppCompatActivity {
             return false;
         }
     };
-
+    @Override
+    public void onBackPressed() {
+        finish();
+        Intent intent = new Intent(Record.this, Dashboard.class); // Return to Dashboard
+        startActivity(intent);
+    }
 }

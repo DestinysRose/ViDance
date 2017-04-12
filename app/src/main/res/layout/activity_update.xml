@@ -28,13 +28,40 @@
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:text="@string/title_input"
                 android:textSize="30sp" />
-
             <TextView
                 android:id="@+id/instructions"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/input_instructions"
+
                 android:paddingLeft="10dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/setDate"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_rounded"
+                    android:text="@string/placeholder"
+                    android:textColor="@color/text"
+                    android:layout_weight="1"
+                    android:layout_margin="10dp"/>
+                <Button
+                    android:id="@+id/setTime"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_rounded"
+                    android:text="@string/placeholder"
+                    android:textColor="@color/text"
+                    android:layout_weight="1"
+                    android:layout_margin="10dp"/>
+
+            </LinearLayout>
+
 
             <Button
                 android:id="@+id/toggleView"
@@ -57,7 +84,7 @@
 
                     <include
                         android:id="@+id/severity_info"
-                        layout="@layout/resource_severityinfo" />
+                        layout="@layout/resource_severityinfo"/>
 
                     <LinearLayout
                         android:id="@+id/questions"
