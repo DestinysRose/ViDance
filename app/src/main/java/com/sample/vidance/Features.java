@@ -12,6 +12,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import com.sample.vidance.helper.SQLiteHandler;
+import com.sample.vidance.helper.SessionManager;
+
 /**
  * Created by Michelle on 22/3/2017.
  */
@@ -20,6 +23,8 @@ public class Features extends AppCompatActivity {
 
     private TextView mTextMessage;
     private ViewFlipper vf;
+    private SQLiteHandler db;
+    private SessionManager session;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -124,6 +129,23 @@ public class Features extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    private void logoutUser() {
+        // SqLite database handler
+        db = new SQLiteHandler(getApplicationContext());
+
+        // session manager
+        session = new SessionManager(getApplicationContext());
+
+        session.setLogin(false);
+
+        db.deleteUsers();
+
+        // Launching the login activity
+        Intent intent = new Intent(Features.this, Login.class);
+        startActivity(intent);
+        finish();
     }
 
     @Override

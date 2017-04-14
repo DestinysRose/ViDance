@@ -8,7 +8,6 @@
     </string-array>
 
     <!-- List of Behaviours -->
-    <string name="behaviour_prompt">Select an observed behaviour</string>
     <string-array name="behaviour_arrays">
         <item>SELECT A SHOWN BEHAVIOUR</item>
         <item>Bizarre body postures</item>
@@ -31,5 +30,18 @@
         <item>Teeth grinding (while awake)</item>
         <item>Waving or shaking arms</item>
         <item>Yelling and screaming</item>
+    </string-array>
+
+    <!-- List of Durations -->
+    <string-array name="duration_arrays">
+        <item>DURATION</item>
+        <item>1 hour</item>
+        <item>2 hours</item>
+        <item>3 hours</item>
+        <item>4 hours</item>
+        <item>5 hours</item>
+        <item>6 hours</item>
+        <item>Half a day (12 hours)</item>
+        <item>1 Day (24 Hours)</item>
     </string-array>
 </resources>

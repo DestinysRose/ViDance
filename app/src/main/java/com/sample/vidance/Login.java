@@ -1,17 +1,16 @@
 package com.sample.vidance;
 
 
+import android.graphics.Typeface;
+import android.support.v7.app.AppCompatActivity;
+import android.widget.TextView;
 import android.app.ProgressDialog;
 import android.content.Intent;
-
-import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request.Method;
@@ -20,8 +19,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.sample.vidance.app.AppConfig;
 import com.sample.vidance.app.AppController;
-import com.sample.vidance.helper.SessionManager;
 import com.sample.vidance.helper.SQLiteHandler;
+import com.sample.vidance.helper.SessionManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -105,18 +104,18 @@ public class Login extends AppCompatActivity {
         btnLinkToRegister.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View view) {
-                finish();
                 Intent i = new Intent(getApplicationContext(), Register.class);
                 startActivity(i);
+                finish();
             }
         });
 
         btnButtonToSkip.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View view) {
-                finish();
                 Intent i = new Intent(getApplicationContext(), Dashboard.class);
                 startActivity(i);
+                finish();
             }
         });
 
@@ -136,7 +135,7 @@ public class Login extends AppCompatActivity {
 
             @Override
             public void onResponse(String response) {
-                Log.d(TAG, "Login Response: " + response.toString());
+                Log.d(TAG, "Login Response: " + response);
                 hideDialog();
 
                 try {

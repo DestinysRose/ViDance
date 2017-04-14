@@ -12,6 +12,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sample.vidance.helper.SQLiteHandler;
+import com.sample.vidance.helper.SessionManager;
+
 /**
  * Created by Michelle on 22/3/2017.
  */
@@ -19,6 +22,8 @@ import android.widget.Toast;
 public class Dashboard extends AppCompatActivity {
     private static final int TIME_LIMIT = 1500;
     private static long backPressed;
+    private SQLiteHandler db;
+    private SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +120,23 @@ public class Dashboard extends AppCompatActivity {
         });
     }
 
+    private void logoutUser() {
+        // SqLite database handler
+        db = new SQLiteHandler(getApplicationContext());
+
+        // session manager
+        session = new SessionManager(getApplicationContext());
+
+        session.setLogin(false);
+
+        db.deleteUsers();
+
+        // Launching the login activity
+        Intent intent = new Intent(Dashboard.this, Login.class);
+        startActivity(intent);
+        finish();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -156,6 +178,9 @@ public class Dashboard extends AppCompatActivity {
                 intent.putExtra("SELECTED_ITEM", 0);
                 intent.putExtra("SELECTED_ACTIVITY", "Help");
                 startActivity(intent);
+                break;
+            case R.id.action_logout:
+                logoutUser();
                 break;
             default:
                 return super.onOptionsItemSelected(item);

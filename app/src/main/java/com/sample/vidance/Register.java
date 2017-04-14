@@ -1,23 +1,21 @@
 package com.sample.vidance;
 
-import android.app.Activity;
+
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request.Method;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.sample.vidance.R;
 import com.sample.vidance.app.AppConfig;
 import com.sample.vidance.app.AppController;
 import com.sample.vidance.helper.SQLiteHandler;
@@ -33,7 +31,7 @@ import java.util.Map;
  * Created by Danil on 27.03.2017.
  */
 
-public class Register extends Activity {
+public class Register extends AppCompatActivity {
     private static final String TAG = Register.class.getSimpleName();
     private Button btnRegister;
     private Button btnLinkToLogin;
@@ -55,18 +53,6 @@ public class Register extends Activity {
         btnRegister = (Button) findViewById(R.id.btnRegister);
         btnLinkToLogin = (Button) findViewById(R.id.btnLinkToLoginScreen);
 
-        // Recreate logo in ImageView to remove visual bugs
-        ImageView imageView = (ImageView) findViewById(R.id.title2);
-        imageView.setImageResource(0);
-        Drawable draw = getResources().getDrawable(R.drawable.ic_vidance);
-        imageView.setImageDrawable(draw);
-
-        // Change font for title
-        String fontPath = "fonts/CatCafe.ttf";
-        TextView txtCat = (TextView) findViewById(R.id.catcafe);
-        Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
-        txtCat.setTypeface(tf);
-
         // Progress dialog
         pDialog = new ProgressDialog(this);
         pDialog.setCancelable(false);
@@ -80,9 +66,9 @@ public class Register extends Activity {
         // Check if user is already logged in or not
         if (session.isLoggedIn()) {
             // User is already logged in. Take him to main activity
-            finish();
-            Intent intent = new Intent(Register.this, Dashboard.class);
+            Intent intent = new Intent(Register.this, com.sample.vidance.Dashboard.class);
             startActivity(intent);
+            finish();
         }
 
         // Register Button Click event
@@ -95,7 +81,9 @@ public class Register extends Activity {
                 if (!name.isEmpty() && !cname.isEmpty() && !password.isEmpty()) {
                     registerUser(name, cname, password);
                 } else {
-                    Toast.makeText(getApplicationContext(), "Please enter your details!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(),
+                            "Please enter your details!", Toast.LENGTH_LONG)
+                            .show();
                 }
             }
         });
@@ -104,9 +92,9 @@ public class Register extends Activity {
         btnLinkToLogin.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View view) {
-                finish();
                 Intent i = new Intent(getApplicationContext(), Login.class);
                 startActivity(i);
+                finish();
             }
         });
 
@@ -116,7 +104,8 @@ public class Register extends Activity {
      * Function to store user in MySQL database will post params(tag, name,
      * email, password) to register url
      * */
-    private void registerUser(final String name, final String cname, final String password) {
+    private void registerUser(final String name, final String cname,
+                              final String password) {
         // Tag used to cancel the request
         String tag_string_req = "req_register";
 
@@ -150,15 +139,16 @@ public class Register extends Activity {
                         Toast.makeText(getApplicationContext(), "User successfully registered. Try login now!", Toast.LENGTH_LONG).show();
 
                         // Launch login activity
-                        finish();
                         Intent intent = new Intent(Register.this, Login.class);
                         startActivity(intent);
+                        finish();
                     } else {
 
                         // Error occurred in registration. Get the error
                         // message
                         String errorMsg = jObj.getString("error_msg");
-                        Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),
+                                errorMsg, Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -170,7 +160,8 @@ public class Register extends Activity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(TAG, "Registration Error: " + error.getMessage());
-                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),
+                        error.getMessage(), Toast.LENGTH_LONG).show();
                 hideDialog();
             }
         }) {
@@ -187,7 +178,6 @@ public class Register extends Activity {
             }
 
         };
-
         // Adding request to request queue
         AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
     }

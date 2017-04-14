@@ -26,6 +26,9 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.sample.vidance.helper.SQLiteHandler;
+import com.sample.vidance.helper.SessionManager;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -38,11 +41,13 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
     private TextView mTextMessage,  tv;
     private View toggle,  toggle2;
     private String value, missing;
-    private String arraySeverity[], arrayBehaviour[];
+    private String arraySeverity[], arrayBehaviour[], arrayDuration[];
     Button btnDatePicker, btnTimePicker;
     private Boolean validation;
     private Typeface jf, cc;
     private int mYear, mMonth, mDay, mHour, mMinute;
+    private SQLiteHandler db;
+    private SessionManager session;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -78,9 +83,8 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
         SimpleDateFormat time = new SimpleDateFormat("hh:mm a");
         btnTime.setText(time.format(new Date()));
         //Set onClickListeners for date and time
-        //setTime();
-        btnDatePicker=(Button)findViewById(R.id.setDate);
-        btnTimePicker=(Button)findViewById(R.id.setTime);
+        btnDatePicker = (Button)findViewById(R.id.setDate);
+        btnTimePicker = (Button)findViewById(R.id.setTime);
 
         btnDatePicker.setOnClickListener(this);
         btnTimePicker.setOnClickListener(this);
@@ -90,6 +94,59 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
         addQuestions();
         delQuestions();
         updateBehaviour();
+
+        // Set spinner items for Duration
+        arrayDuration = getResources().getStringArray(R.array.duration_arrays);
+        Spinner duration = (Spinner) findViewById(R.id.duration);
+        String[] dur = (arrayDuration); // Load array from arrays.xml
+        ArrayAdapter adapter= new ArrayAdapter(this, android.R.layout.select_dialog_item, dur);
+        duration.setAdapter(adapter); // Set values
+
+        // Display hint on spinner by default and make sure its unable to be selected
+        final ArrayAdapter<String> durArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, dur){
+            @Override
+            public boolean isEnabled(int position){
+                if(position == 0)
+                {
+                    return false; // Disable the first item from Spinner to be used for hint
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            @Override // Shows the hint as grey when created
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView tv = (TextView) view;
+                if(position == 0){
+                    tv.setTextColor(Color.GRAY); // Set the hint text color gray
+                }
+                else {
+                    tv.setTextColor(Color.parseColor("#6B5D40")); // Set default font color
+                    tv.setTypeface(null);
+                }
+                return view;
+            }
+
+            @Override //Pop-up shows hint as a title
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView tv = (TextView) view;
+                if(position == 0){
+                    tv.setTextColor(Color.parseColor("#F49E9D")); // Set the hint text color
+                    tv.setTypeface(jf);
+                    tv.setTextSize(32);
+                }
+                else {
+                    tv.setTextColor(Color.BLACK);
+                    tv.setTypeface(cc);
+                    tv.setTextSize(16);
+                }
+                return view;
+            }
+        };
+        duration.setAdapter(durArrayAdapter); // Set hint
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -180,9 +237,7 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
         arraySeverity = getResources().getStringArray(R.array.severity_arrays);
         arrayBehaviour = getResources().getStringArray(R.array.behaviour_arrays);
 
-
         LinearLayout mLinearLayout = (LinearLayout) findViewById(R.id.questions);
-
 
         for (int k = 1; k <= 20; k++) {
 
@@ -401,6 +456,9 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                     String string2 = "radioGroup" + String.valueOf(i);
                     int rgID = getResources().getIdentifier(string2, "id", getPackageName());
                     RadioGroup rg = (RadioGroup) v.findViewById(rgID);
+                    // Get selected spinner item
+                    Spinner duration = (Spinner) findViewById(R.id.duration);
+                    String dur = duration.getSelectedItem().toString();
 
                     if (v.getVisibility() == View.VISIBLE) {
                         // Get selected radio button value
@@ -424,8 +482,12 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                             validation = false;
                             break;
                         }
+                        else if (duration.getSelectedItemPosition() == 0) { // If no radio button is checked
+                            missing = "Duration not selected, if unsure please select \'1 Day (24 Hours)\'";
+                            validation = false;
+                            break;
+                        }
                         else if (spinner.getSelectedItemPosition() > 0 && i > 1) { // Check if duplicate is selected
-
                             for (int x = 1; x <= i; x++) {
                                 String bhvList2 = "bhvList" + String.valueOf(x);
                                 int spinID2 = getResources().getIdentifier(bhvList2, "id", getPackageName());
@@ -442,9 +504,12 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                                     break;
                                 }
                             }
+                            if (validation == false) {
+                                break;
+                            }
                         }
                         else {
-                            value = "Date: " + btnDatePicker.getText() + "Time: " + btnTimePicker.getText() + "\n\nBehaviour " + String.valueOf(i) + " : " + bhv + "\nSeverity: " + rb.getText();
+                            value = "Date: " + btnDatePicker.getText() + " Time: " + btnTimePicker.getText() + " Duration: " + dur + "\n\nBehaviour " + String.valueOf(i) + " : " + bhv + "\nSeverity: " + rb.getText();
                             validation = true;
                         }
                     }
@@ -504,6 +569,23 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                     }, mHour, mMinute, false);
             timePickerDialog.show();
         }
+    }
+
+    private void logoutUser() {
+        // SqLite database handler
+        db = new SQLiteHandler(getApplicationContext());
+
+        // session manager
+        session = new SessionManager(getApplicationContext());
+
+        session.setLogin(false);
+
+        db.deleteUsers();
+
+        // Launching the login activity
+        Intent intent = new Intent(Update.this, Login.class);
+        startActivity(intent);
+        finish();
     }
 
 

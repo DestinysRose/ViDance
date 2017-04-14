@@ -22,6 +22,9 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.VideoView;
 
+import com.sample.vidance.helper.SQLiteHandler;
+import com.sample.vidance.helper.SessionManager;
+
 import java.io.File;
 
 
@@ -43,7 +46,8 @@ public class Gallery extends AppCompatActivity {
     String filename;
     String fullView;
     int flag = 0;
-
+    private SQLiteHandler db;
+    private SessionManager session;
 
     protected Context _context;
     @Override

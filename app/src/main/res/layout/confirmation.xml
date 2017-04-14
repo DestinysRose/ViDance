@@ -44,27 +44,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="bottom"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_margin="5dp">
 
                 <Button
-                    android:id="@+id/button"
+                    android:id="@+id/btnSend"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/submit"
                     android:textColor="@color/white"
                     android:background="@drawable/button_dashed_border"
-                    android:layout_margin="5dp"/>
+                    android:layout_marginRight="5dp"/>
 
                 <Button
-                    android:id="@+id/button2"
+                    android:id="@+id/btnCancel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/cancel"
                     android:textColor="@color/white"
                     android:background="@drawable/button_dashed_border_red"
-                    android:layout_margin="5dp" />
+                    android:layout_marginLeft="5dp" />
         </LinearLayout>
 
     </LinearLayout>
