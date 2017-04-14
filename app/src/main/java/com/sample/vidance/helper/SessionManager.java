@@ -1,5 +1,6 @@
 package com.sample.vidance.helper;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -9,7 +10,7 @@ import android.util.Log;
  * Created by Danil on 27.03.2017.
  */
 
-public class SessionManager {
+public class SessionManager extends Application {
     // LogCat tag
     private static String TAG = SessionManager.class.getSimpleName();
 

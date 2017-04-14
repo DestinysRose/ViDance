@@ -6,7 +6,7 @@ package com.sample.vidance.app;
 
 public class AppConfig {
     // Server user login url
-    public static String URL_LOGIN = "http://thevidance.com/alogin.php";
+    public static String URL_LOGIN = "http://thevidance.com/login.php";
 
     // Server user register url
     public static String URL_REGISTER = "http://thevidance.com/register.php";
