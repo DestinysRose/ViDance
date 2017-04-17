@@ -1,6 +1,7 @@
 package com.sample.vidance;
 
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,12 +27,24 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.sample.vidance.helper.BehaviourHandler;
 import com.sample.vidance.helper.SQLiteHandler;
 import com.sample.vidance.helper.SessionManager;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Created by Michelle on 31/3/2017.
@@ -43,11 +56,12 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
     private String value, missing;
     private String arraySeverity[], arrayBehaviour[], arrayDuration[];
     Button btnDatePicker, btnTimePicker;
-    private Boolean validation;
+    private Boolean validation, timeChange;
     private Typeface jf, cc;
-    private int mYear, mMonth, mDay, mHour, mMinute;
+    private int mYear, mMonth, mDay, mHour, mMinute, durMinute, durHour;
     private SQLiteHandler db;
     private SessionManager session;
+    private ProgressDialog pDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -85,9 +99,13 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
         //Set onClickListeners for date and time
         btnDatePicker = (Button)findViewById(R.id.setDate);
         btnTimePicker = (Button)findViewById(R.id.setTime);
-
         btnDatePicker.setOnClickListener(this);
         btnTimePicker.setOnClickListener(this);
+        // Progress dialog
+        pDialog = new ProgressDialog(this);
+        pDialog.setCancelable(false);
+        // SQLite database handler
+        db = new SQLiteHandler(getApplicationContext());
         //Run functions for the form
         createQuestions();
         toggleSeverity();
@@ -149,88 +167,6 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
         duration.setAdapter(durArrayAdapter); // Set hint
     }
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            Intent intent = new Intent(Update.this, Features.class);
-            switch (item.getItemId()) {
-                case R.id.navigation_dashboard:
-                    finish();
-                    intent = new Intent(Update.this, Dashboard.class); //Record Session page
-                    startActivity(intent);
-                    return true;
-                case R.id.navigation_record:
-                    finish();
-                    intent = new Intent(Update.this, Record.class);
-                    intent.putExtra("SELECTED_ITEM", 0);
-                    intent.putExtra("SELECTED_ACTIVITY", "Notifications");
-                    startActivity(intent);
-                    return true;
-                case R.id.navigation_input:
-                    //Do Nothing
-                    return true;
-                case R.id.navigation_target:
-                    finish();
-                    intent.putExtra("SELECTED_ITEM", 3);
-                    intent.putExtra("SELECTED_ACTIVITY", "Target Behaviours");
-                    intent.putExtra("SELECTED_CONTENT", 1);
-                    startActivity(intent);
-                    return true;
-                case R.id.navigation_report:
-                    finish();
-                    intent.putExtra("SELECTED_ITEM", 4);
-                    intent.putExtra("SELECTED_ACTIVITY", "Generate Reports");
-                    intent.putExtra("SELECTED_CONTENT", 2);
-                    startActivity(intent);
-                    return true;
-            }
-            return false;
-        }
-    };
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_dashboard, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent = new Intent(Update.this, Features.class);
-        switch (item.getItemId()) {
-            case R.id.action_notifications:
-                intent.putExtra("SELECTED_ITEM", 0);
-                intent.putExtra("SELECTED_ACTIVITY", "Notifications");
-                startActivity(intent);
-                break;
-            case R.id.action_settings:
-                intent.putExtra("SELECTED_ITEM", 0);
-                intent.putExtra("SELECTED_ACTIVITY", "Settings");
-                startActivity(intent);
-                break;
-            case R.id.action_contact:
-                intent.putExtra("SELECTED_ITEM", 0);
-                intent.putExtra("SELECTED_ACTIVITY", "Contact");
-                startActivity(intent);
-                break;
-            case R.id.action_about:
-                intent.putExtra("SELECTED_ITEM", 0);
-                intent.putExtra("SELECTED_ACTIVITY", "About");
-                startActivity(intent);
-                break;
-            case R.id.action_help:
-                intent.putExtra("SELECTED_ITEM", 0);
-                intent.putExtra("SELECTED_ACTIVITY", "Help");
-                startActivity(intent);
-                break;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-        return true;
-    }
 
     /** Dynamically create questions **/
     public void createQuestions() {
@@ -483,7 +419,7 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                             break;
                         }
                         else if (duration.getSelectedItemPosition() == 0) { // If no radio button is checked
-                            missing = "Duration not selected, if unsure please select \'1 Day (24 Hours)\'";
+                            missing = "Duration not selected.'";
                             validation = false;
                             break;
                         }
@@ -503,13 +439,34 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                                     validation = false;
                                     break;
                                 }
+
                             }
-                            if (validation == false) {
+                            if (!validation) {
                                 break;
                             }
                         }
                         else {
-                            value = "Date: " + btnDatePicker.getText() + " Time: " + btnTimePicker.getText() + " Duration: " + dur + "\n\nBehaviour " + String.valueOf(i) + " : " + bhv + "\nSeverity: " + rb.getText();
+                            int min = (duration.getSelectedItemPosition() * 15 );
+
+                            Calendar cal = Calendar.getInstance(TimeZone.getDefault());
+
+                            if (timeChange) //If time change, set new time before adding.
+                            {
+                                cal.set(Calendar.HOUR_OF_DAY, durHour);
+                                cal.set(Calendar.MINUTE, durMinute);
+                            }
+
+                            cal.add(Calendar.MINUTE, min);
+                            
+                            mHour = cal.get(Calendar.HOUR_OF_DAY);
+                            mMinute = cal.get(Calendar.MINUTE);
+
+                            int hour = mHour % 12;
+
+
+                            String endTime = String.format("%02d:%02d %s", hour == 0 ? 12 : hour, mMinute, mHour < 12 ? "am" : "pm");
+
+                            value = "Date: " + btnDatePicker.getText() + " Duration: " + dur +  "\nStart Time: " + btnTimePicker.getText() + " End Time: " + endTime + "\n\nBehaviour " + String.valueOf(i) + " : " + bhv + "\nSeverity: " + rb.getText();
                             validation = true;
                         }
                     }
@@ -536,7 +493,7 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
     public void onClick(View v) {
         if (v == btnDatePicker) {
             // Get Current Date
-            final Calendar c = Calendar.getInstance();
+            final Calendar c = Calendar.getInstance((TimeZone.getDefault()));
             mYear = c.get(Calendar.YEAR);
             mMonth = c.get(Calendar.MONTH);
             mDay = c.get(Calendar.DAY_OF_MONTH);
@@ -553,7 +510,7 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
         }
         if (v == btnTimePicker) {
             // Get Current Time
-            final Calendar c = Calendar.getInstance();
+            final Calendar c = Calendar.getInstance((TimeZone.getDefault()));
             mHour = c.get(Calendar.HOUR_OF_DAY);
             mMinute = c.get(Calendar.MINUTE);
 
@@ -565,6 +522,9 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                             int hour = hourOfDay % 12;
                             btnTimePicker.setText(String.format("%02d:%02d %s", hour == 0 ? 12 : hour, minute, hourOfDay < 12 ? "am" : "pm"));
+                            timeChange = true; //Send time for calculating end time.
+                            durHour = hourOfDay;
+                            durMinute = minute;
                         }
                     }, mHour, mMinute, false);
             timePickerDialog.show();
@@ -588,6 +548,84 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
         finish();
     }
 
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.navigation_dashboard:
+                    finish();
+                    Intent intent = new Intent(Update.this, Dashboard.class); //Record Session page
+                    startActivity(intent);
+                    return true;
+                case R.id.navigation_record:
+                    finish();
+                    intent = new Intent(Update.this, Record.class);
+                    startActivity(intent);
+                    return true;
+                case R.id.navigation_input:
+                    //Do Nothing
+                    return true;
+                case R.id.navigation_target:
+                    finish();
+                    intent = new Intent(Update.this, TargetBehaviour.class);
+                    /**intent.putExtra("SELECTED_ITEM", 3);
+                    intent.putExtra("SELECTED_ACTIVITY", "Target Behaviours");
+                    intent.putExtra("SELECTED_CONTENT", 1);**/
+                    startActivity(intent);
+                    return true;
+                case R.id.navigation_report:
+                    finish();
+                    intent = new Intent(Update.this, Report.class);
+                    /***intent.putExtra("SELECTED_ITEM", 4);
+                    intent.putExtra("SELECTED_ACTIVITY", "Generate Reports");
+                    intent.putExtra("SELECTED_CONTENT", 2);*/
+                    startActivity(intent);
+                    return true;
+            }
+            return false;
+        }
+    };
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_dashboard, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent = new Intent(Update.this, MenuItems.class);
+        switch(item.getItemId()) {
+            case R.id.action_notifications:
+                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.action_settings:
+                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.action_contact:
+                finish();
+                intent.putExtra("SELECTED_ACTIVITY", "Contact");
+                startActivity(intent);
+                break;
+            case R.id.action_about:
+                finish();
+                intent.putExtra("SELECTED_ACTIVITY", "About");
+                startActivity(intent);
+                break;
+            case R.id.action_help:
+                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.action_logout:
+                logoutUser();
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
 
     @Override
     public void onBackPressed() {

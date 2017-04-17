@@ -5,6 +5,18 @@
     <string name="submit">Submit</string>
     <string name="cancel">Cancel</string>
 
+    <!-- Menu Items -->
+    <string name="contact">
+        -To be updated- \n\n
+        Android application related questions: \n\n
+        Michelle Chung Chai Ying \n4316916@students.swinburne.edu.my \n\n
+        Database / Server related questions: \n\n
+        Danil Shepelev \n100063197@students.swinburne.edu.my \n\n\n\n
+        Website related questions: \n\n
+        Mohammad Ibrahim Khan \n4300815@students.swinburne.edu.my
+    </string>
+    <string name="about">ViDance is a Dance and Learn application made for special children with the intention of sharing videos with instructors and storing with ease their behaviours shown.</string>
+
     <!-- Login -->
     <string name="hint_password">Password</string>
     <string name="hint_name">Parent Name</string>

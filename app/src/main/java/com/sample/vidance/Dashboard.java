@@ -47,11 +47,7 @@ public class Dashboard extends AppCompatActivity {
         ImageButton imgBtn = (ImageButton) findViewById(R.id.btnNotifications);
         imgBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                finish();
-                Intent intent = new Intent(Dashboard.this, Features.class);
-                intent.putExtra("SELECTED_ITEM", 0);
-                intent.putExtra("SELECTED_ACTIVITY", "Notifications");
-                startActivity(intent);
+                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -89,7 +85,7 @@ public class Dashboard extends AppCompatActivity {
         imgBtn5.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 finish();
-                Intent intent = new Intent(Dashboard.this, Features.class);
+                Intent intent = new Intent(Dashboard.this, TargetBehaviour.class);
                 intent.putExtra("SELECTED_ITEM", 3);
                 intent.putExtra("SELECTED_ACTIVITY", "Target Behaviours");
                 intent.putExtra("SELECTED_CONTENT", 1);
@@ -101,7 +97,7 @@ public class Dashboard extends AppCompatActivity {
         imgBtn6.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 finish();
-                Intent intent = new Intent(Dashboard.this, Features.class);
+                Intent intent = new Intent(Dashboard.this, Report.class);
                 intent.putExtra("SELECTED_ITEM", 4);
                 intent.putExtra("SELECTED_ACTIVITY", "Generate Reports");
                 intent.putExtra("SELECTED_CONTENT", 2);
@@ -112,10 +108,7 @@ public class Dashboard extends AppCompatActivity {
         ImageButton imgBtn7 = (ImageButton) findViewById(R.id.btnSetting);
         imgBtn7.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                finish();
-                Intent intent = new Intent(Dashboard.this, Features.class);
-                intent.putExtra("SELECTED_ACTIVITY", "Settings");
-                startActivity(intent);
+                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -123,12 +116,9 @@ public class Dashboard extends AppCompatActivity {
     private void logoutUser() {
         // SqLite database handler
         db = new SQLiteHandler(getApplicationContext());
-
         // session manager
         session = new SessionManager(getApplicationContext());
-
         session.setLogin(false);
-
         db.deleteUsers();
 
         // Launching the login activity
@@ -147,37 +137,26 @@ public class Dashboard extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        Intent intent = new Intent(Dashboard.this, Features.class);
+        Intent intent = new Intent(Dashboard.this, MenuItems.class);
         switch(item.getItemId()) {
             case R.id.action_notifications:
-                finish();
-                intent.putExtra("SELECTED_ITEM", 0);
-                intent.putExtra("SELECTED_ACTIVITY", "Notifications");
-                startActivity(intent);
+                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.action_settings:
-                finish();
-                intent.putExtra("SELECTED_ITEM", 0);
-                intent.putExtra("SELECTED_ACTIVITY", "Settings");
-                startActivity(intent);
+                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.action_contact:
                 finish();
-                intent.putExtra("SELECTED_ITEM", 0);
                 intent.putExtra("SELECTED_ACTIVITY", "Contact");
                 startActivity(intent);
                 break;
             case R.id.action_about:
                 finish();
-                intent.putExtra("SELECTED_ITEM", 0);
                 intent.putExtra("SELECTED_ACTIVITY", "About");
                 startActivity(intent);
                 break;
             case R.id.action_help:
-                finish();
-                intent.putExtra("SELECTED_ITEM", 0);
-                intent.putExtra("SELECTED_ACTIVITY", "Help");
-                startActivity(intent);
+                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.action_logout:
                 logoutUser();

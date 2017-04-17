@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/catcafe"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="2"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="-5dp"
+        android:textColor="#000000"
+        android:textSize="21sp"
+        android:text="@string/behaviour" />
+    <Spinner
+        android:id="@+id/dataSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/behaviour_arrays"
+        android:paddingTop="10dp"
+        android:spinnerMode="dialog" />
+
+    <TextView
+        android:id="@+id/catcafe2"
+        android:layout_weight="2"
+        android:textColor="#000000"
+        android:textSize="21sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:text="@string/severity" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginBottom="10dp"
+            android:id="@+id/radioGroup"
+            android:checkedButton="@+id/radioButton1"
+            android:orientation="horizontal">
+
+
+            <RadioButton
+                android:id="@+id/radioButton1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:checked="false"
+                android:text="@string/severity_mild" />
+
+            <RadioButton
+                android:id="@+id/radioButton2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:text="@string/severity_moderate" />
+
+            <RadioButton
+                android:id="@+id/radioButton3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:text="@string/severity_severe" />
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/StoreData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Submit data"
+        android:layout_weight="1"
+        android:background="@drawable/button_rounded"
+        android:onClick="onClickAdd"
+        android:textColor="#FFFFFF"
+        android:layout_margin="5dp"
+        android:textSize="20sp"/>
+</LinearLayout>

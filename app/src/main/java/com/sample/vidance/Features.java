@@ -49,13 +49,17 @@ public class Features extends AppCompatActivity {
                     return true;
                 case R.id.navigation_target:
                     finish();
-                    mTextMessage.setText(R.string.title_target);
-                    vf.setDisplayedChild(1);
+                    /** mTextMessage.setText(R.string.title_target);
+                    vf.setDisplayedChild(1); **/
+                    intent = new Intent(Features.this, TargetBehaviour.class); //Target Behaviours page
+                    startActivity(intent);
                     return true;
                 case R.id.navigation_report:
                     finish();
-                    mTextMessage.setText(R.string.title_report);
-                    vf.setDisplayedChild(2);
+                   /** mTextMessage.setText(R.string.title_report);
+                    vf.setDisplayedChild(2); **/
+                    intent = new Intent(Features.this, Report.class); //Generate Report page
+                    startActivity(intent);
                     return true;
             }
             return false;
@@ -98,32 +102,29 @@ public class Features extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent = new Intent(Features.this, Features.class);
-        switch (item.getItemId()) {
+        Intent intent = new Intent(Features.this, MenuItems.class);
+        switch(item.getItemId()) {
             case R.id.action_notifications:
-                intent.putExtra("SELECTED_ITEM", 0);
-                intent.putExtra("SELECTED_ACTIVITY", "Notifications");
-                startActivity(intent);
+                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.action_settings:
-                intent.putExtra("SELECTED_ITEM", 0);
-                intent.putExtra("SELECTED_ACTIVITY", "Settings");
-                startActivity(intent);
+                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.action_contact:
-                intent.putExtra("SELECTED_ITEM", 0);
+                finish();
                 intent.putExtra("SELECTED_ACTIVITY", "Contact");
                 startActivity(intent);
                 break;
             case R.id.action_about:
-                intent.putExtra("SELECTED_ITEM", 0);
+                finish();
                 intent.putExtra("SELECTED_ACTIVITY", "About");
                 startActivity(intent);
                 break;
             case R.id.action_help:
-                intent.putExtra("SELECTED_ITEM", 0);
-                intent.putExtra("SELECTED_ACTIVITY", "Help");
-                startActivity(intent);
+                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.action_logout:
+                logoutUser();
                 break;
             default:
                 return super.onOptionsItemSelected(item);
