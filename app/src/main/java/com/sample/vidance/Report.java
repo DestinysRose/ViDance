@@ -7,8 +7,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -46,6 +47,12 @@ public class Report extends AppCompatActivity {
     //JSON Array
     private JSONArray result;
 
+    private JSONArray report = null;
+
+    private String myJSON;
+
+    private static final String TAG_RESULTS="result";
+
     ArrayList<HashMap<String, String>> dataList;
 
     ListView list;
@@ -60,44 +67,52 @@ public class Report extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.resource_report);
 
-        //Pie chart declaration
-        PieChart pieChart = (PieChart) findViewById(R.id.chart2);
+        list = (ListView) findViewById(R.id.getReport);
+        dataList = new ArrayList<HashMap<String,String>>();
 
-        ArrayList<Entry> entries2 = new ArrayList<>();
-        entries2.add(new Entry(4f, 0));
-        entries2.add(new Entry(8f, 1));
-        entries2.add(new Entry(6f, 2));
-        entries2.add(new Entry(12f, 3));
-        entries2.add(new Entry(18f, 4));
-        entries2.add(new Entry(9f, 5));
 
-        PieDataSet dataset2 = new PieDataSet(entries2, "");
 
-        ArrayList<String> labels2 = new ArrayList<String>();
-        labels2.add("B1");
-        labels2.add("B2");
-        labels2.add("B3");
-        labels2.add("B4");
-        labels2.add("B5");
-        labels2.add("B6");
-
-        PieData data2 = new PieData(labels2, dataset2);
-        dataset2.setColors(ColorTemplate.COLORFUL_COLORS);
-        pieChart.setDescription("Description");
-        pieChart.setData(data2);
-
-        pieChart.animateY(2000);
-
-        final TextView tv = (TextView) findViewById(R.id.tv);
+        //final TextView tv = (TextView) findViewById(R.id.tv);
         Button btn = (Button) findViewById(R.id.btn);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tv.setText("");
+                //tv.setText("");
                 //urlString = "http://thevidance.com/get_behaviour.php";
+
                 new ProcessJSON().execute(BehaviourHandler.RECORD_URL);
+
+                //Pie chart declaration
+                PieChart pieChart = (PieChart) findViewById(R.id.chart2);
+
+                ArrayList<Entry> entries2 = new ArrayList<>();
+                entries2.add(new Entry(4f, 0));
+                entries2.add(new Entry(8f, 1));
+                entries2.add(new Entry(6f, 2));
+                entries2.add(new Entry(12f, 3));
+                entries2.add(new Entry(18f, 4));
+                entries2.add(new Entry(9f, 5));
+
+                PieDataSet dataset2 = new PieDataSet(entries2, "");
+
+                ArrayList<String> labels2 = new ArrayList<String>();
+                labels2.add("B1");
+                labels2.add("B2");
+                labels2.add("B3");
+                labels2.add("B4");
+                labels2.add("B5");
+                labels2.add("B6");
+                PieData data2 = new PieData(labels2, dataset2);
+
+                dataset2.setColors(ColorTemplate.COLORFUL_COLORS);
+                pieChart.setDescription("Description");
+                pieChart.setData(data2);
+
+                pieChart.animateY(2000);
             }
         });
+
+
     }
 
 
@@ -129,7 +144,7 @@ public class Report extends AppCompatActivity {
         }
 
         protected void onPostExecute(String stream){
-            TextView tv = (TextView) findViewById(R.id.tv);
+            //TextView tv = (TextView) findViewById(R.id.tv);
             //tv.setText(stream);
             /*
                 Important in JSON DATA
@@ -162,17 +177,34 @@ public class Report extends AppCompatActivity {
                     for(int i = 0; i < result.length(); i++) {
                         JSONObject weather_object_0 = result.getJSONObject(i);
                         String weather_0_id = weather_object_0.getString("bc_id");
-                        String weather_0_main = weather_object_0.getString("bName");
+                        final String weather_0_main = weather_object_0.getString("bName");
                         String weather_0_description = weather_object_0.getString("counter");
                         String weather_0_icon = weather_object_0.getString("updated_at");
 
-                        tv.setText(tv.getText() + "\t\t\tid - " + weather_0_id + "\n");
-                        tv.setText(tv.getText() + "\t\t\tbName - " + weather_0_main + "\n");
-                        tv.setText(tv.getText() + "\t\t\tCounter - " + weather_0_description + "\n");
-                        tv.setText(tv.getText() + "\t\t\tUpdated at - " + weather_0_icon + "\n\n");
+                        HashMap<String,String> reportData = new HashMap<String,String>();
+
+                        reportData.put("bc_id","ID: " + weather_0_id);
+                        reportData.put("bName","Behavior: " + weather_0_main);
+                        reportData.put("counter","How many times: " + weather_0_description);
+                        reportData.put("updated_at","Date: " + weather_0_icon);
+
+                        dataList.add(reportData);
 
                         count = Integer.parseInt(weather_0_description);
                         entries.add(new Entry(count, i));
+
+                        lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+                            @Override
+                            public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
+                                Toast.makeText(Report.this, "Value: " + e + ", xIndex: "
+                                        + h.getXIndex() + ", DataSet index: " + h.getDataSetIndex(),Toast.LENGTH_LONG).show();
+                            }
+
+                            @Override
+                            public void onNothingSelected() {
+
+                            }
+                        });
 
                         labels.add(weather_0_icon);
                     }
@@ -182,8 +214,8 @@ public class Report extends AppCompatActivity {
 
                     lineChart.setTouchEnabled(true);
 
-                    //CustomMarkerView mv = new CustomMarkerView ();
-                    //lineChart.setMarkerView(mv);
+                    CustomMarkerView mv = new CustomMarkerView (Report.this, R.layout.content_marker);
+                    lineChart.setMarkerView(mv);
 
                     dataset.setColors(ColorTemplate.COLORFUL_COLORS); //
                     dataset.setDrawCubic(true);
@@ -199,6 +231,14 @@ public class Report extends AppCompatActivity {
                     lineChart.setData(data);
                     lineChart.animateY(1000);
 
+                    ListAdapter adapter = new SimpleAdapter(
+                            Report.this, dataList, R.layout.content_report,
+                            new String[]{BehaviourHandler.TAG_BCID, BehaviourHandler.TAG_BNAME,
+                                    "counter",BehaviourHandler.TAG_UPDATED_AT},
+                            new int[]{R.id.bc_id, R.id.bName, R.id.severity, R.id.updated_at}
+                    );
+
+                    list.setAdapter(adapter);
                     // process other data as this way..............
                 }catch(JSONException e){
                     e.printStackTrace();
