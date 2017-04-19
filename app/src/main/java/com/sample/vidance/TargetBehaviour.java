@@ -40,7 +40,7 @@ public class TargetBehaviour  extends AppCompatActivity {
         // Applying font
         txtCat.setTypeface(tf);
 
-        list = (ListView) findViewById(R.id.getReport);
+        //list = (ListView) findViewById(R.id.getReport);
         dataList = new ArrayList<HashMap<String,String>>();
 
         LineChart lineChart = (LineChart) findViewById(R.id.chart);
