@@ -3,6 +3,7 @@ package com.sample.vidance;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -45,15 +46,12 @@ public class ReceiveInput extends AppCompatActivity {
         Button btnCancel = (Button) findViewById(R.id.btnCancel);
         btnCancel.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //Prompt user to send video
+                //Prompt user for confirmation
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ReceiveInput.this);
-                //Set title
-                alertDialogBuilder.setTitle("Cancel?");
-                //Set dialog message
-                alertDialogBuilder
-                        .setMessage("Are you sure you cancel your submission and go back?")
+                alertDialogBuilder.setTitle("Cancel?")
+                        .setMessage("Are you sure you want to cancel your submission and go back?")
                         .setCancelable(false)
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 // Return to update behaviours
                                 finish();
@@ -62,16 +60,16 @@ public class ReceiveInput extends AppCompatActivity {
                                 dialog.cancel();
                             }
                         })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 // Do Nothing
                                 dialog.cancel();
                             }
                         });
-                //Create alert dialog
                 AlertDialog alertDialog = alertDialogBuilder.create();
-                //Show it
                 alertDialog.show();
+                alertDialog.getButton(alertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#E77F7E"));
+                alertDialog.getButton(alertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#BFFFC2"));
             }
         });
     }
