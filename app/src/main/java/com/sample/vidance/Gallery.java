@@ -1,13 +1,18 @@
 package com.sample.vidance;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,8 +48,7 @@ public class Gallery extends AppCompatActivity {
     private int _columnIndex;
     private int[] _videosId;
     private Uri _contentUri;
-    String filename;
-    String fullView;
+    private String filename, fullView, selectedPath;
     int flag = 0;
     private SQLiteHandler db;
     private SessionManager session;
@@ -107,6 +111,7 @@ public class Gallery extends AppCompatActivity {
 
             File f = new File("" + filename);
             String title = f.getName();
+            selectedPath = f.getAbsolutePath();
 
             TextView text = (TextView) findViewById(R.id.videoName);
             text.setText("Preview:" + title);
@@ -214,7 +219,27 @@ public class Gallery extends AppCompatActivity {
         // Send video
         btnSend.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                showToast("Untested");
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Gallery.this);
+                alertDialogBuilder.setTitle("Upload video")
+                        .setMessage("Do you wish to send the recorded video to the instructor for viewing?")
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                uploadVideo(); //Send to database
+                            }
+                        })
+                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel(); //Do Nothing
+                                Toast.makeText(getApplicationContext(), "Video not sent!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                //Create alert dialog
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                //Show it
+                alertDialog.show();
+                alertDialog.getButton(alertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#E77F7E"));
+                alertDialog.getButton(alertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#23C8B2"));
             }
         });
 
@@ -240,6 +265,34 @@ public class Gallery extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    private void uploadVideo() {
+        class UploadVideo extends AsyncTask<Void, Void, String> {
+
+            ProgressDialog uploading;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                uploading = ProgressDialog.show(Gallery.this, "Uploading File", "Please wait...", false, false);
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                uploading.dismiss();
+                //super.onPostExecute(s);
+                Toast.makeText(getApplicationContext(), "Video successfully uploaded!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            protected String doInBackground(Void... params) {
+                Upload u = new Upload();
+                return u.uploadVideo(selectedPath);
+            }
+        }
+        UploadVideo uv = new UploadVideo();
+        uv.execute();
     }
 
     @Override

@@ -15,7 +15,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -63,14 +62,14 @@ public class Record extends AppCompatActivity {
         btnRecord.setTypeface(tf);
         btnSend.setTypeface(tf);
 
-        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             dir = new File(getCacheDir(), "ViDance"); //Install to internal storage
         } else {
             dir = new File (Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES) + File.separator + "ViDance"); //Install to SD
         }
         boolean success = true;
         if (!dir.exists()) {
-            success = dir.mkdir();
+            success = dir.mkdirs();
         }
         if (success) {
             // Folder exists
@@ -111,6 +110,7 @@ public class Record extends AppCompatActivity {
             //Get the videoPath to sent to uploadVideo() so that the f
             File video = new File(videoUri.getPath());
             selectedPath = video.getAbsolutePath();
+            Toast.makeText(getApplicationContext(), "Video saved to Gallery!", Toast.LENGTH_SHORT).show();
             //Create an alert to ask user if they wish to upload the video recorded
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Record.this);
             alertDialogBuilder.setTitle("Upload video")
@@ -124,6 +124,7 @@ public class Record extends AppCompatActivity {
                     .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel(); //Do Nothing
+                                Toast.makeText(getApplicationContext(), "Video not sent!", Toast.LENGTH_SHORT).show();
                             }
                         });
             //Create alert dialog
@@ -137,7 +138,7 @@ public class Record extends AppCompatActivity {
             System.out.println("SELECT_VIDEO");
             Uri selectedImageUri = data.getData();
             selectedPath = getPath(selectedImageUri);
-            String filename=selectedPath.substring(selectedPath.lastIndexOf("/")+1); //Retrieve filename from filepath
+            String filename = selectedPath.substring(selectedPath.lastIndexOf("/")+1); //Retrieve filename from filepath
             //Create an alert to ask user if they wish to upload the video selected
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Record.this);
             alertDialogBuilder.setTitle("Upload video")
@@ -151,6 +152,7 @@ public class Record extends AppCompatActivity {
                     .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             dialog.cancel(); // Do Nothing
+                            Toast.makeText(getApplicationContext(), "Video not sent!", Toast.LENGTH_SHORT).show();
                         }
                     });
             //Create alert dialog
