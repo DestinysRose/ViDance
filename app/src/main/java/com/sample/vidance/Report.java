@@ -38,7 +38,6 @@ import java.util.HashMap;
  */
 
 public class Report extends AppCompatActivity {
-    //Handler for fetching data from URL
     private SQLiteHandler db;
 
     //Show dialog when fetching
@@ -46,6 +45,7 @@ public class Report extends AppCompatActivity {
 
     //JSON Array
     private JSONArray result;
+    private JSONArray pieChartData;
 
     private JSONArray report = null;
 
@@ -67,8 +67,8 @@ public class Report extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.resource_report);
 
-        list = (ListView) findViewById(R.id.getReport);
-        dataList = new ArrayList<HashMap<String,String>>();
+        //list = (ListView) findViewById(R.id.getReport);
+        //dataList = new ArrayList<HashMap<String,String>>();
 
 
 
@@ -81,59 +81,19 @@ public class Report extends AppCompatActivity {
                 //urlString = "http://thevidance.com/get_behaviour.php";
 
                 new ProcessJSON().execute(BehaviourHandler.RECORD_URL);
-
-                //Pie chart declaration
-                PieChart pieChart = (PieChart) findViewById(R.id.chart2);
-
-                ArrayList<Entry> entries2 = new ArrayList<>();
-                entries2.add(new Entry(4f, 0));
-                entries2.add(new Entry(8f, 1));
-                entries2.add(new Entry(6f, 2));
-                entries2.add(new Entry(12f, 3));
-                entries2.add(new Entry(18f, 4));
-                entries2.add(new Entry(9f, 5));
-
-                PieDataSet dataset2 = new PieDataSet(entries2, "");
-
-                ArrayList<String> labels2 = new ArrayList<String>();
-                labels2.add("B1");
-                labels2.add("B2");
-                labels2.add("B3");
-                labels2.add("B4");
-                labels2.add("B5");
-                labels2.add("B6");
-                PieData data2 = new PieData(labels2, dataset2);
-
-                dataset2.setColors(ColorTemplate.COLORFUL_COLORS);
-                pieChart.setDescription("Description");
-                pieChart.setData(data2);
-
-                pieChart.animateY(2000);
             }
         });
-
-
     }
 
 
 
-    public class ProcessJSON extends AsyncTask<String, Void, String> implements OnChartValueSelectedListener {
+    public class ProcessJSON extends AsyncTask<String, Void, String>{
 
         //Line chart declaration
         LineChart lineChart = (LineChart) findViewById(R.id.chart);
 
-        @Override
-        public void onValueSelected(Entry entry, int i, Highlight highlight) {
-            Toast.makeText(Report.this,"Bla Bla",Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void onNothingSelected() {
-
-        }
-
         protected String doInBackground(String... strings){
-            String stream = null;
+            String stream;
             String urlString = strings[0];
 
             HTTPDataHandler hh = new HTTPDataHandler();
@@ -143,7 +103,7 @@ public class Report extends AppCompatActivity {
             return stream;
         }
 
-        protected void onPostExecute(String stream){
+        protected void onPostExecute(final String stream){
             //TextView tv = (TextView) findViewById(R.id.tv);
             //tv.setText(stream);
             /*
@@ -166,45 +126,23 @@ public class Report extends AppCompatActivity {
                     // Get the weather array first JSONObject
 
                     //list = (ListView) findViewById(R.id.getReport);
-                    dataList = new ArrayList<HashMap<String,String>>();
-                    //getDataRecord();
+                    //dataList = new ArrayList<>();
 
-                    //lineChart.setOnClickListener(this);
                     ArrayList<Entry> entries = new ArrayList<>();
-                    ArrayList<String> labels = new ArrayList<String>();
+                    ArrayList<String> labels = new ArrayList<>();
 
                     int count;
                     for(int i = 0; i < result.length(); i++) {
-                        JSONObject weather_object_0 = result.getJSONObject(i);
-                        String weather_0_id = weather_object_0.getString("bc_id");
+                        final JSONObject weather_object_0 = result.getJSONObject(i);
+                        final String weather_0_id = weather_object_0.getString("bc_id");
                         final String weather_0_main = weather_object_0.getString("bName");
-                        String weather_0_description = weather_object_0.getString("counter");
-                        String weather_0_icon = weather_object_0.getString("updated_at");
+                        final String weather_0_description = weather_object_0.getString("counter");
+                        final String weather_0_icon = weather_object_0.getString("updated_at");
 
-                        HashMap<String,String> reportData = new HashMap<String,String>();
 
-                        reportData.put("bc_id","ID: " + weather_0_id);
-                        reportData.put("bName","Behavior: " + weather_0_main);
-                        reportData.put("counter","How many times: " + weather_0_description);
-                        reportData.put("updated_at","Date: " + weather_0_icon);
-
-                        dataList.add(reportData);
 
                         count = Integer.parseInt(weather_0_description);
                         entries.add(new Entry(count, i));
-
-                        lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
-                            @Override
-                            public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
-                                Toast.makeText(Report.this, "Value: " + e + ", xIndex: "
-                                        + h.getXIndex() + ", DataSet index: " + h.getDataSetIndex(),Toast.LENGTH_LONG).show();
-                            }
-
-                            @Override
-                            public void onNothingSelected() {
-
-                            }
-                        });
 
                         labels.add(weather_0_icon);
                     }
@@ -229,16 +167,165 @@ public class Report extends AppCompatActivity {
                     lineChart.setDoubleTapToZoomEnabled(false);
                     lineChart.setMaxVisibleValueCount(result.length());
                     lineChart.setData(data);
+                    lineChart.setDescription("");
                     lineChart.animateY(1000);
 
-                    ListAdapter adapter = new SimpleAdapter(
-                            Report.this, dataList, R.layout.content_report,
-                            new String[]{BehaviourHandler.TAG_BCID, BehaviourHandler.TAG_BNAME,
-                                    "counter",BehaviourHandler.TAG_UPDATED_AT},
-                            new int[]{R.id.bc_id, R.id.bName, R.id.severity, R.id.updated_at}
-                    );
+                    lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+                        @Override
+                        public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
 
-                    list.setAdapter(adapter);
+                            final int info = h.getXIndex();
+
+                            try {
+                                JSONObject severity_info = result.getJSONObject(info);
+                                final String weather_0_main = severity_info.getString("bName");
+                                final String s_mild = severity_info.getString("Mild");
+                                final String s_moderate = severity_info.getString("Moderate");
+                                final String s_severe = severity_info.getString("Severe");
+
+                                int count_mild = Integer.parseInt(s_mild);
+                                int count_moderate = Integer.parseInt(s_moderate);
+                                int count_severe = Integer.parseInt(s_severe);
+
+                                //Pie chart declaration
+                                PieChart pieChart = (PieChart) findViewById(R.id.chart2);
+
+                                ArrayList<Entry> entries2 = new ArrayList<>();
+
+                                ArrayList<String> labels2;
+
+                                 if (count_mild > 0 && count_severe > 0 && count_moderate > 0){
+                                    entries2.add(new Entry(count_mild, 0));
+                                    entries2.add(new Entry(count_moderate, 1));
+                                    entries2.add(new Entry(count_severe, 2));
+
+                                    labels2 = new ArrayList<>();
+                                    labels2.add("Mild");
+                                    labels2.add("Moderate");
+                                    labels2.add("Severe");
+                                }else if (count_severe > 0 && count_moderate > 0) {
+
+                                    entries2.add(new Entry(count_moderate, 0));
+                                    entries2.add(new Entry(count_severe, 1));
+
+                                    labels2 = new ArrayList<>();
+                                    labels2.add("Moderate");
+                                    labels2.add("Severe");
+
+                                } else if (count_mild > 0 && count_moderate > 0) {
+
+                                    entries2.add(new Entry(count_mild, 0));
+                                    entries2.add(new Entry(count_moderate, 1));
+
+                                    labels2 = new ArrayList<>();
+                                    labels2.add("Mild");
+                                    labels2.add("Moderate");
+
+                                } else if (count_mild > 0 && count_severe > 0) {
+
+                                    entries2.add(new Entry(count_mild, 0));
+                                    entries2.add(new Entry(count_severe, 1));
+
+                                    labels2 = new ArrayList<>();
+                                    labels2.add("Mild");
+                                    labels2.add("Severe");
+
+                                } else if (count_severe > 0) {
+
+                                    entries2.add(new Entry(count_severe, 0));
+
+                                    labels2 = new ArrayList<>();
+                                    labels2.add("Severe");
+
+                                } else if (count_moderate > 0) {
+
+                                    entries2.add(new Entry(count_moderate, 0));
+
+                                    labels2 = new ArrayList<>();
+                                    labels2.add("Moderate");
+
+                                }  else {
+
+                                    entries2.add(new Entry(count_mild, 0));
+
+                                    labels2 = new ArrayList<>();
+                                    labels2.add("Mild");
+                                }
+
+                                PieDataSet dataset2 = new PieDataSet(entries2, "");
+
+                                PieData data2 = new PieData(labels2, dataset2);
+
+                                dataset2.setColors(ColorTemplate.COLORFUL_COLORS);
+                                pieChart.setDescription("Description");
+                                pieChart.setData(data2);
+                                pieChart.setDescription(weather_0_main);
+                                pieChart.invalidate();
+
+                                dataset2.setDrawValues(false);
+
+                                pieChart.animateY(0);
+
+                                pieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+                                    @Override
+                                    public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
+
+                                        int slice = h.getXIndex();
+
+                                        try {
+                                            list = (ListView) findViewById(R.id.getReport);
+                                            dataList = new ArrayList<>();
+                                            JSONObject reader = new JSONObject(stream);
+
+                                            // Get the JSONArray weather
+                                            pieChartData = reader.getJSONArray("display");
+
+                                            JSONObject chart_slice = pieChartData.getJSONObject(slice);
+                                            final String bName = chart_slice.getString("bName");
+                                            final String severity = chart_slice.getString("severity");
+                                            final String updated_at = chart_slice.getString("updated_at");
+
+                                            Toast.makeText(getApplicationContext(), weather_0_main + " ----- " + severity + " ----- " + updated_at, Toast.LENGTH_LONG).show();
+
+                                            for(int i=0;i<pieChartData.length();i++) {
+                                                HashMap<String, String> reportData = new HashMap<String, String>();
+
+                                                reportData.put(BehaviourHandler.TAG_BNAME, bName);
+                                                reportData.put(BehaviourHandler.TAG_SEVER, severity);
+                                                reportData.put(BehaviourHandler.TAG_UPDATED_AT, updated_at);
+
+                                                dataList.add(reportData);
+                                            }
+                                            ListAdapter adapter = new SimpleAdapter(
+                                                    Report.this, dataList, R.layout.content_report,
+                                                    new String[]{BehaviourHandler.TAG_BNAME,BehaviourHandler.TAG_SEVER,BehaviourHandler.TAG_UPDATED_AT},
+                                                    new int[]{ R.id.bName, R.id.severity, R.id.updated_at}
+                                            );
+
+
+                                            list.setAdapter(adapter);
+
+                                        } catch (JSONException e1) {
+                                            e1.printStackTrace();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onNothingSelected() {
+
+                                    }
+                                });
+
+                            } catch (JSONException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onNothingSelected() {
+
+                        }
+                    });
                     // process other data as this way..............
                 }catch(JSONException e){
                     e.printStackTrace();
