@@ -73,10 +73,6 @@
             android:name=".TargetBehaviour"
             android:label="@string/app_name" >
         </activity>
-        <activity
-            android:name=".VidList"
-            android:label="@string/app_name" >
-        </activity>
     </application>
 
 </manifest>
