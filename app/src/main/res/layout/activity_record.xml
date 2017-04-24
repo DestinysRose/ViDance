@@ -39,7 +39,7 @@
                 android:textColor="#FFFFFF"
                 android:textStyle="bold"
                 android:layout_margin="20dp"
-                android:textSize="50sp"
+                android:textSize="40sp"
                 />
 
         </LinearLayout>

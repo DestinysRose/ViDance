@@ -124,15 +124,34 @@ public class Gallery extends AppCompatActivity {
 
         user.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                choice.setVisibility(View.GONE);
-                preview.setVisibility(View.VISIBLE);
-                buttons.setVisibility(View.VISIBLE);
-                btnCancel.setVisibility(View.VISIBLE);
-                btnSend.setVisibility(View.GONE);
-                btnDwnl.setVisibility(View.VISIBLE);
-                choiceURL = USERVID_URL;
-                new getVideos().execute();
-                buttonPress();
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Gallery.this);
+                alertDialogBuilder.setTitle("Upload video")
+                        .setMessage("This page requires a large amount of INTERNET usage, proceed?\n(Wi-Fi is recommended to prevent additional charges)")
+                        .setCancelable(false)
+                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                choice.setVisibility(View.GONE);
+                                preview.setVisibility(View.VISIBLE);
+                                buttons.setVisibility(View.VISIBLE);
+                                btnCancel.setVisibility(View.VISIBLE);
+                                btnSend.setVisibility(View.GONE);
+                                btnDwnl.setVisibility(View.VISIBLE);
+                                choiceURL = USERVID_URL;
+                                new getVideos().execute();
+                                buttonPress();
+                            }
+                        })
+                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel(); //Do Nothing
+                            }
+                        });
+                //Create alert dialog
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                //Show it
+                alertDialog.show();
+                alertDialog.getButton(alertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#E77F7E"));
+                alertDialog.getButton(alertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#23C8B2"));
             }
         });
 

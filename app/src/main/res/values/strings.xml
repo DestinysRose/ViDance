@@ -49,7 +49,10 @@
 
     <!-- Camera -->
     <string name="camera_record">Record video</string>
-    <string name="video_send">Send video</string>
+    <string name="video_send">
+        Send video \n
+        (Max file size: 64MB)
+    </string>
     <string name="video_download">Download video</string>
 
     <!-- Gallery -->
