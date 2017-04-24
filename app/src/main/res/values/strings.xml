@@ -50,8 +50,12 @@
     <!-- Camera -->
     <string name="camera_record">Record video</string>
     <string name="video_send">Send video</string>
+    <string name="video_download">Download video</string>
 
     <!-- Gallery -->
+    <string name="frmGallery">My recorded videos</string>
+    <string name="frmUser">My uploaded videos</string>
+    <string name="frmInstruct">Videos from Instructor</string>
     <string name="fullscreen">View in Fullscreen</string>
 
     <!-- Input Form -->

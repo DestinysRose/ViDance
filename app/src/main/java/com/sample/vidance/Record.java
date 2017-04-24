@@ -47,14 +47,14 @@ public class Record extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_record);
+        setContentView(com.sample.vidance.R.layout.activity_record);
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(com.sample.vidance.R.id.navigation);
         navigation.getMenu().getItem(1).setChecked(true);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        btnRecord = (Button) findViewById(R.id.btnRecord);
-        btnSend = (Button) findViewById(R.id.btnSend);
+        btnRecord = (Button) findViewById(com.sample.vidance.R.id.btnRecord);
+        btnSend = (Button) findViewById(com.sample.vidance.R.id.btnSend);
 
         // Set font
         String fontPath = "fonts/James_Fajardo.ttf";

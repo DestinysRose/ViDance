@@ -12,8 +12,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-import com.sample.vidance.helper.SQLiteHandler;
 import com.sample.vidance.helper.SessionManager;
+import com.sample.vidance.helper.SQLiteHandler;
 
 /**
  * Created by Michelle on 22/3/2017.

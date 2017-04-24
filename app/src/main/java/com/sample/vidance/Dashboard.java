@@ -108,7 +108,10 @@ public class Dashboard extends AppCompatActivity {
         ImageButton imgBtn7 = (ImageButton) findViewById(R.id.btnSetting);
         imgBtn7.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
+                finish();
+                Intent intent = new Intent(Dashboard.this, VidList.class);
+                //Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
+                startActivity(intent);
             }
         });
     }

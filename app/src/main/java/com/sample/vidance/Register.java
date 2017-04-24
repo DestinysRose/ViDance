@@ -15,11 +15,10 @@ import com.android.volley.Request.Method;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.sample.vidance.R;
 import com.sample.vidance.app.AppConfig;
-import com.sample.vidance.app.AppController;
 import com.sample.vidance.helper.SQLiteHandler;
 import com.sample.vidance.helper.SessionManager;
+import com.sample.vidance.app.AppController;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -66,7 +65,7 @@ public class Register extends AppCompatActivity {
         // Check if user is already logged in or not
         if (session.isLoggedIn()) {
             // User is already logged in. Take him to main activity
-            Intent intent = new Intent(Register.this, com.sample.vidance.Dashboard.class);
+            Intent intent = new Intent(Register.this, Dashboard.class);
             startActivity(intent);
             finish();
         }

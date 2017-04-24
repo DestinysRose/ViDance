@@ -8,12 +8,16 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.media.MediaMetadataRetriever;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -27,10 +31,19 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.VideoView;
 
+import com.sample.vidance.helper.HttpHandler;
 import com.sample.vidance.helper.SQLiteHandler;
 import com.sample.vidance.helper.SessionManager;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 
 /**
@@ -38,20 +51,31 @@ import java.io.File;
  */
 
 public class Gallery extends AppCompatActivity {
-    //set constants for MediaStore to query, and show videos
+    // Set constants for MediaStore to query, and show videos
     private final static Uri MEDIA_EXTERNAL_CONTENT_URI = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
     private final static String _ID = MediaStore.Video.Media._ID;
     private final static String MEDIA_DATA = MediaStore.Video.Media.DATA;
-    //flag for which one is used for images selection
-    private GridView _gallery;
+    private String TAG = Gallery.class.getSimpleName();
+    public static final String TUTORIALVID_URL = "http://thevidance.com/test/upload.php";
+    public static final String USERVID_URL = "http://thevidance.com/test/retrieve.php";
+
+    private ProgressDialog pDialog;
+    // URL to get contacts JSON
+    private ArrayList<LinkedHashMap<String, String>> videoMap = new ArrayList<>();
+    private ArrayList<Bitmap> videoThumbnails = new ArrayList<Bitmap>();
+    private ArrayList<String> videoLocation = new ArrayList<String>();
+    // Flag for which one is used for images selection
+    private GridView videoList;
     private Cursor _cursor;
     private int _columnIndex;
     private int[] _videosId;
     private Uri _contentUri;
-    private String filename, fullView, selectedPath;
+    private String filename, fullView, selectedPath, choiceURL;
     int flag = 0;
     private SQLiteHandler db;
     private SessionManager session;
+    private View choice, preview, buttons;
+    private Button btnCancel, btnDwnl, btnSend, btnFull, instructor, user, gallery;
 
     protected Context _context;
     @Override
@@ -59,24 +83,156 @@ public class Gallery extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         _context = getApplicationContext();
         setContentView(R.layout.activity_gallery);
-        //set GridView for gallery
-        _gallery = (GridView) findViewById(R.id.gridView);
-        //set default as external/sdcard uri
+        // Set GridView for gallery
+        videoList = (GridView) findViewById(R.id.gridView);
+        // Set default as external/sdcard uri
         _contentUri = MEDIA_EXTERNAL_CONTENT_URI;
         fullView = null; // No video is selected on default
-        initVideosId();
-        buttonPress();
 
-        //set gallery adapter
-        setGalleryAdapter();
+        // Initialise view & button values
+        choice = findViewById(R.id.galleryChoice);
+        preview = findViewById(R.id.galleryPreview);
+        buttons = findViewById(R.id.galleryButtons);
+        btnCancel = (Button) findViewById(R.id.btnCancel);
+        btnDwnl = (Button) findViewById(R.id.btnDownload);
+        btnSend = (Button) findViewById(R.id.btnSend);
+        btnFull = (Button) findViewById(R.id.btnFull);
+        instructor = (Button) findViewById(R.id.frmInstruct);
+        gallery = (Button) findViewById(R.id.frmGallery);
+        user = (Button) findViewById(R.id.frmUser);
 
+        // Hide views until choice is made
+        preview.setVisibility(View.GONE);
+        buttons.setVisibility(View.GONE);
+        btnCancel.setVisibility(View.GONE);
 
+        // Button onclick events
+        choiceSelect();
     }
+
+    //Load videos from selected locations
+    public void choiceSelect() {
+        instructor.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                choice.setVisibility(View.GONE);
+                preview.setVisibility(View.VISIBLE);
+                buttons.setVisibility(View.VISIBLE);
+                btnCancel.setVisibility(View.VISIBLE);
+                btnDwnl.setVisibility(View.VISIBLE);
+            }
+        });
+
+        user.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                choice.setVisibility(View.GONE);
+                preview.setVisibility(View.VISIBLE);
+                buttons.setVisibility(View.VISIBLE);
+                btnCancel.setVisibility(View.VISIBLE);
+                btnSend.setVisibility(View.GONE);
+                btnDwnl.setVisibility(View.VISIBLE);
+                choiceURL = USERVID_URL;
+                new getVideos().execute();
+                buttonPress();
+            }
+        });
+
+        gallery.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                choice.setVisibility(View.GONE);
+                preview.setVisibility(View.VISIBLE);
+                buttons.setVisibility(View.VISIBLE);
+                btnCancel.setVisibility(View.VISIBLE);
+                btnDwnl.setVisibility(View.GONE);
+                btnSend.setVisibility(View.VISIBLE);
+                choiceURL = null;
+                initVideosId();
+                buttonPress();
+                // Set gallery adapter
+                setGalleryAdapter();
+            }
+        });
+    }
+
+    public class ImageAdapter extends BaseAdapter {
+        private Context mContext;
+        private ArrayList<Bitmap> images;
+
+        // Constructor
+        public ImageAdapter(Context c, ArrayList<Bitmap> images) {
+            mContext = c;
+            this.images = images;
+        }
+
+        public int getCount() {
+            return images.size();
+        }
+
+        public Object getItem(int position) {
+            return null;
+        }
+
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        // create a new ImageView for each item referenced by the Adapter
+        public View getView(int position, View convertView, ViewGroup parent) {
+            final ImageView imageView;
+
+            if (convertView == null) {
+                imageView = new ImageView(mContext);
+                imageView.setLayoutParams(new GridView.LayoutParams(200, 200));
+                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                imageView.setPadding(8, 8, 8, 8);
+                imageView.setId(position);
+                imageView.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        showToast("Video selected! Please wait for the video to load!");
+                        preview(imageView.getId());
+                    }
+                });
+            } else {
+                imageView = (ImageView) convertView;
+            }
+            imageView.setImageBitmap(images.get(position));
+            return imageView;
+        }
+    }
+
+
+
+    private void preview(int index){
+
+        Uri uri = Uri.parse(videoLocation.get(index));
+        VideoView video = (VideoView)findViewById(R.id.videoView);
+        video.setVideoURI(uri); // Load selected Video into VideoView
+
+        fullView = uri.toString();
+
+        MediaController mediaController = new MediaController(Gallery.this); // Create video buttons
+        mediaController.setAnchorView(findViewById(R.id.mediaController));
+        video.setMediaController(mediaController);
+
+
+        String title = fullView.replace("http://www.thevidance.com/test/videos/", "");
+        selectedPath = fullView;
+
+        TextView text = (TextView) findViewById(R.id.videoName);
+        text.setText("Preview:" + title);
+        String fontPath = "fonts/CatCafe.ttf";
+        Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
+        text.setTypeface(tf);
+
+        mediaController.show();
+        video.start();
+    }
+
     private void setGalleryAdapter() {
-        _gallery.setAdapter(new VideoGalleryAdapter(_context));
-        _gallery.setOnItemClickListener(_itemClickLis);
+        videoList.setAdapter(new VideoGalleryAdapter(_context));
+        videoList.setOnItemClickListener(_itemClickLis);
         flag = 1;
     }
+
     private AdapterView.OnItemClickListener _itemClickLis = new OnItemClickListener()
     {
         @SuppressWarnings({ "deprecation", "unused", "rawtypes" })
@@ -97,7 +253,6 @@ public class Gallery extends AppCompatActivity {
             _cursor.moveToPosition(position);
             // Retrieve filename
             filename = _cursor.getString(_columnIndex);
-
 
             Uri uri = Uri.parse(filename);
             VideoView video = (VideoView)findViewById(R.id.videoView);
@@ -209,12 +364,146 @@ public class Gallery extends AppCompatActivity {
         }
     }
 
+    public static Bitmap generateThumbnail(String videoPath)
+    {
+        Bitmap bitmap = null;
+        MediaMetadataRetriever mediaMetadataRetriever = null;
+        try
+        {
+            mediaMetadataRetriever = new MediaMetadataRetriever();
+            if (Build.VERSION.SDK_INT >= 14)
+                mediaMetadataRetriever.setDataSource(videoPath, new HashMap<String, String>());
+            else
+                mediaMetadataRetriever.setDataSource(videoPath);
+            bitmap = mediaMetadataRetriever.getFrameAtTime();
+            bitmap = ThumbnailUtils.extractThumbnail(bitmap, 96, 96);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            if (mediaMetadataRetriever != null)
+            {
+                mediaMetadataRetriever.release();
+            }
+        }
+        return bitmap;
+    }
+
+    private class getVideos extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(Gallery.this);
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            HttpHandler sh = new HttpHandler();
+
+            // Making a request to url and getting response
+            String jsonStr = sh.makeServiceCall(choiceURL);
+
+            Log.e(TAG, "Response from url: " + jsonStr);
+            //ArrayList<String> videoList = new ArrayList<String>();
+
+            if (jsonStr != null) {
+                try {
+                    // Retrieve the JSON object
+                    JSONObject jsonObj = new JSONObject(jsonStr);
+
+                    // Values from the Videos Array
+                    JSONArray videos = jsonObj.getJSONArray("Videos");
+
+                    // Get all values within the array
+                    for (int i = 0; i < videos.length(); ++i) {
+                        String video = videos.getString(i);
+
+                        LinkedHashMap<String, String> videoURL = new LinkedHashMap<>();
+                        videoURL.put("videos", video);
+                        videoMap.add(videoURL);
+                    }
+
+                    int x = 0;
+                    for(HashMap<String, String> map: videoMap) {
+                        for(Map.Entry<String, String> mapEntry: map.entrySet()) {
+                            Bitmap thumb = generateThumbnail(mapEntry.getValue());
+                            videoThumbnails.add(thumb); //Video URL
+                            videoLocation.add(mapEntry.getValue());
+                            x++;
+                        }
+                    }
+
+                } catch (final JSONException e) {
+                    Log.e(TAG, "Json parsing error: " + e.getMessage());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "Json parsing error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                }
+            } else {
+                Log.e(TAG, "Couldn't get json from server.");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "Couldn't get json from server. Check LogCat for possible errors!", Toast.LENGTH_LONG).show();
+                    }
+                });
+
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+            videoList.setAdapter(new ImageAdapter(_context,videoThumbnails));
+        }
+    }
 
     /** Automatically hides all behaviour options other than1, then displays them on button press **/
     public void buttonPress() {
-        Button btnSend = (Button) findViewById(R.id.btnSend);
-        Button btnFull = (Button) findViewById(R.id.btnFull);
-        Button btnCancel = (Button) findViewById(R.id.btnCancel);
+        // Download video
+        btnDwnl.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Gallery.this);
+                alertDialogBuilder.setTitle("Download video")
+                        .setMessage("Download the selected video? (Requires INTERNET access)")
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+                            }
+                        })
+                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel(); //Do Nothing
+                                Toast.makeText(getApplicationContext(), "Video not downloaded!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                //Create alert dialog
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                //Show it
+                alertDialog.show();
+                alertDialog.getButton(alertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#E77F7E"));
+                alertDialog.getButton(alertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#23C8B2"));
+            }
+        });
 
         // Send video
         btnSend.setOnClickListener(new View.OnClickListener() {
@@ -232,6 +521,33 @@ public class Gallery extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel(); //Do Nothing
                                 Toast.makeText(getApplicationContext(), "Video not sent!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                //Create alert dialog
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                //Show it
+                alertDialog.show();
+                alertDialog.getButton(alertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#E77F7E"));
+                alertDialog.getButton(alertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#23C8B2"));
+            }
+        });
+        // Download File
+        btnDwnl.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Gallery.this);
+                alertDialogBuilder.setTitle("Upload video")
+                        .setMessage("Open video file in browser for viewing / download?")
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(selectedPath));
+                                startActivity(browserIntent);
+                            }
+                        })
+                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel(); //Do Nothing
+                                Toast.makeText(getApplicationContext(), "Video not saved!", Toast.LENGTH_SHORT).show();
                             }
                         });
                 //Create alert dialog

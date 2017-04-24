@@ -1,6 +1,5 @@
 package com.sample.vidance;
 
-
 import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
@@ -18,9 +17,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.sample.vidance.app.AppConfig;
+import com.sample.vidance.helper.SessionManager;
 import com.sample.vidance.app.AppController;
 import com.sample.vidance.helper.SQLiteHandler;
-import com.sample.vidance.helper.SessionManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
