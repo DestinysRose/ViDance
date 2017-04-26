@@ -45,7 +45,7 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
     private String value, missing;
     private String arraySeverity[], arrayBehaviour[], arrayDuration[];
     Button btnDatePicker, btnTimePicker;
-    private Boolean validation, timeChange;
+    private Boolean validation, timeChange = false;
     private Typeface jf, cc;
     private int mYear, mMonth, mDay, mHour, mMinute, durMinute, durHour;
     private SQLiteHandler db;
@@ -315,8 +315,6 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                     v = findViewById(resID);
                     if (v.getVisibility() == View.GONE) {
                         v.setVisibility(View.VISIBLE);
-
-
                         break;
                     }
                     else if (i == 20 && v.getVisibility() == View.VISIBLE) { //When maximum questions is reached
@@ -452,7 +450,6 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
 
                             int hour = mHour % 12;
 
-
                             String endTime = String.format("%02d:%02d %s", hour == 0 ? 12 : hour, mMinute, mHour < 12 ? "am" : "pm");
 
                             value = "Date: " + btnDatePicker.getText() + " Duration: " + dur +  "\nStart Time: " + btnTimePicker.getText() + " End Time: " + endTime + "\n\nBehaviour " + String.valueOf(i) + " : " + bhv + "\nSeverity: " + rb.getText();
@@ -464,7 +461,7 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                         break;
                     }
                 }
-                if (validation == true) {
+                if (validation) {
                     finish();
                     Intent intent = new Intent(Update.this, ReceiveInput.class);
                     intent.putExtra("TITLE", "Update Behaviours");
@@ -520,21 +517,18 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
         }
     }
 
+    public void alertStyle(AlertDialog ad) {
+        ad.show(); //Show it
+        ad.getButton(ad.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#E77F7E"));
+        ad.getButton(ad.BUTTON_POSITIVE).setTextColor(Color.parseColor("#23C8B2"));
+    }
+
     private void logoutUser() {
-        // SqLite database handler
-        db = new SQLiteHandler(getApplicationContext());
-
-        // session manager
-        session = new SessionManager(getApplicationContext());
-
+        db = new SQLiteHandler(getApplicationContext()); // SqLite database handler
+        session = new SessionManager(getApplicationContext()); // session manager
         session.setLogin(false);
-
         db.deleteUsers();
-
-        // Launching the login activity
-        Intent intent = new Intent(Update.this, Login.class);
-        startActivity(intent);
-        finish();
+        changeActivity(Login.class);// Launching the login activity
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -544,33 +538,19 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_dashboard:
-                    finish();
-                    Intent intent = new Intent(Update.this, Dashboard.class); //Record Session page
-                    startActivity(intent);
+                    changeActivity(Dashboard.class);
                     return true;
                 case R.id.navigation_record:
-                    finish();
-                    intent = new Intent(Update.this, Record.class);
-                    startActivity(intent);
+                    changeActivity(Record.class);
                     return true;
                 case R.id.navigation_input:
                     //Do Nothing
                     return true;
                 case R.id.navigation_target:
-                    finish();
-                    intent = new Intent(Update.this, TargetBehaviour.class);
-                    /**intent.putExtra("SELECTED_ITEM", 3);
-                    intent.putExtra("SELECTED_ACTIVITY", "Target Behaviours");
-                    intent.putExtra("SELECTED_CONTENT", 1);**/
-                    startActivity(intent);
+                    changeActivity(TargetBehaviour.class);
                     return true;
                 case R.id.navigation_report:
-                    finish();
-                    intent = new Intent(Update.this, Report.class);
-                    /***intent.putExtra("SELECTED_ITEM", 4);
-                    intent.putExtra("SELECTED_ACTIVITY", "Generate Reports");
-                    intent.putExtra("SELECTED_CONTENT", 2);*/
-                    startActivity(intent);
+                    changeActivity(Report.class);
                     return true;
             }
             return false;
@@ -616,6 +596,12 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
         return true;
     }
 
+    public void changeActivity(Class activity) {
+        finish();
+        Intent intent = new Intent(this, activity);
+        startActivity(intent);
+    }
+
     @Override
     public void onBackPressed() {
         //Prompt user for confirmation
@@ -641,8 +627,6 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                     }
                 });
         AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-        alertDialog.getButton(alertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#E77F7E"));
-        alertDialog.getButton(alertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#23C8B2"));
+        alertStyle(alertDialog);
     }
 }

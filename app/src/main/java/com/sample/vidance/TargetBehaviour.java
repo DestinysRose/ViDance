@@ -73,23 +73,25 @@ public class TargetBehaviour  extends AppCompatActivity {
         Button toReport = (Button) findViewById(R.id.toReport);
         toReport.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(TargetBehaviour.this, Report.class);
-                startActivity(intent);
+                changeActivity(Report.class);
             }
         });
         Button toHome = (Button) findViewById(R.id.toHome);
         toHome.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(TargetBehaviour.this, Dashboard.class);
-                startActivity(intent);
+                changeActivity(Dashboard.class);
             }
         });
     }
 
+    public void changeActivity(Class activity) {
+        finish();
+        Intent intent = new Intent(this, activity);
+        startActivity(intent);
+    }
+
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(TargetBehaviour.this, Dashboard.class); // Return to Dashboard
-        startActivity(intent);
-        finish();
+        changeActivity(Dashboard.class);
     }
 }

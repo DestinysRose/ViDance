@@ -304,9 +304,6 @@ public class Report extends AppCompatActivity {
                             BehaviourHandler.TAG_BNAME,BehaviourHandler.TAG_SEVER/*,BehaviourHandler.TAG_UPDATED_AT*/},
                     new int[]{R.id.bc_id, /*R.id.name, R.id.cname,*/ R.id.bName, R.id.severity/*, R.id.updated_at*/}
             );
-
-
-
             list.setAdapter(adapter);
 
         } catch (JSONException e) {
@@ -314,10 +311,14 @@ public class Report extends AppCompatActivity {
         }
     }
 
+    public void changeActivity(Class activity) {
+        finish();
+        Intent intent = new Intent(this, activity);
+        startActivity(intent);
+    }
+
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(Report.this, Dashboard.class); // Return to Dashboard
-        startActivity(intent);
-        finish();
+        changeActivity(Dashboard.class);
     }
 }

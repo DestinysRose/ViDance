@@ -44,35 +44,28 @@
         <activity
             android:name=".Dashboard"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-        <activity
-            android:name=".Features"
-            android:label="@string/title_activity_features" />
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".Gallery"
-            android:label="@string/app_name" >
-        </activity>
+            android:label="@string/app_name" />
         <activity
             android:name=".Record"
-            android:label="@string/app_name" >
-        </activity>
+            android:label="@string/app_name" />
         <activity
             android:name=".ReceiveInput"
-            android:label="@string/app_name" >
-        </activity>
+            android:label="@string/app_name" />
         <activity
             android:name=".Update"
-            android:label="@string/app_name" >
-        </activity>
+            android:label="@string/app_name" />
         <activity
             android:name=".Report"
-            android:label="@string/app_name" >
-        </activity>
+            android:label="@string/app_name" />
         <activity
             android:name=".TargetBehaviour"
-            android:label="@string/app_name" >
-        </activity>
+            android:label="@string/app_name" />
+        <activity
+            android:name=".MenuItems"
+            android:label="@string/app_name" />
     </application>
 
 </manifest>

@@ -43,74 +43,7 @@ public class Dashboard extends AppCompatActivity {
         txtCat.setTypeface(tf);
         txtCat2.setTypeface(tf);
 
-        //Link to Notifications
-        ImageButton imgBtn = (ImageButton) findViewById(R.id.btnNotifications);
-        imgBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        //Link to Gallery
-        ImageButton imgBtn2 = (ImageButton) findViewById(R.id.btnGallery);
-        imgBtn2.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                finish();
-                Intent intent = new Intent(Dashboard.this, Gallery.class);
-                intent.putExtra("SELECTED_ITEM", 0);
-                intent.putExtra("SELECTED_ACTIVITY", "Gallery");
-                startActivity(intent);
-            }
-        });
-        //Link to Record Session
-        ImageButton imgBtn3 = (ImageButton) findViewById(R.id.btnRecord);
-        imgBtn3.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                finish();
-                Intent intent = new Intent(Dashboard.this, Record.class);
-                startActivity(intent);
-            }
-        });
-        //Link to Update Behaviours
-        ImageButton imgBtn4 = (ImageButton) findViewById(R.id.btnInput);
-        imgBtn4.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                finish();
-                Intent intent = new Intent(Dashboard.this, Update.class);
-                startActivity(intent);
-            }
-        });
-        //Link to Target Behaviours
-        ImageButton imgBtn5 = (ImageButton) findViewById(R.id.btnTarget);
-        imgBtn5.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                finish();
-                Intent intent = new Intent(Dashboard.this, TargetBehaviour.class);
-                intent.putExtra("SELECTED_ITEM", 3);
-                intent.putExtra("SELECTED_ACTIVITY", "Target Behaviours");
-                intent.putExtra("SELECTED_CONTENT", 1);
-                startActivity(intent);
-            }
-        });
-        //Link to Generate Reports
-        ImageButton imgBtn6 = (ImageButton) findViewById(R.id.btnReport);
-        imgBtn6.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                finish();
-                Intent intent = new Intent(Dashboard.this, Report.class);
-                intent.putExtra("SELECTED_ITEM", 4);
-                intent.putExtra("SELECTED_ACTIVITY", "Generate Reports");
-                intent.putExtra("SELECTED_CONTENT", 2);
-                startActivity(intent);
-            }
-        });
-        //Link to Settings
-        ImageButton imgBtn7 = (ImageButton) findViewById(R.id.btnSetting);
-        imgBtn7.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
-            }
-        });
+        buttonPress();
     }
 
     private void logoutUser() {
@@ -122,9 +55,7 @@ public class Dashboard extends AppCompatActivity {
         db.deleteUsers();
 
         // Launching the login activity
-        Intent intent = new Intent(Dashboard.this, Login.class);
-        startActivity(intent);
-        finish();
+        changeActivity(Login.class);
     }
 
     @Override
@@ -137,7 +68,7 @@ public class Dashboard extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        Intent intent = new Intent(Dashboard.this, MenuItems.class);
+        Intent intent = new Intent(this, MenuItems.class);
         switch(item.getItemId()) {
             case R.id.action_notifications:
                 Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
@@ -149,7 +80,7 @@ public class Dashboard extends AppCompatActivity {
                 finish();
                 intent.putExtra("SELECTED_ACTIVITY", "Contact");
                 startActivity(intent);
-                break;
+                return true;
             case R.id.action_about:
                 finish();
                 intent.putExtra("SELECTED_ACTIVITY", "About");
@@ -165,6 +96,65 @@ public class Dashboard extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    public void changeActivity(Class activity) {
+        finish();
+        Intent intent = new Intent(this, activity);
+        startActivity(intent);
+    }
+
+    public void buttonPress() {
+        //Link to Notifications
+        ImageButton imgBtn = (ImageButton) findViewById(R.id.btnNotifications);
+        imgBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        //Link to Gallery
+        ImageButton imgBtn2 = (ImageButton) findViewById(R.id.btnGallery);
+        imgBtn2.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                changeActivity(Gallery.class);
+            }
+        });
+        //Link to Record Session
+        ImageButton imgBtn3 = (ImageButton) findViewById(R.id.btnRecord);
+        imgBtn3.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                changeActivity(Record.class);
+            }
+        });
+        //Link to Update Behaviours
+        ImageButton imgBtn4 = (ImageButton) findViewById(R.id.btnInput);
+        imgBtn4.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                changeActivity(Update.class);
+            }
+        });
+        //Link to Target Behaviours
+        ImageButton imgBtn5 = (ImageButton) findViewById(R.id.btnTarget);
+        imgBtn5.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                changeActivity(TargetBehaviour.class);
+            }
+        });
+        //Link to Generate Reports
+        ImageButton imgBtn6 = (ImageButton) findViewById(R.id.btnReport);
+        imgBtn6.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                changeActivity(Report.class);
+            }
+        });
+        //Link to Settings
+        ImageButton imgBtn7 = (ImageButton) findViewById(R.id.btnSetting);
+        imgBtn7.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

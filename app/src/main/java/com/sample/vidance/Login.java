@@ -1,7 +1,8 @@
 package com.sample.vidance;
 
+import android.app.Activity;
 import android.graphics.Typeface;
-import android.support.v7.app.AppCompatActivity;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -31,16 +32,12 @@ import java.util.Map;
  * Created by Danil on 27.03.2017.
  */
 
-public class Login extends AppCompatActivity {
+public class Login extends Activity {
     private static final int TIME_LIMIT = 1500;
     private static long backPressed;
     private static final String TAG = Register.class.getSimpleName();
-    private Button btnLogin;
-    private Button btnLinkToRegister;
-    private Button btnButtonToSkip;
-    private EditText inputFullName;
-    private EditText inputChildName;
-    private EditText inputPassword;
+    private Button btnLogin, btnLinkToRegister, btnButtonToSkip;
+    private EditText inputFullName, inputChildName, inputPassword;
     private ProgressDialog pDialog;
     private SessionManager session;
     private SQLiteHandler db;
@@ -56,6 +53,10 @@ public class Login extends AppCompatActivity {
         btnLogin = (Button) findViewById(R.id.btnLogin);
         btnLinkToRegister = (Button) findViewById(R.id.btnLinkToRegisterScreen);
         btnButtonToSkip = (Button) findViewById(R.id.btnButtonToSkip);
+
+        // Reset Image to prevent visual bugs
+        ImageView iv = (ImageView)findViewById(R.id.title);
+        iv.setImageResource(R.drawable.ic_vidance);
 
         // Change font for title
         String fontPath = "fonts/CatCafe.ttf";
@@ -103,18 +104,14 @@ public class Login extends AppCompatActivity {
         btnLinkToRegister.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), Register.class);
-                startActivity(i);
-                finish();
+                changeActivity(Register.class);
             }
         });
 
         btnButtonToSkip.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), Dashboard.class);
-                startActivity(i);
-                finish();
+                changeActivity(Dashboard.class);
             }
         });
 
@@ -208,6 +205,12 @@ public class Login extends AppCompatActivity {
     private void hideDialog() {
         if (pDialog.isShowing())
             pDialog.dismiss();
+    }
+
+    public void changeActivity(Class activity) {
+        finish();
+        Intent intent = new Intent(this, activity);
+        startActivity(intent);
     }
 
     @Override

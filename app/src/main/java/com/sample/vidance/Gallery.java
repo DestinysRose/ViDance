@@ -32,8 +32,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.VideoView;
 
 import com.sample.vidance.helper.HttpHandler;
-import com.sample.vidance.helper.SQLiteHandler;
-import com.sample.vidance.helper.SessionManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -55,9 +53,9 @@ public class Gallery extends AppCompatActivity {
     private final static Uri MEDIA_EXTERNAL_CONTENT_URI = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
     private final static String _ID = MediaStore.Video.Media._ID;
     private final static String MEDIA_DATA = MediaStore.Video.Media.DATA;
-    private String TAG = Gallery.class.getSimpleName();
-    public static final String TUTORIALVID_URL = "http://thevidance.com/test/upload.php";
+    public static final String TUTORIALVID_URL = "";
     public static final String USERVID_URL = "http://thevidance.com/test/retrieve.php";
+    private String TAG = Gallery.class.getSimpleName();
 
     private ProgressDialog pDialog;
     // URL to get contacts JSON
@@ -72,10 +70,10 @@ public class Gallery extends AppCompatActivity {
     private Uri _contentUri;
     private String filename, fullView, selectedPath, choiceURL;
     int flag = 0;
-    private SQLiteHandler db;
-    private SessionManager session;
     private View choice, preview, buttons;
     private Button btnCancel, btnDwnl, btnSend, btnFull, instructor, user, gallery;
+    private String fontPath;
+    private Typeface tf;
 
     protected Context _context;
     @Override
@@ -106,6 +104,19 @@ public class Gallery extends AppCompatActivity {
         buttons.setVisibility(View.GONE);
         btnCancel.setVisibility(View.GONE);
 
+        // Initialize font styles
+        fontPath = "fonts/CatCafe.ttf";
+        tf = Typeface.createFromAsset(getAssets(), fontPath);
+        fontPath = "fonts/James_Fajardo.ttf";
+        Typeface jf = Typeface.createFromAsset(getAssets(), fontPath);
+        btnDwnl.setTypeface(jf);
+        btnCancel.setTypeface(jf);
+        btnSend.setTypeface(jf);
+        btnFull.setTypeface(jf);
+        instructor.setTypeface(jf);
+        gallery.setTypeface(jf);
+        user.setTypeface(jf);
+
         // Button onclick events
         choiceSelect();
     }
@@ -114,29 +125,14 @@ public class Gallery extends AppCompatActivity {
     public void choiceSelect() {
         instructor.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                choice.setVisibility(View.GONE);
-                preview.setVisibility(View.VISIBLE);
-                buttons.setVisibility(View.VISIBLE);
-                btnCancel.setVisibility(View.VISIBLE);
-                btnDwnl.setVisibility(View.VISIBLE);
-            }
-        });
-
-        user.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Gallery.this);
                 alertDialogBuilder.setTitle("Upload video")
                         .setMessage("This page requires a large amount of INTERNET usage, proceed?\n(Wi-Fi is recommended to prevent additional charges)")
                         .setCancelable(false)
                         .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                choice.setVisibility(View.GONE);
-                                preview.setVisibility(View.VISIBLE);
-                                buttons.setVisibility(View.VISIBLE);
-                                btnCancel.setVisibility(View.VISIBLE);
-                                btnSend.setVisibility(View.GONE);
-                                btnDwnl.setVisibility(View.VISIBLE);
                                 choiceURL = USERVID_URL;
+                                changeView();
                                 new getVideos().execute();
                                 buttonPress();
                             }
@@ -148,22 +144,39 @@ public class Gallery extends AppCompatActivity {
                         });
                 //Create alert dialog
                 AlertDialog alertDialog = alertDialogBuilder.create();
-                //Show it
-                alertDialog.show();
-                alertDialog.getButton(alertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#E77F7E"));
-                alertDialog.getButton(alertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#23C8B2"));
+                alertStyle(alertDialog);
+            }
+        });
+
+        user.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Gallery.this);
+                alertDialogBuilder.setTitle("Upload video")
+                        .setMessage("This page requires a large amount of INTERNET usage, proceed?\n(Wi-Fi is recommended to prevent additional charges)")
+                        .setCancelable(false)
+                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                choiceURL = USERVID_URL;
+                                changeView();
+                                new getVideos().execute();
+                                buttonPress();
+                            }
+                        })
+                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel(); //Do Nothing
+                            }
+                        });
+                //Create alert dialog
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertStyle(alertDialog);
             }
         });
 
         gallery.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                choice.setVisibility(View.GONE);
-                preview.setVisibility(View.VISIBLE);
-                buttons.setVisibility(View.VISIBLE);
-                btnCancel.setVisibility(View.VISIBLE);
-                btnDwnl.setVisibility(View.GONE);
-                btnSend.setVisibility(View.VISIBLE);
                 choiceURL = null;
+                changeView();
                 initVideosId();
                 buttonPress();
                 // Set gallery adapter
@@ -171,6 +184,28 @@ public class Gallery extends AppCompatActivity {
             }
         });
     }
+
+    public void changeView() {
+        choice.setVisibility(View.GONE);
+        preview.setVisibility(View.VISIBLE);
+        buttons.setVisibility(View.VISIBLE);
+        btnCancel.setVisibility(View.VISIBLE);
+        if (choiceURL != null) {
+            btnSend.setVisibility(View.GONE);
+            btnDwnl.setVisibility(View.VISIBLE);
+        }
+        else {
+            btnDwnl.setVisibility(View.GONE);
+            btnSend.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void alertStyle(AlertDialog ad) {
+        ad.show(); //Show it
+        ad.getButton(ad.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#E77F7E"));
+        ad.getButton(ad.BUTTON_POSITIVE).setTextColor(Color.parseColor("#23C8B2"));
+    }
+
 
     public class ImageAdapter extends BaseAdapter {
         private Context mContext;
@@ -185,15 +220,12 @@ public class Gallery extends AppCompatActivity {
         public int getCount() {
             return images.size();
         }
-
         public Object getItem(int position) {
             return null;
         }
-
         public long getItemId(int position) {
             return 0;
         }
-
         // create a new ImageView for each item referenced by the Adapter
         public View getView(int position, View convertView, ViewGroup parent) {
             final ImageView imageView;
@@ -221,25 +253,19 @@ public class Gallery extends AppCompatActivity {
 
 
     private void preview(int index){
-
         Uri uri = Uri.parse(videoLocation.get(index));
         VideoView video = (VideoView)findViewById(R.id.videoView);
         video.setVideoURI(uri); // Load selected Video into VideoView
-
         fullView = uri.toString();
-
         MediaController mediaController = new MediaController(Gallery.this); // Create video buttons
         mediaController.setAnchorView(findViewById(R.id.mediaController));
         video.setMediaController(mediaController);
-
 
         String title = fullView.replace("http://www.thevidance.com/test/videos/", "");
         selectedPath = fullView;
 
         TextView text = (TextView) findViewById(R.id.videoName);
         text.setText("Preview:" + title);
-        String fontPath = "fonts/CatCafe.ttf";
-        Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
         text.setTypeface(tf);
 
         mediaController.show();
@@ -289,8 +315,6 @@ public class Gallery extends AppCompatActivity {
 
             TextView text = (TextView) findViewById(R.id.videoName);
             text.setText("Preview:" + title);
-            String fontPath = "fonts/CatCafe.ttf";
-            Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
             text.setTypeface(tf);
 
             mediaController.show();
@@ -497,33 +521,6 @@ public class Gallery extends AppCompatActivity {
 
     /** Automatically hides all behaviour options other than1, then displays them on button press **/
     public void buttonPress() {
-        // Download video
-        btnDwnl.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Gallery.this);
-                alertDialogBuilder.setTitle("Download video")
-                        .setMessage("Download the selected video? (Requires INTERNET access)")
-                        .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-
-                            }
-                        })
-                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel(); //Do Nothing
-                                Toast.makeText(getApplicationContext(), "Video not downloaded!", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                //Create alert dialog
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                //Show it
-                alertDialog.show();
-                alertDialog.getButton(alertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#E77F7E"));
-                alertDialog.getButton(alertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#23C8B2"));
-            }
-        });
-
         // Send video
         btnSend.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -546,8 +543,7 @@ public class Gallery extends AppCompatActivity {
                 AlertDialog alertDialog = alertDialogBuilder.create();
                 //Show it
                 alertDialog.show();
-                alertDialog.getButton(alertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#E77F7E"));
-                alertDialog.getButton(alertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#23C8B2"));
+                alertStyle(alertDialog);
             }
         });
         // Download File
@@ -573,8 +569,7 @@ public class Gallery extends AppCompatActivity {
                 AlertDialog alertDialog = alertDialogBuilder.create();
                 //Show it
                 alertDialog.show();
-                alertDialog.getButton(alertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#E77F7E"));
-                alertDialog.getButton(alertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#23C8B2"));
+                alertStyle(alertDialog);
             }
         });
 
@@ -595,9 +590,7 @@ public class Gallery extends AppCompatActivity {
         // Cancel submission and go back
         btnCancel.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                finish();
-                Intent intent = new Intent(Gallery.this, Dashboard.class); // Return to Dashboard
-                startActivity(intent);
+                changeActivity(Dashboard.class);
             }
         });
     }
@@ -616,7 +609,6 @@ public class Gallery extends AppCompatActivity {
             @Override
             protected void onPostExecute(String s) {
                 uploading.dismiss();
-                //super.onPostExecute(s);
                 Toast.makeText(getApplicationContext(), "Video successfully uploaded!", Toast.LENGTH_SHORT).show();
             }
 
@@ -630,10 +622,14 @@ public class Gallery extends AppCompatActivity {
         uv.execute();
     }
 
+    public void changeActivity(Class activity) {
+        finish();
+        Intent intent = new Intent(this, activity);
+        startActivity(intent);
+    }
+
     @Override
     public void onBackPressed() {
-        finish();
-        Intent intent = new Intent(Gallery.this, Dashboard.class); // Return to Dashboard
-        startActivity(intent);
+        changeActivity(Dashboard.class);
     }
 }

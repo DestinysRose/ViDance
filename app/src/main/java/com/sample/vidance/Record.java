@@ -130,9 +130,7 @@ public class Record extends AppCompatActivity {
             //Create alert dialog
             AlertDialog alertDialog = alertDialogBuilder.create();
             //Show it
-            alertDialog.show();
-            alertDialog.getButton(alertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#E77F7E"));
-            alertDialog.getButton(alertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#23C8B2"));
+            alertStyle(alertDialog);
         }
         else if (requestCode == SELECT_VIDEO && resultCode == RESULT_OK) {
             System.out.println("SELECT_VIDEO");
@@ -158,9 +156,7 @@ public class Record extends AppCompatActivity {
             //Create alert dialog
             AlertDialog alertDialog = alertDialogBuilder.create();
             //Show it
-            alertDialog.show();
-            alertDialog.getButton(alertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#E77F7E"));
-            alertDialog.getButton(alertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#23C8B2"));
+            alertStyle(alertDialog);
         }
     }
 
@@ -213,6 +209,12 @@ public class Record extends AppCompatActivity {
         uv.execute();
     }
 
+    public void alertStyle(AlertDialog ad) {
+        ad.show(); //Show it
+        ad.getButton(ad.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#E77F7E"));
+        ad.getButton(ad.BUTTON_POSITIVE).setTextColor(Color.parseColor("#23C8B2"));
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -222,7 +224,7 @@ public class Record extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent = new Intent(Record.this, Features.class);
+        Intent intent = new Intent(Record.this, MenuItems.class);
         switch(item.getItemId()) {
             case R.id.action_notifications:
                 Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
@@ -231,7 +233,7 @@ public class Record extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.action_contact:
-                finish();
+                changeActivity(Report.class);
                 intent.putExtra("SELECTED_ACTIVITY", "Contact");
                 startActivity(intent);
                 break;
@@ -259,36 +261,19 @@ public class Record extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_dashboard:
-                    finish();
-                    Intent intent = new Intent(Record.this, Dashboard.class); //Record Session page
-                    startActivity(intent);
+                    changeActivity(Dashboard.class);
                     return true;
                 case R.id.navigation_record:
                     //Do Nothing
                     return true;
                 case R.id.navigation_input:
-                    finish();
-                    intent = new Intent(Record.this, Update.class);
-                    intent.putExtra("SELECTED_ITEM", 2);
-                    intent.putExtra("SELECTED_ACTIVITY", "Update Behaviours");
-                    intent.putExtra("SELECTED_CONTENT", 0);
-                    startActivity(intent);
+                    changeActivity(Update.class);
                     return true;
                 case R.id.navigation_target:
-                    finish();
-                    intent = new Intent(Record.this, TargetBehaviour.class);
-                    intent.putExtra("SELECTED_ITEM", 3);
-                    intent.putExtra("SELECTED_ACTIVITY", "Target Behaviours");
-                    intent.putExtra("SELECTED_CONTENT", 1);
-                    startActivity(intent);
+                    changeActivity(TargetBehaviour.class);
                     return true;
                 case R.id.navigation_report:
-                    finish();
-                    intent = new Intent(Record.this, Report.class);
-                    intent.putExtra("SELECTED_ITEM", 4);
-                    intent.putExtra("SELECTED_ACTIVITY", "Generate Reports");
-                    intent.putExtra("SELECTED_CONTENT", 2);
-                    startActivity(intent);
+                    changeActivity(Report.class);
                     return true;
             }
             return false;
@@ -298,18 +283,18 @@ public class Record extends AppCompatActivity {
     private void logoutUser() {
         // SqLite database handler
         db = new SQLiteHandler(getApplicationContext());
-
         // session manager
         session = new SessionManager(getApplicationContext());
-
         session.setLogin(false);
-
         db.deleteUsers();
-
         // Launching the login activity
-        Intent intent = new Intent(Record.this, Login.class);
-        startActivity(intent);
+        changeActivity(Login.class);
+    }
+
+    public void changeActivity(Class activity) {
         finish();
+        Intent intent = new Intent(this, activity);
+        startActivity(intent);
     }
 
     @Override
