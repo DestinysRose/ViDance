@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sample.vidance.helper.SQLiteHandler;
 import com.sample.vidance.helper.SessionManager;
@@ -18,6 +19,7 @@ import com.sample.vidance.helper.SessionManager;
 public class MenuItems extends AppCompatActivity {
 
     private TextView title, text;
+    private Button btnSend;
     private SQLiteHandler db;
     private SessionManager session;
 
@@ -26,9 +28,9 @@ public class MenuItems extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.confirmation);
         getSupportActionBar().setTitle("ViDance");
-        Intent mIntent = getIntent();
         //Receive input and update content appropriately
         title = (TextView) findViewById(R.id.title);
+        btnSend = (Button) findViewById(R.id.btnSend);
         text = (TextView) findViewById(R.id.input_results);
         String message = getIntent().getStringExtra("SELECTED_ACTIVITY");
         title.setText(message);
@@ -38,10 +40,15 @@ public class MenuItems extends AppCompatActivity {
         title.setTypeface(tf);
         title.setTextSize(30);
 
-        Button btnSend = (Button) findViewById(R.id.btnSend);
-        btnSend.setVisibility(View.GONE);
+        btnSend.setText("CONTACT INSTRUCTOR");
+        btnSend.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                sendEmail();
+            }
+        });
 
         Button btnCancel = (Button) findViewById(R.id.btnCancel);
+        btnCancel.setText("Back");
         btnCancel.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 finish();
@@ -61,11 +68,23 @@ public class MenuItems extends AppCompatActivity {
                  text.setText("Under Construction");
         }
     }
+    protected void sendEmail() {
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.setType("message/rfc822");
+        i.putExtra(Intent.EXTRA_EMAIL, new String[]{"michccy@gmail.com"});
+        i.putExtra(Intent.EXTRA_SUBJECT, "Testingl");
+        i.putExtra(Intent.EXTRA_TEXT, "Test!");
+        try {
+            startActivity(Intent.createChooser(i, "Send mail..."));
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(MenuItems.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     @Override
     public void onBackPressed() {
         finish();
-        Intent intent = new Intent(MenuItems.this, Dashboard.class); // Return to Dashboard
+        Intent intent = new Intent(this, Dashboard.class); // Return to Dashboard
         startActivity(intent);
     }
 }
