@@ -13,7 +13,7 @@ import com.github.mikephil.charting.highlight.Highlight;
 
 public class CustomMarkerView extends MarkerView {
 
-    private TextView tvContent;
+    public TextView tvContent;
     public CustomMarkerView (Context context, int layoutResource) {
         super(context, layoutResource);
         // this markerview only displays a textview

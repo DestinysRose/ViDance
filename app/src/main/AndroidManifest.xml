@@ -64,8 +64,13 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name=".Send"
-            android:label="@string/app_name" >
+            android:name=".listcharts.BarChartItem"
+            android:label="BarChartItem" >
+        </activity>
+
+        <activity
+            android:name=".listcharts.LineChartItem"
+            android:label="LineChartItem" >
         </activity>
         <activity
             android:name=".Report"
