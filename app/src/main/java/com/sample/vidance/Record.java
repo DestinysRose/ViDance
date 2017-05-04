@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.sample.vidance.app.AppController;
 import com.sample.vidance.helper.SQLiteHandler;
 import com.sample.vidance.helper.SessionManager;
 
@@ -55,6 +56,9 @@ public class Record extends AppCompatActivity {
 
         btnRecord = (Button) findViewById(com.sample.vidance.R.id.btnRecord);
         btnSend = (Button) findViewById(com.sample.vidance.R.id.btnSend);
+
+        // Session manager
+        session = new SessionManager(getApplicationContext());
 
         // Set font
         String fontPath = "fonts/James_Fajardo.ttf";
@@ -287,7 +291,7 @@ public class Record extends AppCompatActivity {
         session = new SessionManager(getApplicationContext());
         session.setLogin(false);
         db.deleteUsers();
-        // Launching the login activity
+        AppController.getInstance().setUser(null);
         changeActivity(Login.class);
     }
 

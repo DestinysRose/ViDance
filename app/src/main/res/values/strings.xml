@@ -56,9 +56,9 @@
     <string name="video_download">Download video</string>
 
     <!-- Gallery -->
-    <string name="frmGallery">My recorded videos</string>
-    <string name="frmUser">My uploaded videos</string>
-    <string name="frmInstruct">Videos from Instructor</string>
+    <string name="frmGallery">My Recorded\nVideos</string>
+    <string name="frmUser">My Uploaded\nVideos</string>
+    <string name="frmInstruct">My Social\nStories</string>
     <string name="fullscreen">View in Fullscreen</string>
 
     <!-- Input Form -->

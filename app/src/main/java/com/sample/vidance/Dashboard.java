@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sample.vidance.app.AppController;
 import com.sample.vidance.helper.SQLiteHandler;
 import com.sample.vidance.helper.SessionManager;
 
@@ -22,8 +23,8 @@ import com.sample.vidance.helper.SessionManager;
 public class Dashboard extends AppCompatActivity {
     private static final int TIME_LIMIT = 1500;
     private static long backPressed;
-    private SQLiteHandler db;
     private SessionManager session;
+    private SQLiteHandler db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +33,10 @@ public class Dashboard extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Dashboard");
+        // Session manager
+        session = new SessionManager(getApplicationContext());
+        // SQLite database handler
+        db = new SQLiteHandler(getApplicationContext());
         // Font path
         String fontPath = "fonts/CatCafe.ttf";
         // text view label
@@ -44,18 +49,6 @@ public class Dashboard extends AppCompatActivity {
         txtCat2.setTypeface(tf);
 
         buttonPress();
-    }
-
-    private void logoutUser() {
-        // SqLite database handler
-        db = new SQLiteHandler(getApplicationContext());
-        // session manager
-        session = new SessionManager(getApplicationContext());
-        session.setLogin(false);
-        db.deleteUsers();
-
-        // Launching the login activity
-        changeActivity(Login.class);
     }
 
     @Override
@@ -96,6 +89,17 @@ public class Dashboard extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    public void logoutUser() {
+        // SqLite database handler
+        db = new SQLiteHandler(getApplicationContext());
+        // session manager
+        session = new SessionManager(getApplicationContext());
+        session.setLogin(false);
+        db.deleteUsers();
+        AppController.getInstance().setUser(null);
+        changeActivity(Login.class);
     }
 
     public void changeActivity(Class activity) {

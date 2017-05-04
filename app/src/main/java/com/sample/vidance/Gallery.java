@@ -18,20 +18,27 @@ import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.VideoView;
 
+import com.sample.vidance.app.AppController;
 import com.sample.vidance.helper.HttpHandler;
+import com.sample.vidance.helper.SQLiteHandler;
+import com.sample.vidance.helper.SessionManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,15 +60,19 @@ public class Gallery extends AppCompatActivity {
     private final static Uri MEDIA_EXTERNAL_CONTENT_URI = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
     private final static String _ID = MediaStore.Video.Media._ID;
     private final static String MEDIA_DATA = MediaStore.Video.Media.DATA;
-    public static final String TUTORIALVID_URL = "";
+    public static final String STORIES_URL = "http://thevidance.com/test/showStories.php";
     public static final String USERVID_URL = "http://thevidance.com/test/retrieve.php";
     private String TAG = Gallery.class.getSimpleName();
+    private SessionManager session;
+    private SQLiteHandler db;
 
     private ProgressDialog pDialog;
     // URL to get contacts JSON
     private ArrayList<LinkedHashMap<String, String>> videoMap = new ArrayList<>();
     private ArrayList<Bitmap> videoThumbnails = new ArrayList<Bitmap>();
     private ArrayList<String> videoLocation = new ArrayList<String>();
+    private ArrayList<LinkedHashMap<String, String>> storyMap = new ArrayList<>();
+    private ArrayList<String> storyList = new ArrayList<String>();
     // Flag for which one is used for images selection
     private GridView videoList;
     private Cursor _cursor;
@@ -71,6 +82,7 @@ public class Gallery extends AppCompatActivity {
     private String filename, fullView, selectedPath, choiceURL;
     int flag = 0;
     private View choice, preview, buttons;
+    private ListView sList;
     private Button btnCancel, btnDwnl, btnSend, btnFull, instructor, user, gallery;
     private String fontPath;
     private Typeface tf;
@@ -91,6 +103,7 @@ public class Gallery extends AppCompatActivity {
         choice = findViewById(R.id.galleryChoice);
         preview = findViewById(R.id.galleryPreview);
         buttons = findViewById(R.id.galleryButtons);
+        sList = (ListView) findViewById(R.id.storyList);
         btnCancel = (Button) findViewById(R.id.btnCancel);
         btnDwnl = (Button) findViewById(R.id.btnDownload);
         btnSend = (Button) findViewById(R.id.btnSend);
@@ -103,6 +116,7 @@ public class Gallery extends AppCompatActivity {
         preview.setVisibility(View.GONE);
         buttons.setVisibility(View.GONE);
         btnCancel.setVisibility(View.GONE);
+        sList.setVisibility(View.GONE);
 
         // Initialize font styles
         fontPath = "fonts/CatCafe.ttf";
@@ -116,10 +130,16 @@ public class Gallery extends AppCompatActivity {
         instructor.setTypeface(jf);
         gallery.setTypeface(jf);
         user.setTypeface(jf);
-
+        // Session manager
+        session = new SessionManager(getApplicationContext());
+        // SQLite database handler
+        db = new SQLiteHandler(getApplicationContext());
         // Button onclick events
         choiceSelect();
+
     }
+
+
 
     //Load videos from selected locations
     public void choiceSelect() {
@@ -127,13 +147,13 @@ public class Gallery extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Gallery.this);
                 alertDialogBuilder.setTitle("Upload video")
-                        .setMessage("This page requires a large amount of INTERNET usage, proceed?\n(Wi-Fi is recommended to prevent additional charges)")
+                        .setMessage("This page requires INTERNET usage, proceed?\n(Wi-Fi is recommended to prevent additional charges)")
                         .setCancelable(false)
                         .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                choiceURL = USERVID_URL;
+                                choiceURL = STORIES_URL;
                                 changeView();
-                                new getVideos().execute();
+                                new getStories().execute();
                                 buttonPress();
                             }
                         })
@@ -175,7 +195,7 @@ public class Gallery extends AppCompatActivity {
 
         gallery.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                choiceURL = null;
+                choiceURL = "";
                 changeView();
                 initVideosId();
                 buttonPress();
@@ -190,13 +210,22 @@ public class Gallery extends AppCompatActivity {
         preview.setVisibility(View.VISIBLE);
         buttons.setVisibility(View.VISIBLE);
         btnCancel.setVisibility(View.VISIBLE);
-        if (choiceURL != null) {
+        if (choiceURL.equals(USERVID_URL)) {
+            sList.setVisibility(View.GONE);
             btnSend.setVisibility(View.GONE);
             btnDwnl.setVisibility(View.VISIBLE);
         }
+        else if (choiceURL.equals(STORIES_URL)) {
+            sList.setVisibility(View.VISIBLE);
+            btnSend.setVisibility(View.GONE);
+            btnDwnl.setVisibility(View.GONE);
+            btnFull.setVisibility(View.GONE);
+        }
         else {
+            sList.setVisibility(View.GONE);
             btnDwnl.setVisibility(View.GONE);
             btnSend.setVisibility(View.VISIBLE);
+            btnFull.setVisibility(View.VISIBLE);
         }
     }
 
@@ -249,8 +278,6 @@ public class Gallery extends AppCompatActivity {
             return imageView;
         }
     }
-
-
 
     private void preview(int index){
         Uri uri = Uri.parse(videoLocation.get(index));
@@ -435,8 +462,8 @@ public class Gallery extends AppCompatActivity {
         return bitmap;
     }
 
+    /**Load video thumbnails into gridview**/
     private class getVideos extends AsyncTask<Void, Void, Void> {
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -456,7 +483,6 @@ public class Gallery extends AppCompatActivity {
             String jsonStr = sh.makeServiceCall(choiceURL);
 
             Log.e(TAG, "Response from url: " + jsonStr);
-            //ArrayList<String> videoList = new ArrayList<String>();
 
             if (jsonStr != null) {
                 try {
@@ -490,17 +516,18 @@ public class Gallery extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getApplicationContext(), "Json parsing error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            showToast("Json parsing error: " + e.getMessage());
                         }
                     });
 
                 }
-            } else {
+            }
+            else {
                 Log.e(TAG, "Couldn't get json from server.");
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getApplicationContext(), "Couldn't get json from server. Check LogCat for possible errors!", Toast.LENGTH_LONG).show();
+                        showToast("Couldn't get json from server. Check LogCat for possible errors!");
                     }
                 });
 
@@ -519,6 +546,84 @@ public class Gallery extends AppCompatActivity {
         }
     }
 
+    /** Fill Story List **/
+    private class getStories extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(Gallery.this);
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            HttpHandler sh = new HttpHandler();
+
+            // Making a request to url and getting response
+            String jsonStr = sh.makeServiceCall(choiceURL);
+
+            Log.e(TAG, "Response from url: " + jsonStr);
+
+            if (jsonStr != null) {
+                try {
+                    JSONObject jsonObj = new JSONObject(jsonStr);
+
+                    // Getting JSON Array
+                    JSONArray stories = jsonObj.getJSONArray("Stories");
+
+                    // looping through All Contacts
+                    // Get all values within the array
+                    for (int i = 0; i < stories.length(); ++i) {
+                        storyList.add(stories.getString(i));
+                    }
+                } catch (final JSONException e) {
+                    Log.e(TAG, "Json parsing error: " + e.getMessage());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showToast("Json parsing error: " + e.getMessage());
+                        }
+                    });
+                }
+            } else {
+                Log.e(TAG, "Couldn't get json from server.");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        showToast("Couldn't get json from server. Check LogCat for possible errors!");
+                    }
+                });
+
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+            /**
+             * Updating parsed JSON data into ListView
+             * */
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(Gallery.this, android.R.layout.simple_list_item_1, storyList);
+            sList.setAdapter(arrayAdapter);
+            sList.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
+                    showToast(sList.getItemAtPosition(position).toString());
+                }
+            });
+        }
+    }
+
     /** Automatically hides all behaviour options other than1, then displays them on button press **/
     public void buttonPress() {
         // Send video
@@ -526,7 +631,7 @@ public class Gallery extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Gallery.this);
                 alertDialogBuilder.setTitle("Upload video")
-                        .setMessage("Do you wish to send the recorded video to the instructor for viewing?")
+                        .setMessage("Do you wish to send the selected video to the instructor for viewing?")
                         .setCancelable(false)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
@@ -536,7 +641,7 @@ public class Gallery extends AppCompatActivity {
                         .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel(); //Do Nothing
-                                Toast.makeText(getApplicationContext(), "Video not sent!", Toast.LENGTH_SHORT).show();
+                                showToast("Video not sent!");
                             }
                         });
                 //Create alert dialog
@@ -562,7 +667,6 @@ public class Gallery extends AppCompatActivity {
                         .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel(); //Do Nothing
-                                Toast.makeText(getApplicationContext(), "Video not saved!", Toast.LENGTH_SHORT).show();
                             }
                         });
                 //Create alert dialog
@@ -620,6 +724,56 @@ public class Gallery extends AppCompatActivity {
         }
         UploadVideo uv = new UploadVideo();
         uv.execute();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_dashboard, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent = new Intent(Gallery.this, MenuItems.class);
+        switch(item.getItemId()) {
+            case R.id.action_notifications:
+                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.action_settings:
+                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.action_contact:
+                finish();
+                intent.putExtra("SELECTED_ACTIVITY", "Contact");
+                startActivity(intent);
+                break;
+            case R.id.action_about:
+                finish();
+                intent.putExtra("SELECTED_ACTIVITY", "About");
+                startActivity(intent);
+                break;
+            case R.id.action_help:
+                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.action_logout:
+                logoutUser();
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    public void logoutUser() {
+        // SqLite database handler
+        db = new SQLiteHandler(getApplicationContext());
+        // session manager
+        session = new SessionManager(getApplicationContext());
+        session.setLogin(false);
+        db.deleteUsers();
+        AppController.getInstance().setUser(null);
+        changeActivity(Login.class);
     }
 
     public void changeActivity(Class activity) {

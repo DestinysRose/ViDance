@@ -155,6 +155,10 @@ public class Login extends Activity {
                         // Inserting row in users table
                         db.addUser(name, cname, uid, created_at);
 
+                        // Add username as a global variable
+                        AppController.getInstance().setUser(name);
+                        AppController.getInstance().setChild(cname);
+
                         // Launch main activity
                         finish();
                         Intent intent = new Intent(Login.this, Dashboard.class);

@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.sample.vidance.app.AppController;
 import com.sample.vidance.helper.SQLiteHandler;
 import com.sample.vidance.helper.SessionManager;
 
@@ -60,6 +61,10 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.getMenu().getItem(2).setChecked(true);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        // Session manager
+        session = new SessionManager(getApplicationContext());
+
         //Receive input and update content appropriately
         mTextMessage = (TextView) findViewById(R.id.message);
         mTextMessage.setText(R.string.title_input);
@@ -78,6 +83,7 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
         mText.setTypeface(jf);
         mText = (Button) findViewById(R.id.updateBehaviour);
         mText.setTypeface(jf);
+
         //Initialise date and time
         Button btnDate = (Button) findViewById(R.id.setDate);
         SimpleDateFormat date = new SimpleDateFormat("dd/MM/yyyy");
@@ -85,16 +91,17 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
         Button btnTime = (Button) findViewById(R.id.setTime);
         SimpleDateFormat time = new SimpleDateFormat("hh:mm a");
         btnTime.setText(time.format(new Date()));
+
         //Set onClickListeners for date and time
         btnDatePicker = (Button)findViewById(R.id.setDate);
         btnTimePicker = (Button)findViewById(R.id.setTime);
         btnDatePicker.setOnClickListener(this);
         btnTimePicker.setOnClickListener(this);
+
         // Progress dialog
         pDialog = new ProgressDialog(this);
         pDialog.setCancelable(false);
-        // SQLite database handler
-        db = new SQLiteHandler(getApplicationContext());
+
         //Run functions for the form
         createQuestions();
         toggleSeverity();
@@ -523,14 +530,6 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
         ad.getButton(ad.BUTTON_POSITIVE).setTextColor(Color.parseColor("#23C8B2"));
     }
 
-    private void logoutUser() {
-        db = new SQLiteHandler(getApplicationContext()); // SqLite database handler
-        session = new SessionManager(getApplicationContext()); // session manager
-        session.setLogin(false);
-        db.deleteUsers();
-        changeActivity(Login.class);// Launching the login activity
-    }
-
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -594,6 +593,17 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    public void logoutUser() {
+        // SqLite database handler
+        db = new SQLiteHandler(getApplicationContext());
+        // session manager
+        session = new SessionManager(getApplicationContext());
+        session.setLogin(false);
+        db.deleteUsers();
+        AppController.getInstance().setUser(null);
+        changeActivity(Login.class);
     }
 
     public void changeActivity(Class activity) {

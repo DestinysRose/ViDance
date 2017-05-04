@@ -72,12 +72,10 @@ public class MenuItems extends AppCompatActivity {
         Intent i = new Intent(Intent.ACTION_SEND);
         i.setType("message/rfc822");
         i.putExtra(Intent.EXTRA_EMAIL, new String[]{"michccy@gmail.com"});
-        i.putExtra(Intent.EXTRA_SUBJECT, "Testingl");
-        i.putExtra(Intent.EXTRA_TEXT, "Test!");
         try {
             startActivity(Intent.createChooser(i, "Send mail..."));
         } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(MenuItems.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MenuItems.this, "There are no applications capable of sending emails on your phone, please install one to continue.", Toast.LENGTH_SHORT).show();
         }
     }
 
