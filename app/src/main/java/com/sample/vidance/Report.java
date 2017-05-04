@@ -4,6 +4,7 @@ package com.sample.vidance;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -13,12 +14,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sample.vidance.helper.SQLiteHandler;
 import com.sample.vidance.helper.SessionManager;
 import com.sample.vidance.listcharts.BarChartItem;
 import com.sample.vidance.listcharts.LineChartItem;
+import com.sample.vidance.listcharts.PieChartItem;
 
 /**
  * Created by Danil on 06.04.2017.
@@ -33,8 +36,10 @@ public class Report extends AppCompatActivity {
     private SQLiteHandler db;
     private SessionManager session;
 
+    Typeface tf;
+    Typeface jf;
 
-
+    private TextView mTextMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +49,25 @@ public class Report extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.resource_report);
+
+        String fontPath = "fonts/CatCafe.ttf";
+        tf = Typeface.createFromAsset(getAssets(), fontPath);
+        String fontPath2 = "fonts/James_Fajardo.ttf";
+        jf = Typeface.createFromAsset(getAssets(), fontPath2);
+
+        mTextMessage = (TextView) findViewById(R.id.textView2);
+        mTextMessage.setText(R.string.title_report);
+        mTextMessage.setTypeface(tf);
+
+        TextView txtJf1 = (TextView) findViewById(R.id.textView3);
+        TextView txtJf2 = (TextView) findViewById(R.id.textView4);
+        TextView txtJf3 = (TextView) findViewById(R.id.textView5);
+        txtJf1.setTypeface(tf);
+        txtJf1.setTextSize(15);
+        txtJf2.setTypeface(tf);
+        txtJf2.setTextSize(15);
+        txtJf3.setTypeface(tf);
+        txtJf3.setTextSize(15);
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.getMenu().getItem(4).setChecked(true);
@@ -66,6 +90,22 @@ public class Report extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        Button btnToPie = (Button) findViewById(R.id.toPie);
+        btnToPie.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Report.this, PieChartItem.class);
+                startActivity(intent);
+            }
+        });
+
+        btn.setTypeface(jf);
+        btn.setTextSize(25);
+        btnToBar.setTypeface(jf);
+        btnToBar.setTextSize(25);
+        btnToPie.setTypeface(jf);
+        btnToPie.setTextSize(25);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener

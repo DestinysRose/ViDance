@@ -23,7 +23,6 @@
                         android:layout_weight="0.25"
                         android:background="@drawable/filter_selector"
                         android:textColor="@color/text"
-                        android:checked="true"
                         android:button="@null"
                         android:gravity="center"
                         android:text="Hourly" />
@@ -77,35 +76,81 @@
             android:background="@drawable/button_rounded"
             android:text="Day"
             android:textColor="@color/text"
-            android:layout_weight="1.25"
+            android:layout_weight="1"
             android:layout_margin="5dp"/>
+
+        <Button
+            android:id="@+id/setFirstDate"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_rounded"
+            android:text="First Day"
+            android:textColor="@color/text"
+            android:layout_weight="1"
+            android:layout_margin="5dp"/>
+
+        <Button
+            android:id="@+id/setEndDate"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_rounded"
+            android:text="End Day"
+            android:textColor="@color/text" />
+
         <Button
             android:id="@+id/setStartTime"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
             android:background="@drawable/button_rounded"
-            android:text="Start Time"
-            android:textColor="@color/text"
-            android:layout_weight="1.25"
-            android:layout_margin="5dp"/>
+            android:text="First day of Week"
+            android:textColor="@color/text" />
+
         <Button
             android:id="@+id/setEndTime"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
             android:background="@drawable/button_rounded"
-            android:text="End Time"
-            android:textColor="@color/text"
-            android:layout_weight="1.25"
-            android:layout_margin="5dp"/>
+            android:text="First day of Month"
+            android:textColor="@color/text" />
+
+        <EditText
+            android:id="@+id/setNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="How many?"
+            android:inputType="number" />
     </LinearLayout>
-    <Button
-        android:id="@+id/dateApply"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/button_rounded"
-        android:text="Show report"
-        android:textColor="@color/text"
-        android:layout_margin="5dp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:weightSum="1">
+        <Button
+            android:id="@+id/dateApply"
+            android:layout_width="257dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_rounded"
+            android:text="Show report"
+            android:textColor="@color/text"
+            android:layout_margin="5dp"
+            android:layout_weight="0.58" />
+
+        <Button
+            android:id="@+id/hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_rounded_green"
+            android:text="Hint"
+            android:textColor="@color/text"
+            android:layout_margin="5dp" />
+    </LinearLayout>
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/chart"

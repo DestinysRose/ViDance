@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical" >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -23,7 +28,6 @@
                 android:layout_weight="0.25"
                 android:background="@drawable/filter_selector"
                 android:textColor="@color/text"
-                android:checked="true"
                 android:button="@null"
                 android:gravity="center"
                 android:text="Hourly" />
@@ -76,46 +80,97 @@
             android:background="@drawable/button_rounded"
             android:text="Day"
             android:textColor="@color/text"
-            android:layout_weight="1.25"
+            android:layout_weight="1"
             android:layout_margin="5dp"/>
+
         <Button
-            android:id="@+id/setStartTime"
+            android:id="@+id/setFirstDate"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/button_rounded"
-            android:text="Start Time"
+            android:text="First Day"
             android:textColor="@color/text"
-            android:layout_weight="1.25"
+            android:layout_weight="1"
             android:layout_margin="5dp"/>
+
         <Button
-            android:id="@+id/setEndTime"
+            android:id="@+id/setEndDate"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
             android:background="@drawable/button_rounded"
-            android:text="End Time"
-            android:textColor="@color/text"
-            android:layout_weight="1.25"
-            android:layout_margin="5dp"/>
+            android:text="End Day"
+            android:textColor="@color/text" />
+
+        <Button
+            android:id="@+id/setWeek"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_rounded"
+            android:text="First day of Week"
+            android:textColor="@color/text" />
+
+        <Button
+            android:id="@+id/setMonth"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_rounded"
+            android:text="First day of Month"
+            android:textColor="@color/text" />
+
+        <EditText
+            android:id="@+id/setNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="How many?"
+            android:inputType="number" />
     </LinearLayout>
-    <Button
-        android:id="@+id/dateApply"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/button_rounded"
-        android:text="Show report"
-        android:textColor="@color/text"
-        android:layout_weight="1.25"
-        android:layout_margin="5dp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:weightSum="1">
+        <Button
+            android:id="@+id/dateApply"
+            android:layout_width="257dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_rounded"
+            android:text="Show report"
+            android:textColor="@color/text"
+            android:layout_margin="5dp"
+            android:layout_weight="0.58" />
+
+        <Button
+            android:id="@+id/hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_rounded_green"
+            android:text="Hint"
+            android:textColor="@color/text"
+            android:layout_margin="5dp" />
+    </LinearLayout>
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/chart"
         android:layout_width="match_parent"
         android:layout_height="200dp" />
-    <ListView
-        android:id="@+id/getReport"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="126dp"
-        android:layout_marginBottom="5dp"
-        android:layout_marginTop="30dp"
-        android:headerDividersEnabled="false" />
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/chart2"
+        android:layout_width="match_parent"
+        android:layout_height="304dp" />
+    </LinearLayout>
+
+
+
 </LinearLayout>
+</ScrollView>
