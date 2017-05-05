@@ -648,7 +648,6 @@ public class Gallery extends AppCompatActivity {
     }
 
     private void uploadVideo() {
-        Toast.makeText(getApplicationContext(), userName, Toast.LENGTH_SHORT).show();
         class UploadVideo extends AsyncTask<Void, Void, String> {
 
             ProgressDialog uploading;
