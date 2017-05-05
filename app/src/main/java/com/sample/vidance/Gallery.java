@@ -65,7 +65,7 @@ public class Gallery extends AppCompatActivity {
     private String TAG = Gallery.class.getSimpleName();
     private SessionManager session;
     private SQLiteHandler db;
-
+    private String userName;
     private ProgressDialog pDialog;
     // URL to get contacts JSON
     private ArrayList<LinkedHashMap<String, String>> videoMap = new ArrayList<>();
@@ -137,59 +137,71 @@ public class Gallery extends AppCompatActivity {
         // Button onclick events
         choiceSelect();
 
+        userName = AppController.getInstance().getUser();
+
     }
 
-
+    public AlertDialog alertStyler(String title, String msg, final String selection) { // Function to create a pop up
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Gallery.this);
+        alertDialogBuilder.setTitle(title)
+                .setMessage(msg)
+                .setCancelable(false)
+                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Perform different functions for different popups on this page
+                        if(selection.equals("instructor")) {
+                            choiceURL = STORIES_URL;
+                            changeView();
+                            new getStories().execute();
+                            buttonPress();
+                        } else if (selection.equals("user")) {
+                            choiceURL = USERVID_URL;
+                            changeView();
+                            new getVideos().execute();
+                            buttonPress();
+                        } else if (selection.equals("upload")) {
+                            if (fullView == null) {
+                                showToast("No video selected!");
+                            } else {
+                                uploadVideo();
+                            }
+                        } else if (selection.equals("download")) {
+                            if (fullView == null) {
+                                showToast("No video selected!");
+                            } else {
+                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(selectedPath));
+                                startActivity(browserIntent);
+                            }
+                        }
+                    }
+                })
+                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel(); //Do Nothing
+                        if (selection.equals("upload")) {
+                            showToast("Video not sent!");
+                        }
+                    }
+                });
+        //Create alert dialog
+        AlertDialog ad = alertDialogBuilder.create();
+         ad.show(); //Show it
+        ad.getButton(ad.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#E77F7E"));
+        ad.getButton(ad.BUTTON_POSITIVE).setTextColor(Color.parseColor("#23C8B2"));
+        return ad;
+    }
 
     //Load videos from selected locations
     public void choiceSelect() {
         instructor.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Gallery.this);
-                alertDialogBuilder.setTitle("Upload video")
-                        .setMessage("This page requires INTERNET usage, proceed?\n(Wi-Fi is recommended to prevent additional charges)")
-                        .setCancelable(false)
-                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                choiceURL = STORIES_URL;
-                                changeView();
-                                new getStories().execute();
-                                buttonPress();
-                            }
-                        })
-                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel(); //Do Nothing
-                            }
-                        });
-                //Create alert dialog
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                alertStyle(alertDialog);
+                alertStyler("View Social Stories", "This page requires INTERNET usage, proceed?\n(Wi-Fi is recommended to prevent additional charges)", "instructor");
             }
         });
 
         user.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Gallery.this);
-                alertDialogBuilder.setTitle("Upload video")
-                        .setMessage("This page requires a large amount of INTERNET usage, proceed?\n(Wi-Fi is recommended to prevent additional charges)")
-                        .setCancelable(false)
-                        .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                choiceURL = USERVID_URL;
-                                changeView();
-                                new getVideos().execute();
-                                buttonPress();
-                            }
-                        })
-                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel(); //Do Nothing
-                            }
-                        });
-                //Create alert dialog
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                alertStyle(alertDialog);
+                alertStyler("View Uploaded Videos", "This page requires INTERNET usage, proceed?\n(Wi-Fi is recommended to prevent additional charges)", "user");
             }
         });
 
@@ -199,8 +211,7 @@ public class Gallery extends AppCompatActivity {
                 changeView();
                 initVideosId();
                 buttonPress();
-                // Set gallery adapter
-                setGalleryAdapter();
+                setGalleryAdapter(); // Set gallery adapter
             }
         });
     }
@@ -227,12 +238,6 @@ public class Gallery extends AppCompatActivity {
             btnSend.setVisibility(View.VISIBLE);
             btnFull.setVisibility(View.VISIBLE);
         }
-    }
-
-    public void alertStyle(AlertDialog ad) {
-        ad.show(); //Show it
-        ad.getButton(ad.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#E77F7E"));
-        ad.getButton(ad.BUTTON_POSITIVE).setTextColor(Color.parseColor("#23C8B2"));
     }
 
 
@@ -486,26 +491,21 @@ public class Gallery extends AppCompatActivity {
 
             if (jsonStr != null) {
                 try {
-                    // Retrieve the JSON object
-                    JSONObject jsonObj = new JSONObject(jsonStr);
-
-                    // Values from the Videos Array
-                    JSONArray videos = jsonObj.getJSONArray("Videos");
-
+                    JSONObject jsonObj = new JSONObject(jsonStr); // Retrieve the JSON object
+                    JSONArray videos = jsonObj.getJSONArray("Videos"); // Values from the Videos Array
                     // Get all values within the array
                     for (int i = 0; i < videos.length(); ++i) {
                         String video = videos.getString(i);
 
-                        LinkedHashMap<String, String> videoURL = new LinkedHashMap<>();
+                        LinkedHashMap<String, String> videoURL = new LinkedHashMap<>(); // Assign to a LinkedHashMap
                         videoURL.put("videos", video);
                         videoMap.add(videoURL);
                     }
-
                     int x = 0;
                     for(HashMap<String, String> map: videoMap) {
                         for(Map.Entry<String, String> mapEntry: map.entrySet()) {
                             Bitmap thumb = generateThumbnail(mapEntry.getValue());
-                            videoThumbnails.add(thumb); //Video URL
+                            videoThumbnails.add(thumb); // Generate thumbnail from video
                             videoLocation.add(mapEntry.getValue());
                             x++;
                         }
@@ -532,7 +532,6 @@ public class Gallery extends AppCompatActivity {
                 });
 
             }
-
             return null;
         }
 
@@ -542,7 +541,7 @@ public class Gallery extends AppCompatActivity {
             // Dismiss the progress dialog
             if (pDialog.isShowing())
                 pDialog.dismiss();
-            videoList.setAdapter(new ImageAdapter(_context,videoThumbnails));
+                videoList.setAdapter(new ImageAdapter(_context,videoThumbnails));
         }
     }
 
@@ -551,35 +550,26 @@ public class Gallery extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-            super.onPreExecute();
-            // Showing progress dialog
+            super.onPreExecute(); // Show progress dialog
             pDialog = new ProgressDialog(Gallery.this);
             pDialog.setMessage("Please wait...");
             pDialog.setCancelable(false);
             pDialog.show();
-
         }
 
         @Override
         protected Void doInBackground(Void... arg0) {
             HttpHandler sh = new HttpHandler();
-
-            // Making a request to url and getting response
-            String jsonStr = sh.makeServiceCall(choiceURL);
-
+            String jsonStr = sh.makeServiceCall(choiceURL); // Making a request to url and getting response
             Log.e(TAG, "Response from url: " + jsonStr);
 
             if (jsonStr != null) {
                 try {
                     JSONObject jsonObj = new JSONObject(jsonStr);
-
-                    // Getting JSON Array
-                    JSONArray stories = jsonObj.getJSONArray("Stories");
-
-                    // looping through All Contacts
+                    JSONArray stories = jsonObj.getJSONArray("Stories"); // Get JSON Array
                     // Get all values within the array
                     for (int i = 0; i < stories.length(); ++i) {
-                        storyList.add(stories.getString(i));
+                        storyList.add(stories.getString(i)); //Add into array
                     }
                 } catch (final JSONException e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
@@ -600,21 +590,16 @@ public class Gallery extends AppCompatActivity {
                 });
 
             }
-
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-            // Dismiss the progress dialog
+            super.onPostExecute(result); // Dismiss the progress dialog
             if (pDialog.isShowing())
                 pDialog.dismiss();
-            /**
-             * Updating parsed JSON data into ListView
-             * */
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(Gallery.this, android.R.layout.simple_list_item_1, storyList);
-            sList.setAdapter(arrayAdapter);
+            sList.setAdapter(arrayAdapter); // Populates List view with data retrieved
             sList.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
@@ -629,51 +614,14 @@ public class Gallery extends AppCompatActivity {
         // Send video
         btnSend.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Gallery.this);
-                alertDialogBuilder.setTitle("Upload video")
-                        .setMessage("Do you wish to send the selected video to the instructor for viewing?")
-                        .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                uploadVideo(); //Send to database
-                            }
-                        })
-                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel(); //Do Nothing
-                                showToast("Video not sent!");
-                            }
-                        });
-                //Create alert dialog
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                //Show it
-                alertDialog.show();
-                alertStyle(alertDialog);
+                alertStyler("Upload video", "Do you wish to send the selected video to the instructor for viewing?", "upload");
             }
         });
         // Download File
         btnDwnl.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                alertStyler("Download video", "Open video file in browser for viewing / download?", "download");
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Gallery.this);
-                alertDialogBuilder.setTitle("Upload video")
-                        .setMessage("Open video file in browser for viewing / download?")
-                        .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(selectedPath));
-                                startActivity(browserIntent);
-                            }
-                        })
-                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel(); //Do Nothing
-                            }
-                        });
-                //Create alert dialog
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                //Show it
-                alertDialog.show();
-                alertStyle(alertDialog);
             }
         });
 
@@ -700,6 +648,7 @@ public class Gallery extends AppCompatActivity {
     }
 
     private void uploadVideo() {
+        Toast.makeText(getApplicationContext(), userName, Toast.LENGTH_SHORT).show();
         class UploadVideo extends AsyncTask<Void, Void, String> {
 
             ProgressDialog uploading;
@@ -719,7 +668,7 @@ public class Gallery extends AppCompatActivity {
             @Override
             protected String doInBackground(Void... params) {
                 Upload u = new Upload();
-                return u.uploadVideo(selectedPath);
+                return u.uploadVideo(selectedPath, userName);
             }
         }
         UploadVideo uv = new UploadVideo();

@@ -39,6 +39,7 @@ public class Record extends AppCompatActivity {
     private Button btnRecord, btnSend;
     private int ACTIVITY_START_CAMERA_APP = 0; //Initialise camera
     private static final int SELECT_VIDEO = 3; //Set to allow video selection
+    private String userName;
     private Uri videoUri = null;
     private File dir;
     private String CAPTURE_TITLE, selectedPath;
@@ -59,6 +60,8 @@ public class Record extends AppCompatActivity {
 
         // Session manager
         session = new SessionManager(getApplicationContext());
+
+        userName = AppController.getInstance().getUser();
 
         // Set font
         String fontPath = "fonts/James_Fajardo.ttf";
@@ -206,7 +209,7 @@ public class Record extends AppCompatActivity {
             @Override
             protected String doInBackground(Void... params) {
                 Upload u = new Upload();
-                return u.uploadVideo(selectedPath);
+                return u.uploadVideo(selectedPath, userName);
             }
         }
         UploadVideo uv = new UploadVideo();

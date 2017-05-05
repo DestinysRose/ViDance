@@ -22,7 +22,7 @@ public class Upload {
 
     private int serverResponseCode;
 
-    public String uploadVideo(String file) {
+    public String uploadVideo(String file, String user) {
 
         String fileName = file;
         HttpURLConnection conn = null;
@@ -52,9 +52,19 @@ public class Upload {
             conn.setRequestProperty("ENCTYPE", "multipart/form-data");
             conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
             conn.setRequestProperty("video", fileName);
+
             dos = new DataOutputStream(conn.getOutputStream());
 
             dos.writeBytes(twoHyphens + boundary + lineEnd);
+
+            // Send userID for folder creation
+            dos.writeBytes("Content-Disposition: form-data; name=\"user\"" + lineEnd);
+            dos.writeBytes(lineEnd);
+            dos.writeBytes(user);
+            dos.writeBytes(lineEnd);
+            dos.writeBytes(twoHyphens + boundary + lineEnd);
+
+            // Send video file details
             dos.writeBytes("Content-Disposition: form-data; name=\"video\";filename=\"" + fileName + "\"" + lineEnd);
             dos.writeBytes(lineEnd);
 
@@ -75,7 +85,12 @@ public class Upload {
 
             dos.writeBytes(lineEnd);
             dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-
+            dos.writeBytes("Content-Disposition: form-data; name=\"user\"" + lineEnd);
+            dos.writeBytes("Content-Type: text/plain; charset=UTF-8" + lineEnd);
+            dos.writeBytes("Content-Length: " + user.length() + lineEnd);
+            dos.writeBytes(lineEnd);
+            dos.writeBytes(user); // mobile_no is String variable
+            dos.writeBytes(lineEnd);
             serverResponseCode = conn.getResponseCode();
 
             fileInputStream.close();

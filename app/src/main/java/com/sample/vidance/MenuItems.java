@@ -71,7 +71,7 @@ public class MenuItems extends AppCompatActivity {
     protected void sendEmail() {
         Intent i = new Intent(Intent.ACTION_SEND);
         i.setType("message/rfc822");
-        i.putExtra(Intent.EXTRA_EMAIL, new String[]{"michccy@gmail.com"});
+        i.putExtra(Intent.EXTRA_EMAIL, new String[]{"customer_service@thevidance.com"});
         try {
             startActivity(Intent.createChooser(i, "Send mail..."));
         } catch (android.content.ActivityNotFoundException ex) {

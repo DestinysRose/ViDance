@@ -70,4 +70,20 @@ public class AppController extends Application {
     public void setChild(String childname) { //Set current child
         this.childname = childname;
     }
+
+    public String getUserID() { //Retrieve current user
+        return username;
+    }
+
+    public void setUserID(String username) { //Set current user
+        this.username = username;
+    }
+
+    public String getChildID() { //Retrieve current child
+        return childname;
+    }
+
+    public void setChildID(String childname) { //Set current child
+        this.childname = childname;
+    }
 }
