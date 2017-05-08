@@ -30,6 +30,7 @@ import java.util.Map;
 
 /**
  * Created by Danil on 27.03.2017.
+ * Modified by Michelle on 08.03.2017.
  */
 
 public class Login extends Activity {
@@ -37,7 +38,7 @@ public class Login extends Activity {
     private static long backPressed;
     private static final String TAG = Register.class.getSimpleName();
     private Button btnLogin, btnLinkToRegister, btnButtonToSkip;
-    private EditText inputFullName, inputChildName, inputPassword;
+    private EditText inputFullName, inputPassword;
     private ProgressDialog pDialog;
     private SessionManager session;
     private SQLiteHandler db;
@@ -47,8 +48,7 @@ public class Login extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        inputFullName = (EditText) findViewById(R.id.name);
-        inputChildName = (EditText) findViewById(R.id.cname);
+        inputFullName = (EditText) findViewById(R.id.username);
         inputPassword = (EditText) findViewById(R.id.password);
         btnLogin = (Button) findViewById(R.id.btnLogin);
         btnLinkToRegister = (Button) findViewById(R.id.btnLinkToRegisterScreen);
@@ -86,12 +86,11 @@ public class Login extends Activity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View view) {
-                String name = inputFullName.getText().toString().trim();
-                String cname = inputChildName.getText().toString().trim();
+                String username = inputFullName.getText().toString().trim();
                 String password = inputPassword.getText().toString().trim();
 
-                if (!name.isEmpty() && !cname.isEmpty() && !password.isEmpty()) {
-                    checkLogin(name, cname, password);
+                if (!username.isEmpty() && !password.isEmpty()) {
+                    checkLogin(username, password);
                 } else {
                     Toast.makeText(getApplicationContext(), "Please enter your details!", Toast.LENGTH_LONG).show();
                 }
@@ -120,7 +119,7 @@ public class Login extends Activity {
     /**
      * function to verify login details in mysql db
      * */
-    private void checkLogin(final String name, final String cname, final String password) {
+    private void checkLogin(final String username, final String password) {
         // Tag used to cancel the request
         String tag_string_req = "req_login";
 
@@ -148,20 +147,14 @@ public class Login extends Activity {
                         String uid = jObj.getString("uid");
 
                         JSONObject user = jObj.getJSONObject("user");
-                        String name = user.getString("name");
-                        String cname = user.getString("cname");
+                        String username = user.getString("username");
                         String created_at = user.getString("created_at");
 
                         // Inserting row in users table
-                        db.addUser(name, cname, uid, created_at);
-
-                        // Add username as a global variable
-                        AppController.getInstance().setUser(name);
-                        AppController.getInstance().setChild(cname);
-
+                        db.addUser(uid, username, created_at);
                         // Launch main activity
                         finish();
-                        Intent intent = new Intent(Login.this, Dashboard.class);
+                        Intent intent = new Intent(Login.this, Child.class);
                         startActivity(intent);
                     } else {
                         // Error in login. Get the error message
@@ -189,8 +182,7 @@ public class Login extends Activity {
             protected Map<String, String> getParams() {
                 // Posting parameters to login url
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("name", name);
-                params.put("cname", cname);
+                params.put("username", username);
                 params.put("password", password);
 
                 return params;

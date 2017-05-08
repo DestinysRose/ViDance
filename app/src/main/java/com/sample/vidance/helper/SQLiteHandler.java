@@ -32,12 +32,10 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 
     // Table Columns names
     private static final String KEY_ID = "id";
-    private static final String KEY_NAME = "name";
-    private static final String KEY_CNAME = "cname";
-    private static final String KEY_EMAIL = "email";
+    private static final String KEY_USERNAME = "username";
+    private static final String KEY_CHILD = "cname";
     private static final String KEY_UID = "uid";
     private static final String KEY_CREATED_AT = "created_at";
-    private static final String KEY_UPDATED_AT = "updated_at";
 
     public SQLiteHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -46,17 +44,11 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     // Creating Tables
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_LOGIN_TABLE = "CREATE TABLE " + TABLE_USER + "("
-                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT," + KEY_CNAME + " TEXT, "
-                + KEY_EMAIL + " TEXT UNIQUE," + KEY_UID + " TEXT,"
+        String  CREATE_LOGIN_TABLE = "CREATE TABLE " + TABLE_USER + "("
+                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_USERNAME + " TEXT,"
+                + KEY_CHILD + " TEXT," + KEY_UID + " TEXT,"
                 + KEY_CREATED_AT + " TEXT" + ")";
         db.execSQL(CREATE_LOGIN_TABLE);
-
-        String CREATE_BTEST_TABLE = "CREATE TABLE " + TABLE_BHTEST + "("
-                + BehaviourHandler.TAG_BID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT," + KEY_CNAME + " TEXT, "
-                + BehaviourHandler.TAG_BNAME + " TEXT," + BehaviourHandler.TAG_SEVER + " TEXT,"
-                + KEY_UPDATED_AT + " TEXT" + ")";
-        db.execSQL(CREATE_BTEST_TABLE);
 
         Log.d(TAG, "Database tables created");
     }
@@ -67,8 +59,6 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         // Drop older table if existed
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BHTEST);
-
         // Create tables again
         onCreate(db);
     }
@@ -76,13 +66,12 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     /**
      * Storing user details in database
      * */
-    public void addUser(String name, String cname, /*String email,*/ String uid, String created_at) {
+    public void addUser(String uid, String username,  String created_at) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_NAME, name); // Name
-        values.put(KEY_CNAME, cname); // Child Name
-        //values.put(KEY_EMAIL, email); // Email
-        values.put(KEY_UID, uid); // Email
+        values.put(KEY_USERNAME, username); // UserName
+        values.put(KEY_CHILD," "); // Child not selected by default
+        values.put(KEY_UID, uid); // Userid
         values.put(KEY_CREATED_AT, created_at); // Created At
 
         // Inserting Row
@@ -92,20 +81,49 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         Log.d(TAG, "New user inserted into sqlite: " + id);
     }
 
-    public void addBehaviour(String name, String cname, String bName, String role, String updated_at) {
-        SQLiteDatabase db = this.getWritableDatabase();
+    /**
+     * Getting user data from database
+     * */
+    public String getUserID() {
+        String userID = "";
+        String selectQuery = "SELECT uid FROM " + TABLE_USER;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            userID = cursor.getString(0);
+            cursor.close();
+        }
+        Log.d(TAG, "Fetching userID from Sqlite: " + userID);
+        return userID;
 
-        ContentValues values = new ContentValues();
-        values.put(KEY_NAME, name); // Name
-        values.put(KEY_CNAME, cname); // Child Name
-        values.put(BehaviourHandler.TAG_BNAME, bName);
-        values.put(BehaviourHandler.TAG_SEVER, role);
-        values.put(KEY_UPDATED_AT, updated_at);
+    }
 
-        long id = db.insert(TABLE_BHTEST, null, values);
-        db.close(); // Closing database connection
+    /**
+     * Getting childID from database
+     * */
+    public String selectChild() {
+        String userID = "";
+        String selectQuery = "SELECT cname FROM " + TABLE_USER;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            userID = cursor.getString(0);
+            cursor.close();
+        }
+        Log.d(TAG, "Fetching userID from Sqlite: " + userID);
+        return userID;
+    }
 
-        Log.d(TAG, "Behaviours inserted into sqlite: " + id);
+    /**
+     * Getting user data from database
+     * */
+    public void setChild(String child) {
+        String selectQuery = "UPDATE user SET cname='"+child+"'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL(selectQuery);
+        Log.d(TAG, "Setting childID from Sqlite: " + child);
     }
 
     /**
@@ -121,10 +139,10 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         cursor.moveToFirst();
         if (cursor.getCount() > 0) {
             user.put("name", cursor.getString(1));
-            user.put("cname", cursor.getString(2));
+            //user.put("cname", cursor.getString(2));
             //user.put("email", cursor.getString(3));
-            user.put("uid", cursor.getString(3));
-            user.put("created_at", cursor.getString(4));
+            user.put("uid", cursor.getString(2));
+            user.put("created_at", cursor.getString(3));
         }
         cursor.close();
         db.close();
@@ -132,31 +150,6 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         Log.d(TAG, "Fetching user from Sqlite: " + user.toString());
 
         return user;
-    }
-
-    public HashMap<String, String> getBehaviourDetails() {
-        HashMap<String, String> behaviour = new HashMap<String, String>();
-        String selectQueryFromBTest = "SELECT * FROM " + TABLE_BHTEST;
-
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(selectQueryFromBTest, null);
-        // Move to first row
-        cursor.moveToFirst();
-        if (cursor.getCount() > 0) {
-            //behaviour.put("bc_id", cursor.getString(1));
-            behaviour.put("name", cursor.getString(1));
-            behaviour.put("cname", cursor.getString(2));
-            behaviour.put("bName", cursor.getString(3));
-            behaviour.put("severity", cursor.getString(4));
-            behaviour.put("updated_at", cursor.getString(5));
-        }
-
-        cursor.close();
-        db.close();
-        // return behaviour
-        Log.d(TAG, "Fetching btest from Sqlite: " + behaviour.toString());
-
-        return behaviour;
     }
 
     /**

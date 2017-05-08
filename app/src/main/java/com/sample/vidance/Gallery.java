@@ -65,7 +65,7 @@ public class Gallery extends AppCompatActivity {
     private String TAG = Gallery.class.getSimpleName();
     private SessionManager session;
     private SQLiteHandler db;
-    private String userName;
+    private String userID;
     private ProgressDialog pDialog;
     // URL to get contacts JSON
     private ArrayList<LinkedHashMap<String, String>> videoMap = new ArrayList<>();
@@ -137,8 +137,7 @@ public class Gallery extends AppCompatActivity {
         // Button onclick events
         choiceSelect();
 
-        userName = AppController.getInstance().getUser();
-
+        userID = db.getUserID();
     }
 
     public AlertDialog alertStyler(String title, String msg, final String selection) { // Function to create a pop up
@@ -667,7 +666,7 @@ public class Gallery extends AppCompatActivity {
             @Override
             protected String doInBackground(Void... params) {
                 Upload u = new Upload();
-                return u.uploadVideo(selectedPath, userName);
+                return u.uploadVideo(selectedPath, userID);
             }
         }
         UploadVideo uv = new UploadVideo();

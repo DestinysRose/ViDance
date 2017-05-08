@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,44 +20,62 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.sample.vidance.app.AppConfig;
+import com.sample.vidance.helper.HttpHandler;
 import com.sample.vidance.helper.SQLiteHandler;
 import com.sample.vidance.helper.SessionManager;
 import com.sample.vidance.app.AppController;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedWriter;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+
+import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Created by Danil on 27.03.2017.
+ * Modified by Michelle on 08.03.2017.
  */
 
 public class Register extends Activity {
     private static final String TAG = Register.class.getSimpleName();
     private Button btnRegister;
     private Button btnLinkToLogin;
-    private EditText inputFullName;
-    private EditText inputChildName;
-    private EditText inputPassword;
+    private EditText inputUserName, inputFullName, inputPassword, inputCfmPassword, inputEmail;
     private ProgressDialog pDialog;
     private SessionManager session;
     private SQLiteHandler db;
+    private String username, fullname, password, cfmpassword, email;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        inputFullName = (EditText) findViewById(R.id.name);
-        inputChildName = (EditText) findViewById(R.id.cname);
+        inputUserName = (EditText) findViewById(R.id.username);
+        inputFullName = (EditText) findViewById(R.id.fullname);
         inputPassword = (EditText) findViewById(R.id.password);
+        inputCfmPassword = (EditText) findViewById(R.id.cfmpassword);
+        inputEmail = (EditText) findViewById(R.id.email);
         btnRegister = (Button) findViewById(R.id.btnRegister);
         btnLinkToLogin = (Button) findViewById(R.id.btnLinkToLoginScreen);
 
         // Reset Image to prevent visual bugs
-        ImageView iv = (ImageView)findViewById(R.id.title2);
+        ImageView iv = (ImageView) findViewById(R.id.title2);
         iv.setImageResource(R.drawable.ic_vidance);
 
         // Change font for title
@@ -84,14 +103,16 @@ public class Register extends Activity {
         // Register Button Click event
         btnRegister.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                String name = inputFullName.getText().toString().trim();
-                String cname = inputChildName.getText().toString().trim();
-                String password = inputPassword.getText().toString().trim();
+                username = inputUserName.getText().toString().trim();
+                fullname = inputFullName.getText().toString().trim();
+                password = inputPassword.getText().toString().trim();
+                cfmpassword = inputCfmPassword.getText().toString().trim();
+                email = inputEmail.getText().toString().trim();
 
-                if (!name.isEmpty() && !cname.isEmpty() && !password.isEmpty()) {
-                    registerUser(name, cname, password);
+                if (!username.isEmpty() && !fullname.isEmpty() && !password.isEmpty() && !cfmpassword.isEmpty() && !email.isEmpty()) {
+                    registerUser(username, fullname, password, email);
                 } else {
-                    Toast.makeText(getApplicationContext(), "Please enter your details!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Please fill in all information!", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -109,20 +130,20 @@ public class Register extends Activity {
     /**
      * Function to store user in MySQL database will post params(tag, name,
      * email, password) to register url
-     * */
-    private void registerUser(final String name, final String cname, final String password) {
-        // Tag used to cancel the request
+     */
+    @SuppressWarnings("deprecation")
+    private void registerUser(final String username, final String fullname, final String password, final String email) {
+    // Tag used to cancel the request
         String tag_string_req = "req_register";
 
         pDialog.setMessage("Registering ...");
         showDialog();
 
-        StringRequest strReq = new StringRequest(Method.POST,
-                AppConfig.URL_REGISTER, new Response.Listener<String>() {
+        StringRequest strReq = new StringRequest(Method.POST, AppConfig.URL_REGISTER, new Response.Listener<String>() {
 
             @Override
             public void onResponse(String response) {
-                Log.d(TAG, "Register Response: " + response.toString());
+                Log.d(TAG, "Register Response: " + response);
                 hideDialog();
 
                 try {
@@ -134,24 +155,22 @@ public class Register extends Activity {
                         String uid = jObj.getString("uid");
 
                         JSONObject user = jObj.getJSONObject("user");
-                        String name = user.getString("name");
-                        String cname = user.getString("cname");
+                        String name = user.getString("username");
+                        String email = user.getString("email");
                         String created_at = user.getString("created_at");
 
                         // Inserting row in users table
-                        db.addUser(name, cname, uid, created_at);
+                        db.addUser(name, uid, created_at);
 
                         Toast.makeText(getApplicationContext(), "User successfully registered. Try login now!", Toast.LENGTH_LONG).show();
 
                         // Launch login activity
                         changeActivity(Login.class);
                     } else {
-
                         // Error occurred in registration. Get the error
                         // message
                         String errorMsg = jObj.getString("error_msg");
-                        Toast.makeText(getApplicationContext(),
-                                errorMsg, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -163,8 +182,7 @@ public class Register extends Activity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(TAG, "Registration Error: " + error.getMessage());
-                Toast.makeText(getApplicationContext(),
-                        error.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
                 hideDialog();
             }
         }) {
@@ -173,13 +191,14 @@ public class Register extends Activity {
             protected Map<String, String> getParams() {
                 // Posting params to register url
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("name", name);
-                params.put("cname", cname);
+                params.put("username", username);
+                params.put("fullname", fullname);
                 params.put("password", password);
+                params.put("cfmpassword", cfmpassword);
+                params.put("email", email);
 
                 return params;
             }
-
         };
         // Adding request to request queue
         AppController.getInstance().addToRequestQueue(strReq, tag_string_req);

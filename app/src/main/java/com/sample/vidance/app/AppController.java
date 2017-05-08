@@ -71,14 +71,6 @@ public class AppController extends Application {
         this.childname = childname;
     }
 
-    public String getUserID() { //Retrieve current user
-        return username;
-    }
-
-    public void setUserID(String username) { //Set current user
-        this.username = username;
-    }
-
     public String getChildID() { //Retrieve current child
         return childname;
     }

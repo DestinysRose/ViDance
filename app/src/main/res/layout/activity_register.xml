@@ -37,12 +37,12 @@
             android:textSize="18sp" />
 
         <EditText
-            android:id="@+id/name"
+            android:id="@+id/username"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:background="#958ed2"
-            android:hint="@string/hint_name"
+            android:hint="@string/hint_username"
             android:inputType="textCapWords"
             android:padding="10dp"
             android:textColor="@color/white"
@@ -50,12 +50,12 @@
             android:layout_marginTop="20dp" />
 
         <EditText
-            android:id="@+id/cname"
+            android:id="@+id/fullname"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:background="#958ed2"
-            android:hint="@string/hint_cname"
+            android:hint="@string/hint_fullname"
             android:inputType="textCapWords"
             android:padding="10dp"
             android:textColor="@color/white"
@@ -73,13 +73,36 @@
             android:textColor="@color/white"
             android:textColorHint="@color/white" />
 
+        <EditText
+            android:id="@+id/cfmpassword"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="#958ed2"
+            android:hint="@string/hint_cfmPassword"
+            android:inputType="textPassword"
+            android:padding="10dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white" />
+
+        <EditText
+            android:id="@+id/email"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="#958ed2"
+            android:hint="@string/hint_email"
+            android:padding="10dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white" />
+
         <!-- Register Button -->
 
         <Button
             android:id="@+id/btnRegister"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dip"
+            android:layout_marginTop="10dip"
             android:background="@color/navbar"
             android:text="@string/btn_register"
             android:textColor="#0F574E" />
