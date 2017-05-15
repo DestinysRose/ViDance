@@ -61,8 +61,6 @@ public class Record extends AppCompatActivity {
         // Session manager
         session = new SessionManager(getApplicationContext());
 
-        userName = AppController.getInstance().getUser();
-
         // Set font
         String fontPath = "fonts/James_Fajardo.ttf";
         Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
@@ -294,7 +292,6 @@ public class Record extends AppCompatActivity {
         session = new SessionManager(getApplicationContext());
         session.setLogin(false);
         db.deleteUsers();
-        AppController.getInstance().setUser(null);
         changeActivity(Login.class);
     }
 

@@ -35,6 +35,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     private static final String KEY_USERNAME = "username";
     private static final String KEY_CHILD = "cname";
     private static final String KEY_UID = "uid";
+    private static final String KEY_CID = "cid";
     private static final String KEY_CREATED_AT = "created_at";
 
     public SQLiteHandler(Context context) {
@@ -46,7 +47,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String  CREATE_LOGIN_TABLE = "CREATE TABLE " + TABLE_USER + "("
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_USERNAME + " TEXT,"
-                + KEY_CHILD + " TEXT," + KEY_UID + " TEXT,"
+                + KEY_CHILD + " TEXT," + KEY_UID + " TEXT," + KEY_CID + " TEXT,"
                 + KEY_CREATED_AT + " TEXT" + ")";
         db.execSQL(CREATE_LOGIN_TABLE);
 
@@ -72,6 +73,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         values.put(KEY_USERNAME, username); // UserName
         values.put(KEY_CHILD," "); // Child not selected by default
         values.put(KEY_UID, uid); // Userid
+        values.put(KEY_CID," "); // Childid
         values.put(KEY_CREATED_AT, created_at); // Created At
 
         // Inserting Row
@@ -100,30 +102,57 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Getting childID from database
-     * */
-    public String selectChild() {
-        String userID = "";
-        String selectQuery = "SELECT cname FROM " + TABLE_USER;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        if (cursor != null) {
-            cursor.moveToFirst();
-            userID = cursor.getString(0);
-            cursor.close();
-        }
-        Log.d(TAG, "Fetching userID from Sqlite: " + userID);
-        return userID;
-    }
-
-    /**
      * Getting user data from database
      * */
     public void setChild(String child) {
         String selectQuery = "UPDATE user SET cname='"+child+"'";
         SQLiteDatabase db = this.getReadableDatabase();
         db.execSQL(selectQuery);
+        Log.d(TAG, "Setting child from Sqlite: " + child);
+    }
+
+    /**
+     * Getting childname from database
+     * */
+    public String getChild() {
+        String childName = "";
+        String selectQuery = "SELECT cname FROM " + TABLE_USER;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            childName = cursor.getString(0);
+            cursor.close();
+        }
+        Log.d(TAG, "Fetching child from Sqlite: " + childName);
+        return childName;
+    }
+
+    /**
+     * Getting user data from database
+     * */
+    public void setChildID(String child) {
+        String selectQuery = "UPDATE user SET cid='"+child+"'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL(selectQuery);
         Log.d(TAG, "Setting childID from Sqlite: " + child);
+    }
+
+    /**
+     * Getting childname from database
+     * */
+    public String getChildID() {
+        String childID = "";
+        String selectQuery = "SELECT cid FROM " + TABLE_USER;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            childID = cursor.getString(0);
+            cursor.close();
+        }
+        Log.d(TAG, "Fetching childID from Sqlite: " + childID);
+        return childID;
     }
 
     /**

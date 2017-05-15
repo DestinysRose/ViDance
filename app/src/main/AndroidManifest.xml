@@ -50,6 +50,9 @@
             android:name=".Gallery"
             android:label="@string/app_name" />
         <activity
+            android:name=".Preview"
+            android:label="@string/app_name" />
+        <activity
             android:name=".Record"
             android:label="@string/app_name" />
         <activity

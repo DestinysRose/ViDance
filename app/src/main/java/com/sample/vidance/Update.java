@@ -31,9 +31,12 @@ import com.sample.vidance.app.AppController;
 import com.sample.vidance.helper.SQLiteHandler;
 import com.sample.vidance.helper.SessionManager;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.TimeZone;
 
 /**
@@ -44,7 +47,10 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
     private TextView mTextMessage,  tv;
     private View toggle,  toggle2;
     private String value, missing;
-    private String arraySeverity[], arrayBehaviour[], arrayDuration[];
+    private String rDate, rStart, rEnd; //Results to be sent
+    private ArrayList<String> rBehaviours = new ArrayList<>(); //Behaviour array
+    private ArrayList<String> rSeverity = new ArrayList<>(); //Severity array
+    private String arraySeverity[], arrayBehaviour[], arrayDuration[]; //Spinner arrays
     Button btnDatePicker, btnTimePicker;
     private Boolean validation, timeChange = false;
     private Typeface jf, cc;
@@ -64,6 +70,9 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
 
         // Session manager
         session = new SessionManager(getApplicationContext());
+
+        // SQLite database handler
+        db = new SQLiteHandler(getApplicationContext());
 
         //Receive input and update content appropriately
         mTextMessage = (TextView) findViewById(R.id.message);
@@ -86,7 +95,7 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
 
         //Initialise date and time
         Button btnDate = (Button) findViewById(R.id.setDate);
-        SimpleDateFormat date = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
         btnDate.setText(date.format(new Date()));
         Button btnTime = (Button) findViewById(R.id.setTime);
         SimpleDateFormat time = new SimpleDateFormat("hh:mm a");
@@ -424,6 +433,8 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                                 Spinner spinner2 = (Spinner) findViewById(spinID2);
                                 if (x == i) {
                                     value = value + "\n\nBehaviour " + String.valueOf(i) + " : " + bhv + "\nSeverity: " + rb.getText();
+                                    rBehaviours.add(bhv);
+                                    rSeverity.add(i + "|" + rb.getText().toString());
                                     validation = true;
                                     break;
                                 }
@@ -457,9 +468,25 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
 
                             int hour = mHour % 12;
 
-                            String endTime = String.format("%02d:%02d %s", hour == 0 ? 12 : hour, mMinute, mHour < 12 ? "am" : "pm");
+                            String endTime = String.format("%02d:%02d %s", hour == 0 ? 12 : hour, mMinute, mHour < 12 ? "AM" : "PM");
 
                             value = "Date: " + btnDatePicker.getText() + " Duration: " + dur +  "\nStart Time: " + btnTimePicker.getText() + " End Time: " + endTime + "\n\nBehaviour " + String.valueOf(i) + " : " + bhv + "\nSeverity: " + rb.getText();
+
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                            SimpleDateFormat date24Format = new SimpleDateFormat("HH:mm");
+                            try { // Convert time into 24Hour format for storing
+                                rStart = date24Format.format(date24Format.parse(btnTimePicker.getText().toString()));
+                                rEnd = date24Format.format(date24Format.parse(endTime));
+                                rDate = dateFormat.format(dateFormat.parse(btnDatePicker.getText().toString()));
+                            } catch (ParseException pe) {
+                                pe.printStackTrace();
+                            }
+
+                            rStart = (rDate + " " + rStart);
+                            rEnd = (rDate + " " + rEnd);
+                            rBehaviours.add(bhv);
+                            rSeverity.add(i + "|" + rb.getText().toString());
+
                             validation = true;
                         }
                     }
@@ -473,6 +500,10 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                     Intent intent = new Intent(Update.this, ReceiveInput.class);
                     intent.putExtra("TITLE", "Update Behaviours");
                     intent.putExtra("RESULT", value);
+                    intent.putExtra("STARTTIME", rStart);
+                    intent.putExtra("ENDTIME", rEnd);
+                    intent.putStringArrayListExtra("BEHAVIOURS", rBehaviours);
+                    intent.putStringArrayListExtra("SEVERITY", rSeverity);
                     startActivity(intent);
                 }
                 else {
@@ -496,7 +527,14 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
 
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            btnDatePicker.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
+                            SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+                            String currentDate = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
+                            try { // Convert time into 24Hour format for storing
+                                currentDate = date.format(date.parse(currentDate));
+                            } catch (ParseException pe) {
+                                pe.printStackTrace();
+                            }
+                            btnDatePicker.setText(currentDate);
                         }
                     }, mYear, mMonth, mDay);
             datePickerDialog.show();
@@ -602,7 +640,6 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
         session = new SessionManager(getApplicationContext());
         session.setLogin(false);
         db.deleteUsers();
-        AppController.getInstance().setUser(null);
         changeActivity(Login.class);
     }
 

@@ -35,6 +35,11 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.VideoView;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.sample.vidance.app.AppConfig;
 import com.sample.vidance.app.AppController;
 import com.sample.vidance.helper.HttpHandler;
 import com.sample.vidance.helper.SQLiteHandler;
@@ -71,7 +76,6 @@ public class Gallery extends AppCompatActivity {
     private ArrayList<LinkedHashMap<String, String>> videoMap = new ArrayList<>();
     private ArrayList<Bitmap> videoThumbnails = new ArrayList<Bitmap>();
     private ArrayList<String> videoLocation = new ArrayList<String>();
-    private ArrayList<LinkedHashMap<String, String>> storyMap = new ArrayList<>();
     private ArrayList<String> storyList = new ArrayList<String>();
     // Flag for which one is used for images selection
     private GridView videoList;
@@ -84,7 +88,7 @@ public class Gallery extends AppCompatActivity {
     private View choice, preview, buttons;
     private ListView sList;
     private Button btnCancel, btnDwnl, btnSend, btnFull, instructor, user, gallery;
-    private String fontPath;
+    private String fontPath,  checkUser;
     private Typeface tf;
 
     protected Context _context;
@@ -137,6 +141,7 @@ public class Gallery extends AppCompatActivity {
         // Button onclick events
         choiceSelect();
 
+        checkUser = "http://www.thevidance.com/test/videos/" + db.getUserID();
         userID = db.getUserID();
     }
 
@@ -292,14 +297,14 @@ public class Gallery extends AppCompatActivity {
         mediaController.setAnchorView(findViewById(R.id.mediaController));
         video.setMediaController(mediaController);
 
-        String title = fullView.replace("http://www.thevidance.com/test/videos/", "");
+        String title = fullView.replace(checkUser, "");
         selectedPath = fullView;
 
         TextView text = (TextView) findViewById(R.id.videoName);
         text.setText("Preview:" + title);
         text.setTypeface(tf);
 
-        mediaController.show();
+        mediaController.show(0);
         video.start();
     }
 
@@ -348,7 +353,7 @@ public class Gallery extends AppCompatActivity {
             text.setText("Preview:" + title);
             text.setTypeface(tf);
 
-            mediaController.show();
+            mediaController.show(0);
             video.start();
         }
     };
@@ -495,10 +500,11 @@ public class Gallery extends AppCompatActivity {
                     // Get all values within the array
                     for (int i = 0; i < videos.length(); ++i) {
                         String video = videos.getString(i);
-
-                        LinkedHashMap<String, String> videoURL = new LinkedHashMap<>(); // Assign to a LinkedHashMap
-                        videoURL.put("videos", video);
-                        videoMap.add(videoURL);
+                        if (video.substring(0,44).equals(checkUser)) {
+                            LinkedHashMap<String, String> videoURL = new LinkedHashMap<>(); // Assign to a LinkedHashMap
+                            videoURL.put("videos", video);
+                            videoMap.add(videoURL);
+                        }
                     }
                     int x = 0;
                     for(HashMap<String, String> map: videoMap) {
@@ -518,7 +524,6 @@ public class Gallery extends AppCompatActivity {
                             showToast("Json parsing error: " + e.getMessage());
                         }
                     });
-
                 }
             }
             else {
@@ -538,9 +543,10 @@ public class Gallery extends AppCompatActivity {
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
             // Dismiss the progress dialog
-            if (pDialog.isShowing())
+            if (pDialog.isShowing()){
                 pDialog.dismiss();
-                videoList.setAdapter(new ImageAdapter(_context,videoThumbnails));
+            }
+            videoList.setAdapter(new ImageAdapter(_context,videoThumbnails));
         }
     }
 
@@ -597,12 +603,12 @@ public class Gallery extends AppCompatActivity {
             super.onPostExecute(result); // Dismiss the progress dialog
             if (pDialog.isShowing())
                 pDialog.dismiss();
-            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(Gallery.this, android.R.layout.simple_list_item_1, storyList);
-            sList.setAdapter(arrayAdapter); // Populates List view with data retrieved
-            sList.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(Gallery.this, android.R.layout.simple_list_item_1, storyList);
+                sList.setAdapter(arrayAdapter); // Populates List view with data retrieved
+                sList.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
-                    showToast(sList.getItemAtPosition(position).toString());
+                    getStory(sList.getItemAtPosition(position).toString());
                 }
             });
         }
@@ -673,6 +679,74 @@ public class Gallery extends AppCompatActivity {
         uv.execute();
     }
 
+
+    /**
+     * Load social story into preview
+     */
+    @SuppressWarnings("deprecation")
+    private void getStory(final  String folder) {
+        // Tag used to cancel the request
+        String tag_string_req = "req_child";
+
+        pDialog.setMessage("Loading ...");
+        showDialog();
+
+        StringRequest strReq = new StringRequest(Request.Method.POST, AppConfig.URL_GETSTORY, new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, "Get story Response: " + response);
+                hideDialog();
+
+                try {
+                    JSONObject jObj = new JSONObject(response);
+                    String audio = jObj.getString("audio");
+                    String image = jObj.getString("image");
+
+                    finish();
+                    Intent i = new Intent(Gallery.this, Preview.class);
+                    i.putExtra("AUDIO", audio);
+                    i.putExtra("IMAGE", image);
+                    i.putExtra("FOLDER", folder);
+                    startActivity(i);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "Registration Error: " + error.getMessage());
+                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+                hideDialog();
+            }
+        }) {
+
+            @Override
+            protected Map<String, String> getParams() {
+                // Posting params to register url
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("folder", folder);
+                return params;
+            }
+        };
+        // Adding request to request queue
+        AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
+    }
+
+    private void showDialog() {
+        if (!pDialog.isShowing())
+            pDialog.show();
+    }
+
+    private void hideDialog() {
+        if (pDialog.isShowing())
+            pDialog.dismiss();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -719,7 +793,6 @@ public class Gallery extends AppCompatActivity {
         session = new SessionManager(getApplicationContext());
         session.setLogin(false);
         db.deleteUsers();
-        AppController.getInstance().setUser(null);
         changeActivity(Login.class);
     }
 

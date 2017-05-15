@@ -24,6 +24,10 @@
     <string name="hint_cfmPassword">Confirm Password</string>
     <string name="hint_email">E-mail</string>
     <string name="hint_cname">Child Name</string>
+    <string name="hint_cAge">Child Age</string>
+    <string name="gender">Child Gender:</string>
+    <string name="female">Female</string>
+    <string name="male">Male</string>
     <string name="btn_login">LOGIN</string>
     <string name="btn_register">REGISTER</string>
     <string name="btn_link_to_register">Not a member? Sign up now</string>

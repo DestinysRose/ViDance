@@ -139,7 +139,7 @@ public class Register extends Activity {
         pDialog.setMessage("Registering ...");
         showDialog();
 
-        StringRequest strReq = new StringRequest(Method.POST, AppConfig.URL_REGISTER, new Response.Listener<String>() {
+        StringRequest strReq = new StringRequest(Method.POST, AppConfig.URL_REGUSER, new Response.Listener<String>() {
 
             @Override
             public void onResponse(String response) {
@@ -156,7 +156,6 @@ public class Register extends Activity {
 
                         JSONObject user = jObj.getJSONObject("user");
                         String name = user.getString("username");
-                        String email = user.getString("email");
                         String created_at = user.getString("created_at");
 
                         // Inserting row in users table

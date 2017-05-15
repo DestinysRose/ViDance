@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.Request.Method;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -22,9 +23,11 @@ import com.sample.vidance.helper.SessionManager;
 import com.sample.vidance.app.AppController;
 import com.sample.vidance.helper.SQLiteHandler;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -152,10 +155,8 @@ public class Login extends Activity {
 
                         // Inserting row in users table
                         db.addUser(uid, username, created_at);
-                        // Launch main activity
-                        finish();
-                        Intent intent = new Intent(Login.this, Child.class);
-                        startActivity(intent);
+
+                        changeActivity(Settings.class);
                     } else {
                         // Error in login. Get the error message
                         String errorMsg = jObj.getString("error_msg");
@@ -208,6 +209,7 @@ public class Login extends Activity {
         Intent intent = new Intent(this, activity);
         startActivity(intent);
     }
+
 
     @Override
     public void onBackPressed() {

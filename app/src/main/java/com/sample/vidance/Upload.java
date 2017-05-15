@@ -32,7 +32,6 @@ import java.util.ArrayList;
 public class Upload {
 
     public static final String UPLOAD_URL = "http://thevidance.com/test/upload.php";
-    public static final String REG_URL = "http://thevidance.com/test/reg_test.php";
 
     private int serverResponseCode;
 
@@ -126,35 +125,5 @@ public class Upload {
         } else {
             return "Could not upload";
         }
-    }
-
-    @SuppressWarnings("deprecation")
-    public String register(String username, String fullname, String password, String cfmpass, String email) {
-        HttpClient httpclient;
-        HttpPost httppost;
-        ArrayList<NameValuePair> postParameters;
-        httpclient = new DefaultHttpClient();
-        httppost = new HttpPost("your login link");
-        String respon="";
-
-        postParameters = new ArrayList<NameValuePair>();
-        postParameters.add(new BasicNameValuePair("username", username));
-        postParameters.add(new BasicNameValuePair("fullname", fullname));
-        postParameters.add(new BasicNameValuePair("password", password));
-        postParameters.add(new BasicNameValuePair("cfmpassword", cfmpass));
-        postParameters.add(new BasicNameValuePair("email", email));
-
-        try {
-            httppost.setEntity(new UrlEncodedFormEntity(postParameters));
-            HttpResponse response = httpclient.execute(httppost);
-            respon = response.toString();
-        } catch (UnsupportedEncodingException e) {
-            throw new AssertionError("UTF-8 is unknown");
-            // or 'throw new AssertionError("Impossible things are happening today. " +
-            //                              "Consider buying a lottery ticket!!");'
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
-        return respon;
     }
 }

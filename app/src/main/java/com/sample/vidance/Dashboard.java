@@ -67,7 +67,7 @@ public class Dashboard extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.action_settings:
-                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
+                changeActivity(Settings.class);
                 break;
             case R.id.action_contact:
                 finish();
@@ -98,7 +98,6 @@ public class Dashboard extends AppCompatActivity {
         session = new SessionManager(getApplicationContext());
         session.setLogin(false);
         db.deleteUsers();
-        AppController.getInstance().setUser(null);
         changeActivity(Login.class);
     }
 
