@@ -54,6 +54,10 @@ public class Colors {
             Color.rgb(118, 174, 175), Color.rgb(42, 109, 130)
     };
 
+    public static final int[] H_BAR_COLOR = {
+            Color.rgb(255, 100, 0), Color.rgb(218, 86, 0), Color.rgb(193, 76, 0)
+    };
+
     /**
      * Converts the given hex-color-string to rgb.
      *

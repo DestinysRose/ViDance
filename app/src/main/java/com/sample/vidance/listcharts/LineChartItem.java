@@ -34,9 +34,11 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.sample.vidance.CustomMarkerView;
 import com.sample.vidance.Dashboard;
 import com.sample.vidance.Login;
@@ -54,6 +56,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -315,7 +318,23 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
         });
     }
 
+    public class MyValueFormatter implements ValueFormatter {
 
+        private DecimalFormat mFormat;
+
+        public MyValueFormatter() {
+            mFormat = new DecimalFormat("###,###,###"); // use no decimals
+        }
+
+        @Override
+        public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+
+            if(value < 5)
+                return "";
+            else
+                return mFormat.format(value) + "%";
+        }
+    }
 
     private void storeDateHourly() throws JSONException {
         final String date = (String) btnDatePicker.getText();
@@ -480,6 +499,7 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
                                                 }
 
                                                 PieDataSet dataset2 = new PieDataSet(entries2, "");
+                                                dataset2.setValueFormatter(new MyValueFormatter());
 
                                                 PieData data2 = new PieData(labels2, dataset2);
 
@@ -708,6 +728,7 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
                                                 }
 
                                                 PieDataSet dataset2 = new PieDataSet(entries2, "");
+                                                dataset2.setValueFormatter(new MyValueFormatter());
 
                                                 PieData data2 = new PieData(labels2, dataset2);
 
@@ -938,6 +959,7 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
                                                 }
 
                                                 PieDataSet dataset2 = new PieDataSet(entries2, "");
+                                                dataset2.setValueFormatter(new MyValueFormatter());
 
                                                 PieData data2 = new PieData(labels2, dataset2);
 
@@ -1167,6 +1189,11 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
                                                 }
 
                                                 PieDataSet dataset2 = new PieDataSet(entries2, "");
+                                                dataset2.setValueFormatter(new MyValueFormatter());
+                                                //dataSet.setSelectionShift(0f);
+
+
+
 
                                                 PieData data2 = new PieData(labels2, dataset2);
 

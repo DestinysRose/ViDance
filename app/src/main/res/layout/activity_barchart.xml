@@ -80,16 +80,6 @@
             android:layout_margin="5dp"/>
 
         <Button
-            android:id="@+id/setFirstDate"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/button_rounded"
-            android:text="First Day"
-            android:textColor="@color/text"
-            android:layout_weight="1"
-            android:layout_margin="5dp"/>
-
-        <Button
             android:id="@+id/setEndDate"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -97,26 +87,6 @@
             android:layout_weight="1"
             android:background="@drawable/button_rounded"
             android:text="End Day"
-            android:textColor="@color/text" />
-
-        <Button
-            android:id="@+id/setStartTime"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:layout_weight="1"
-            android:background="@drawable/button_rounded"
-            android:text="First day of Week"
-            android:textColor="@color/text" />
-
-        <Button
-            android:id="@+id/setEndTime"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:layout_weight="1"
-            android:background="@drawable/button_rounded"
-            android:text="First day of Month"
             android:textColor="@color/text" />
 
         <EditText
@@ -157,7 +127,7 @@
         android:layout_width="match_parent"
         android:layout_height="200dp" />
 
-    <com.github.mikephil.charting.charts.PieChart
+    <com.github.mikephil.charting.charts.HorizontalBarChart
         android:id="@+id/chart2"
         android:layout_width="match_parent"
         android:layout_height="151dp" />
