@@ -21,6 +21,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -46,7 +47,7 @@ public class TargetBehaviour  extends AppCompatActivity {
 
     ArrayList<HashMap<String, String>> dataList;
 
-    public static final String TARGET_DATA = "http://thevidance.com/filter/pieChart.php";
+    public static final String TARGET_CURR_WEEK = "http://thevidance.com/targetBehaviour.php";
 
     //JSON Array
     private JSONArray result;
@@ -71,7 +72,6 @@ public class TargetBehaviour  extends AppCompatActivity {
         mTextMessage.setText(R.string.title_target);
         mTextMessage.setTypeface(tf);
 
-        //list = (ListView) findViewById(R.id.getReport);
         dataList = new ArrayList<HashMap<String,String>>();
 
         try {
@@ -108,14 +108,19 @@ public class TargetBehaviour  extends AppCompatActivity {
     }
 
     private void storeDateHourly() throws JSONException {
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, TARGET_DATA,
+
+        final LineChart lineChart = (LineChart) findViewById(R.id.chart);
+
+        final ArrayList<Entry> current = new ArrayList<>();
+        final ArrayList<Entry> target = new ArrayList<>();
+        final ArrayList<String> labels = new ArrayList<>();
+
+        final ArrayList<ILineDataSet> lineDataSets = new ArrayList<>();
+
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, TARGET_CURR_WEEK,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-
-                            LineChart lineChart = (LineChart) findViewById(R.id.chart);
-
-                            //Toast.makeText(LineChartItem.this,response,Toast.LENGTH_LONG).show();
 
                             JSONObject reader = null;
                             try {
@@ -125,25 +130,16 @@ public class TargetBehaviour  extends AppCompatActivity {
                                 if (result.length() == 0)
                                     Toast.makeText(TargetBehaviour.this, "Sorry, no records this day(s)", Toast.LENGTH_LONG).show();
                                 else {
-                                    //Toast.makeText(LineChartItem.this,"Shit Working!",Toast.LENGTH_LONG).show();
-
-                                    ArrayList<Entry> current = new ArrayList<>();
-                                    ArrayList<String> labels = new ArrayList<>();
-
-                                    ArrayList<Entry> target = new ArrayList<>();
 
                                     int count;
-
-
-
                                     for (int i = 0; i < result.length(); i++) {
                                         final JSONObject weather_object_0 = result.getJSONObject(i);
                                         final String weather_0_description = weather_object_0.getString("counter");
                                         count = Integer.parseInt(weather_0_description);
 
                                         current.add(new Entry(count, i));
-                                        target.add(new Entry(count/2,i));
-                                        labels.add("#"+i);
+                                        target.add(new Entry(1,i));
+                                        labels.add("");
                                     }
 
                                     String[] xaxes = new String[labels.size()];
@@ -152,7 +148,6 @@ public class TargetBehaviour  extends AppCompatActivity {
                                         xaxes[i] = labels.get(i);
                                     }
 
-                                    ArrayList<ILineDataSet> lineDataSets = new ArrayList<>();
 
                                     LineDataSet lineDataSet1 = new LineDataSet(current, "Current behaviour");
                                     lineDataSet1.setDrawCircles(false);
@@ -175,9 +170,14 @@ public class TargetBehaviour  extends AppCompatActivity {
                                     lineChart.setScaleEnabled(false);
                                     lineChart.setDoubleTapToZoomEnabled(false);
                                     lineChart.setMaxVisibleValueCount(result.length());
-                                    lineChart.setDescription("");
+                                    lineChart.setDescription("Comparison number of behaviours from last week with target number");
                                     lineChart.animateY(1000);
                                     lineChart.getLegend().setEnabled(true);
+                                    YAxis yAxisRight = lineChart.getAxisRight();
+                                    yAxisRight.setEnabled(false);
+
+                                    lineChart.fitScreen();
+
                                     lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
                                         @Override
                                         public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
@@ -198,7 +198,6 @@ public class TargetBehaviour  extends AppCompatActivity {
 
                                         }
                                     });
-                                    lineChart.fitScreen();
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -251,9 +250,6 @@ public class TargetBehaviour  extends AppCompatActivity {
                 case R.id.navigation_report:
                     finish();
                     intent = new Intent(TargetBehaviour.this, Report.class);
-                    /**intent.putExtra("SELECTED_ITEM", 3);
-                     intent.putExtra("SELECTED_ACTIVITY", "Target Behaviours");
-                     intent.putExtra("SELECTED_CONTENT", 1);**/
                     startActivity(intent);
                     return true;
             }

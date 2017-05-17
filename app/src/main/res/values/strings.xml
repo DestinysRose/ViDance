@@ -66,6 +66,33 @@
     <string name="hide_severity">Hide Severity Information</string>
     <string name="behaviour">Select Behaviour:</string>
 
+    <!-- Default button values (inside Generate Report) -->
+    <string name="day">Day</string>
+    <string name="first_day">First Day</string>
+    <string name="end_day">End Day</string>
+    <string name="week">First day of week</string>
+    <string name="month">First day of month</string>
+    <string name="amount"></string>
+    <string name="times"> time(s)</string>
+    <string name="hourly">Hourly</string>
+    <string name="daily">Daily</string>
+    <string name="weekly">Weekly</string>
+    <string name="monthly">Monthly</string>
+    <string name="show_report">Show Report</string>
+    <string name="hint">Hint</string>
+
+    <!-- Total chart options -->
+    <string name="by_behaviour">By Behaviour</string>
+    <string name="by_severity">By Severity</string>
+
+    <!-- Report -->
+    <string name="num_behaviours">Behaviours per severity</string>
+    <string name="num_severities">Severities per behaviour</string>
+    <string name="total">Total</string>
+    <string name="chart1desc">First graph will show number of behaviours and its severity over time</string>
+    <string name="chart2desc">Second graph will show number of severities for each behaviour over time</string>
+    <string name="chart3desc">Final graph combines first and second graphs to show all your records</string>
+
     <!-- Behaviour Severity Information -->
     <string name="severity_info">
         For self injurious behaviours:

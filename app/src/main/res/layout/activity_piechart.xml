@@ -6,7 +6,7 @@
     tools:context="com.sample.vidance.listcharts.PieChartItem">
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical" android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:weightSum="1">
         <LinearLayout
             android:layout_width="match_parent"
@@ -31,7 +31,7 @@
                     android:textColor="@color/text"
                     android:button="@null"
                     android:gravity="center"
-                    android:text="BY BEHAVIOUR" />
+                    android:text="@string/by_behaviour" />
                 <RadioButton
                     android:id="@+id/bySeverity"
                     android:layout_width="wrap_content"
@@ -42,15 +42,14 @@
                     android:textColor="@color/text"
                     android:button="@null"
                     android:gravity="center"
-                    android:text="BY SEVERITY" />
+                    android:text="@string/by_severity" />
 
             </RadioGroup>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="288dp"
-            android:layout_weight="9.73"
+            android:layout_height="363dp"
             android:orientation="horizontal">
 
             <com.github.mikephil.charting.charts.PieChart
@@ -66,7 +65,7 @@
                 android:id="@+id/bName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="left"
+                android:gravity="start"
                 android:textSize="20sp"
                 android:layout_marginTop="25dp"
                 android:layout_marginBottom="5dp"
@@ -82,7 +81,9 @@
                         android:id="@+id/mild"
                         android:layout_width="89dp"
                         android:layout_height="wrap_content"
-                        android:text="Mild"
+                        android:text="@string/severity_mild"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginLeft="10dp"
                         android:textStyle="normal" />
 
                     <TextView
@@ -99,7 +100,9 @@
                     android:layout_width="89dp"
                     android:layout_height="wrap_content"
                     android:textStyle="normal"
-                    android:text="Moderate"/>
+                    android:layout_marginStart="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/severity_moderate"/>
                 <TextView
                     android:id="@+id/moderateCount"
                     android:layout_width="fill_parent"
@@ -115,7 +118,9 @@
                     android:layout_width="89dp"
                     android:layout_height="wrap_content"
                     android:textStyle="normal"
-                    android:text="Severe" />
+                    android:layout_marginStart="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/severity_severe" />
                 <TextView
                     android:id="@+id/severeCount"
                     android:layout_width="fill_parent"
@@ -129,7 +134,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="25dp"
                 android:layout_marginBottom="5dp"
-                android:gravity="left"
+                android:layout_marginStart="5dp"
+                android:layout_marginLeft="5dp"
+                android:gravity="start"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -139,11 +146,13 @@
                     android:layout_weight="1">
                     <TextView
                         android:id="@+id/getBehaviours"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:gravity="left"
+                        android:gravity="start"
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="5dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginLeft="10dp"
                         android:textStyle="normal"
                         android:layout_weight="61.59" />
 
@@ -153,7 +162,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="5dp"
                         android:layout_marginTop="10dp"
-                        android:gravity="left"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:gravity="start"
                         android:textStyle="normal" />
                 </LinearLayout>
             </TableRow>

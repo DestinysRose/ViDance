@@ -29,6 +29,7 @@ import com.android.volley.toolbox.Volley;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -77,30 +78,31 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
     //JSON Array
     private JSONArray result;
 
-    ArrayList<HashMap<String, String>> dataList;
-
-    Button btnDatePicker, btnFirstDatePicker, btnEndDatePicker, btnWeekPicker, btnMonthPicker;
-
+    Button btnDatePicker, btnEndDatePicker;
+    LineChart lineChart;
+    PieChart pieChart;
     EditText inputAmount;
-
-    private int mYear, mMonth, mDay;
 
     public static final String LINE_FILTER_HOURLY = "http://thevidance.com/filter/hourly/lineChart.php";
     public static final String LINE_FILTER_DAILY = "http://thevidance.com/filter/daily/lineChart.php";
     public static final String LINE_FILTER_WEEKLY = "http://thevidance.com/filter/weekly/lineChart.php";
     public static final String LINE_FILTER_MONTHLY = "http://thevidance.com/filter/monthly/lineChart.php";
 
+    public static final String EMPTY_LINE_FILTER_HOURLY = "http://thevidance.com/filter/hourly/lineChart(Empty).php";
+    public static final String EMPTY_LINE_FILTER_DAILY = "http://thevidance.com/filter/daily/lineChart(Empty).php";
+    public static final String EMPTY_LINE_FILTER_WEEKLY = "http://thevidance.com/filter/weekly/lineChart(Empty).php";
+    public static final String EMPTY_LINE_FILTER_MONTHLY = "http://thevidance.com/filter/monthly/lineChart(Empty).php";
+
     public static final String KEY_DATE = "date1";
     public static final String KEY_END_DATE = "date2";
     public static final String KEY_AMOUNT = "amount";
 
+    private String arrayBehaviour[];
+    private int bArray[];
+    private String date, endDate, amount;
+
     Typeface tf;
     Typeface jf;
-
-    private int[] bArray;
-    private String[] bNameArray;
-
-    private RadioGroup radioGroup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,60 +112,46 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
         // Progress dialog
         pDialog = new ProgressDialog(this);
         pDialog.setCancelable(false);
+        pDialog.setMessage("Loading ...");
+
+        lineChart = (LineChart) findViewById(R.id.chart);
+        pieChart = (PieChart) findViewById(R.id.chart2);
 
         String fontPath = "fonts/CatCafe.ttf";
         tf = Typeface.createFromAsset(getAssets(), fontPath);
         String fontPath2 = "fonts/James_Fajardo.ttf";
         jf = Typeface.createFromAsset(getAssets(), fontPath2);
 
-        final LineChart lineChart = (LineChart) findViewById(R.id.chart);
-        final PieChart pieChart = (PieChart) findViewById(R.id.chart2);
-
         //Set onClickListeners for date and time
         btnDatePicker = (Button)findViewById(R.id.setDate);
-        btnDatePicker.setOnClickListener((View.OnClickListener) this);
+        btnDatePicker.setOnClickListener(this);
         btnDatePicker.setTypeface(jf);
         btnDatePicker.setTextSize(25);
 
-
-        //Set onClickListeners for date and time
-        btnFirstDatePicker = (Button)findViewById(R.id.setFirstDate);
-        btnFirstDatePicker.setOnClickListener((View.OnClickListener) this);
-        btnFirstDatePicker.setTypeface(jf);
-        btnFirstDatePicker.setTextSize(25);
-
         //Set onClickListeners for date and time
         btnEndDatePicker = (Button)findViewById(R.id.setEndDate);
-        btnEndDatePicker.setOnClickListener((View.OnClickListener) this);
+        btnEndDatePicker.setOnClickListener(this);
         btnEndDatePicker.setTypeface(jf);
         btnEndDatePicker.setTextSize(25);
-
-        //Set onClickListeners for date and time
-        btnWeekPicker = (Button)findViewById(R.id.setWeek);
-        btnWeekPicker.setOnClickListener(this);
-        btnWeekPicker.setTypeface(jf);
-        btnWeekPicker.setTextSize(25);
-
-        //Set onClickListeners for date and time
-        btnMonthPicker = (Button)findViewById(R.id.setMonth);
-        btnMonthPicker.setOnClickListener(this);
-        btnMonthPicker.setTypeface(jf);
-        btnMonthPicker.setTextSize(25);
 
         inputAmount = (EditText)findViewById(R.id.setNumber);
         inputAmount.setHint("How many?");
         inputAmount.setTypeface(tf);
 
-        btnDatePicker.setVisibility(View.GONE);
-        btnFirstDatePicker.setVisibility(View.GONE);
-        btnWeekPicker.setVisibility(View.GONE);
-        btnMonthPicker.setVisibility(View.GONE);
-        btnEndDatePicker.setVisibility(View.GONE);
-        inputAmount.setVisibility(View.GONE);
-        lineChart.setVisibility(View.GONE);
-        pieChart.setVisibility(View.GONE);
+        final String lineDescHourly = "Number of behaviours per each hour";
+        final String lineDescDaily = "Number of behaviours per each day";
+        final String lineDescWeekly = "Number of behaviours per each week";
+        final String lineDescMonthly = "Number of behaviours per each month";
 
-        radioGroup = (RadioGroup) findViewById(R.id.radio);
+        final String pieDescHourly = "Time: ";
+        final String pieDescDaily = "Day: ";
+        final String pieDescWeekly = "Week: ";
+        final String pieDescMonthly = "Month: ";
+
+        arrayBehaviour = getResources().getStringArray(R.array.behaviour_arrays);
+        bArray = new int[arrayBehaviour.length];
+
+        RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radio);
         RadioButton rbH=(RadioButton)findViewById(R.id.hourly);
         RadioButton rbD=(RadioButton)findViewById(R.id.daily);
         RadioButton rbW=(RadioButton)findViewById(R.id.weekly);
@@ -178,7 +166,7 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
         rbM.setTypeface(jf);
         rbM.setTextSize(23);
 
-        showMessage();
+        hideButtons();
 
         Button dateApply = (Button) findViewById(R.id.dateApply);
         dateApply.setTypeface(jf);
@@ -208,24 +196,20 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
                 RadioButton rb=(RadioButton)findViewById(checkedId);
                 switch(rb.getId()) {
                     case R.id.hourly:
-                        setTextByDefault();
+                        hideButtons();
+                        setTextForHourly();
                         btnDatePicker.setVisibility(View.VISIBLE);
-                        btnFirstDatePicker.setVisibility(View.GONE);
-                        btnWeekPicker.setVisibility(View.GONE);
-                        btnMonthPicker.setVisibility(View.GONE);
-                        btnEndDatePicker.setVisibility(View.GONE);
-                        inputAmount.setVisibility(View.GONE);
-                        lineChart.setVisibility(View.GONE);
-                        pieChart.setVisibility(View.GONE);
-
 
                         Button filHour = (Button) findViewById(R.id.dateApply);
                         filHour.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 try {
-                                    storeDateHourly();
-                                    //Toast.makeText(getApplicationContext(), date, Toast.LENGTH_SHORT).show();
+                                    date = (String) btnDatePicker.getText();
+                                    endDate = (String) btnEndDatePicker.getText();
+                                    amount = inputAmount.getText().toString().trim();
+                                    if(hourlyValid(date) == 0)
+                                        storeDate(LINE_FILTER_HOURLY, lineDescHourly, pieDescHourly);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                     Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
@@ -235,22 +219,21 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
 
                         break;
                     case R.id.daily:
-                        setTextByDefault();
-                        btnDatePicker.setVisibility(View.GONE);
-                        btnFirstDatePicker.setVisibility(View.VISIBLE);
+                        hideButtons();
+                        setTextForDaily();
+                        btnDatePicker.setVisibility(View.VISIBLE);
                         btnEndDatePicker.setVisibility(View.VISIBLE);
-                        btnWeekPicker.setVisibility(View.GONE);
-                        btnMonthPicker.setVisibility(View.GONE);
-                        inputAmount.setVisibility(View.GONE);
-                        lineChart.setVisibility(View.GONE);
-                        pieChart.setVisibility(View.GONE);
 
                         Button filDay = (Button) findViewById(R.id.dateApply);
                         filDay.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 try {
-                                    storeDateDaily();
+                                    date = (String) btnDatePicker.getText();
+                                    endDate = (String) btnEndDatePicker.getText();
+                                    amount = inputAmount.getText().toString().trim();
+                                    if(dailyValid(date, endDate) == 0)
+                                        storeDate(LINE_FILTER_DAILY, lineDescDaily, pieDescDaily);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                     Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
@@ -260,22 +243,21 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
 
                         break;
                     case R.id.weekly:
-                        setTextByDefault();
-                        btnDatePicker.setVisibility(View.GONE);
-                        btnFirstDatePicker.setVisibility(View.GONE);
-                        btnWeekPicker.setVisibility(View.VISIBLE);
-                        btnMonthPicker.setVisibility(View.GONE);
-                        btnEndDatePicker.setVisibility(View.GONE);
+                        hideButtons();
+                        setTextForWeekly();
+                        btnDatePicker.setVisibility(View.VISIBLE);
                         inputAmount.setVisibility(View.VISIBLE);
-                        lineChart.setVisibility(View.GONE);
-                        pieChart.setVisibility(View.GONE);
 
                         Button filWeek = (Button) findViewById(R.id.dateApply);
                         filWeek.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 try {
-                                    storeDateWeekly();
+                                    date = (String) btnDatePicker.getText();
+                                    endDate = (String) btnEndDatePicker.getText();
+                                    amount = inputAmount.getText().toString().trim();
+                                    if(weeklyValid(date, amount) == 0)
+                                        storeDate(LINE_FILTER_WEEKLY, lineDescWeekly, pieDescWeekly);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                     Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
@@ -285,30 +267,25 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
 
                         break;
                     case R.id.monthly:
-                        setTextByDefault();
-                        btnDatePicker.setVisibility(View.GONE);
-                        btnFirstDatePicker.setVisibility(View.GONE);
-                        btnWeekPicker.setVisibility(View.GONE);
-                        btnMonthPicker.setVisibility(View.VISIBLE);
-                        btnEndDatePicker.setVisibility(View.GONE);
+                        hideButtons();
+                        setTextForMonthly();
+                        btnDatePicker.setVisibility(View.VISIBLE);
                         inputAmount.setVisibility(View.VISIBLE);
-                        lineChart.setVisibility(View.GONE);
-                        pieChart.setVisibility(View.GONE);
 
                         Button filMonth = (Button) findViewById(R.id.dateApply);
                         filMonth.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 try {
-                                    storeDateMonthly();
-                                    //Toast.makeText(getApplicationContext(), date, Toast.LENGTH_SHORT).show();
+                                    date = (String) btnDatePicker.getText();
+                                    endDate = (String) btnEndDatePicker.getText();
+                                    amount = inputAmount.getText().toString().trim();
+                                    if(monthlyValid(date, amount) == 0)
+                                        storeDate(LINE_FILTER_MONTHLY, lineDescMonthly, pieDescMonthly);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                     Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
                                 }
-
-                                //new LineChartItem.ProcessJSON().execute(REGISTER_URL);
-
                             }
                         });
 
@@ -318,940 +295,415 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
         });
     }
 
-    public class MyValueFormatter implements ValueFormatter {
+    private void storeDate(String url, final String lineDesc, final String pieDesc) throws JSONException {
+        showDialog();
+
+        date = (String) btnDatePicker.getText();
+        endDate = (String) btnEndDatePicker.getText();
+        amount = inputAmount.getText().toString().trim();
+
+        String lastUrl = null;
+
+        switch (url) {
+            case LINE_FILTER_HOURLY:
+                lastUrl = EMPTY_LINE_FILTER_HOURLY;
+                break;
+            case LINE_FILTER_DAILY:
+                lastUrl = EMPTY_LINE_FILTER_DAILY;
+                break;
+            case LINE_FILTER_WEEKLY:
+                lastUrl = EMPTY_LINE_FILTER_WEEKLY;
+                break;
+            case LINE_FILTER_MONTHLY:
+                lastUrl = EMPTY_LINE_FILTER_MONTHLY;
+                break;
+        }
+
+        final String finalDate = date;
+        final String finalEndDate = endDate;
+        final String finalAmount = amount;
+        final String finalLastUrl = lastUrl;
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        JSONObject reader;
+                        try {
+                            reader = new JSONObject(response);
+
+                            result = reader.getJSONArray("result");
+                            if (result.length() == 0){
+                                lastDateIfEmpty(finalLastUrl, lineDesc, pieDesc);
+                                alert(finalLastUrl);
+                            }
+                            else {
+
+                                ArrayList<Entry> entries = new ArrayList<>();
+                                ArrayList<String> labels = new ArrayList<>();
+
+                                int count;
+                                if (result.length() == 1) {
+                                    final JSONObject weather_object_0 = result.getJSONObject(0);
+                                    final String weather_0_description = weather_object_0.getString("counter");
+                                    final String weather_0_icon = weather_object_0.getString("OutputDate");
+                                    count = Integer.parseInt(weather_0_description);
+
+                                    entries.add(new Entry(count, 0));
+                                    labels.add(weather_0_icon);
+
+                                    entries.add(new Entry(0, 1));
+                                    labels.add("");
+                                } else {
+
+                                    for (int i = 0; i < result.length(); i++) {
+                                        final JSONObject weather_object_0 = result.getJSONObject(i);
+                                        final String weather_0_description = weather_object_0.getString("counter");
+                                        final String weather_0_icon = weather_object_0.getString("OutputDate");
+                                        count = Integer.parseInt(weather_0_description);
+
+                                        entries.add(new Entry(count, i));
+                                        labels.add(weather_0_icon);
+                                    }
+                                }
+                                LineDataSet dataset = new LineDataSet(entries, "Implementation in progress");
+                                dataset.setColors(ColorTemplate.COLORFUL_COLORS);
+                                dataset.setDrawCubic(true);
+                                dataset.setDrawFilled(true);
+                                dataset.setDrawValues(true);
+                                dataset.setHighlightEnabled(true);
+                                dataset.setDrawHighlightIndicators(true);
+
+                                LineData data = new LineData(labels, dataset);
+                                lineChart.setData(data);
+
+                                lineChartStyle(lineDesc);
+                                lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+                                    @Override
+                                    public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
+
+                                        final int info = h.getXIndex();
+
+                                        String[] bNameArray = (arrayBehaviour);
+
+                                        try {
+                                            JSONObject behaviours = result.getJSONObject(info);
+                                            final String behaviour_name = behaviours.getString("OutputDate");
+                                            for(int i = 1; i<bNameArray.length; i++){
+                                                bArray[i] = behaviours.getInt(bNameArray[i]);
+                                            }
+
+                                            ArrayList<Entry> entries2 = new ArrayList<>();
+                                            ArrayList<String> labels2;
+
+                                            int ePos = 0;
+                                            labels2 = new ArrayList<>();
+                                            for (int i = 1; i < bArray.length; i++) {
+                                                if (bArray[i] != 0) {
+                                                    entries2.add(new Entry(bArray[i], ePos));
+                                                    labels2.add(bNameArray[i]);
+
+                                                    ePos++;
+                                                }
+                                            }
+
+                                            PieDataSet dataset2 = new PieDataSet(entries2, "");
+                                            dataset2.setValueFormatter(new MyValueFormatter());
+                                            dataset2.setValueFormatter(new MyValueFormatter());
+                                            dataset2.setDrawValues(true);
+                                            dataset2.setSliceSpace(3);
+                                            dataset2.setSelectionShift(5);
+                                            dataset2.setColors(Colors.ALL_COLORS);
+
+                                            PieData data2 = new PieData(labels2, dataset2);
+                                            pieChart.setData(data2);
+
+                                            pieChartStyle(pieDesc, behaviour_name);
+
+                                        } catch (JSONException e1) {
+                                            e1.printStackTrace();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onNothingSelected() {
+
+                                    }
+                                });
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        // Get the JSONArray weather
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(LineChartItem.this, error.toString(), Toast.LENGTH_LONG).show();
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put(KEY_DATE, finalDate);
+                params.put(KEY_END_DATE, finalEndDate);
+                params.put(KEY_AMOUNT, finalAmount);
+                return params;
+            }
+        };
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
+
+    private void lastDateIfEmpty(String url, final String lineDesc, final String pieDesc) throws JSONException {
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            JSONObject reader;
+                            try {
+                                reader = new JSONObject(response);
+
+                                result = reader.getJSONArray("result");
+
+                                    ArrayList<Entry> entries = new ArrayList<>();
+                                    ArrayList<String> labels = new ArrayList<>();
+
+                                    int count;
+                                    if (result.length() == 1) {
+                                        final JSONObject weather_object_0 = result.getJSONObject(0);
+                                        final String weather_0_description = weather_object_0.getString("counter");
+                                        final String weather_0_icon = weather_object_0.getString("OutputDate");
+                                        count = Integer.parseInt(weather_0_description);
+
+                                        entries.add(new Entry(count, 0));
+                                        labels.add(weather_0_icon);
+
+                                        entries.add(new Entry(0, 1));
+                                        labels.add("");
+                                    } else {
+
+                                        for (int i = 0; i < result.length(); i++) {
+                                            final JSONObject weather_object_0 = result.getJSONObject(i);
+                                            final String weather_0_description = weather_object_0.getString("counter");
+                                            final String weather_0_icon = weather_object_0.getString("OutputDate");
+                                            count = Integer.parseInt(weather_0_description);
+
+                                            entries.add(new Entry(count, i));
+                                            labels.add(weather_0_icon);
+                                        }
+                                    }
+                                    LineDataSet dataset = new LineDataSet(entries, "Implementation in progress");
+                                    dataset.setColors(ColorTemplate.COLORFUL_COLORS);
+                                    dataset.setDrawCubic(true);
+                                    dataset.setDrawFilled(true);
+                                    dataset.setDrawValues(true);
+                                    dataset.setHighlightEnabled(true);
+                                    dataset.setDrawHighlightIndicators(true);
+
+                                    LineData data = new LineData(labels, dataset);
+                                    lineChart.setData(data);
+
+                                    lineChartStyle(lineDesc);
+                                    lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+                                        @Override
+                                        public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
+
+                                            final int info = h.getXIndex();
+
+                                            String[] bNameArray = (arrayBehaviour);
+
+                                            try {
+                                                JSONObject behaviours = result.getJSONObject(info);
+                                                final String behaviour_name = behaviours.getString("OutputDate");
+                                                for(int i = 1; i<bNameArray.length; i++){
+                                                    bArray[i] = behaviours.getInt(bNameArray[i]);
+                                                }
+
+                                                ArrayList<Entry> entries2 = new ArrayList<>();
+                                                ArrayList<String> labels2;
+
+                                                int ePos = 0;
+                                                labels2 = new ArrayList<>();
+                                                for (int i = 1; i < bArray.length; i++) {
+                                                    if (bArray[i] != 0) {
+                                                        entries2.add(new Entry(bArray[i], ePos));
+                                                        labels2.add(bNameArray[i]);
+
+                                                        ePos++;
+                                                    }
+                                                }
+
+                                                PieDataSet dataset2 = new PieDataSet(entries2, "");
+                                                dataset2.setValueFormatter(new MyValueFormatter());
+                                                dataset2.setDrawValues(true);
+                                                dataset2.setSliceSpace(3);
+                                                dataset2.setSelectionShift(5);
+                                                dataset2.setColors(Colors.ALL_COLORS);
+
+                                                PieData data2 = new PieData(labels2, dataset2);
+                                                pieChart.setData(data2);
+
+                                                pieChartStyle(pieDesc, behaviour_name);
+
+                                            } catch (JSONException e1) {
+                                                e1.printStackTrace();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onNothingSelected() {
+
+                                        }
+                                    });
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Toast.makeText(LineChartItem.this, error.toString(), Toast.LENGTH_LONG).show();
+                        }
+                    }) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    return params;
+                }
+            };
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            requestQueue.add(stringRequest);
+    }
+
+    private class MyValueFormatter implements ValueFormatter {
 
         private DecimalFormat mFormat;
 
-        public MyValueFormatter() {
+        MyValueFormatter() {
             mFormat = new DecimalFormat("###,###,###"); // use no decimals
         }
 
         @Override
         public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
 
-            if(value < 5)
+            if(value < 4)
                 return "";
             else
                 return mFormat.format(value) + "%";
         }
     }
 
-    private void storeDateHourly() throws JSONException {
-        final String date = (String) btnDatePicker.getText();
+    private void lineChartStyle(String lineDesc){
+        lineChart.setVisibility(View.VISIBLE);
+        CustomMarkerView mv = new CustomMarkerView(LineChartItem.this, R.layout.content_marker);
+        lineChart.setMarkerView(mv);
+        lineChart.setScaleEnabled(false);
+        lineChart.setDoubleTapToZoomEnabled(false);
+        lineChart.setMaxVisibleValueCount(result.length());
+        lineChart.setDescription(lineDesc);
+        lineChart.animateY(1000);
+        lineChart.getLegend().setEnabled(false);
+        lineChart.fitScreen();
+        lineChart.setTouchEnabled(true);
+        YAxis yAxisRight = lineChart.getAxisRight();
+        yAxisRight.setEnabled(false);
 
+        hideDialog();
+    }
+
+    private void pieChartStyle(String pieDesc, String behaviour_name){
+        pieChart.setVisibility(View.VISIBLE);
+
+        Legend l = pieChart.getLegend();
+        l.setPosition(Legend.LegendPosition.BELOW_CHART_CENTER);
+        l.setWordWrapEnabled(true);
+        l.setMaxSizePercent(0.55f);
+
+        pieChart.setDrawHoleEnabled(false);
+        pieChart.setUsePercentValues(true);
+        pieChart.setDescription(pieDesc + behaviour_name);
+        pieChart.setDescriptionTextSize(20);
+        pieChart.invalidate();
+        pieChart.setDrawSliceText(false);
+        pieChart.animateY(2000);
+    }
+
+    private int hourlyValid(String date){
         if(date.equals("Day")) {
-            Toast.makeText(LineChartItem.this,"Please input date",Toast.LENGTH_LONG).show();
+            Toast.makeText(LineChartItem.this, "Please input date", Toast.LENGTH_LONG).show();
+            return 1;
         }
-        else {
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, LINE_FILTER_HOURLY,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-
-                            LineChart lineChart = (LineChart) findViewById(R.id.chart);
-                            lineChart.setVisibility(View.VISIBLE);
-
-                            //Toast.makeText(LineChartItem.this,response,Toast.LENGTH_LONG).show();
-
-                            JSONObject reader = null;
-                            try {
-                                reader = new JSONObject(response);
-
-                                result = reader.getJSONArray("result");
-                                if (result.length() == 0)
-                                    Toast.makeText(LineChartItem.this, "Sorry, no records this day(s)", Toast.LENGTH_LONG).show();
-                                else {
-                                    //Toast.makeText(LineChartItem.this,"Shit Working!",Toast.LENGTH_LONG).show();
-
-                                    ArrayList<Entry> entries = new ArrayList<>();
-                                    ArrayList<String> labels = new ArrayList<>();
-
-                                    int count;
-                                    if (result.length() == 1) {
-                                        final JSONObject weather_object_0 = result.getJSONObject(0);
-                                        final String weather_0_description = weather_object_0.getString("counter");
-                                        final String weather_0_icon = weather_object_0.getString("DateField");
-                                        count = Integer.parseInt(weather_0_description);
-
-                                        entries.add(new Entry(0, -1));
-                                        labels.add("");
-
-                                        entries.add(new Entry(count, 0));
-                                        labels.add(weather_0_icon);
-
-                                        entries.add(new Entry(0, 1));
-                                        labels.add("");
-                                    } else {
-
-                                        for (int i = 0; i < result.length(); i++) {
-                                            final JSONObject weather_object_0 = result.getJSONObject(i);
-                                            final String weather_0_description = weather_object_0.getString("counter");
-                                            final String weather_0_icon = weather_object_0.getString("DateField");
-                                            count = Integer.parseInt(weather_0_description);
-
-                                            entries.add(new Entry(count, i));
-                                            labels.add(weather_0_icon);
-                                        }
-                                    }
-
-                                    LineDataSet dataset = new LineDataSet(entries, "Implementation in progress");
-                                    LineData data = new LineData(labels, dataset);
-
-                                    lineChart.setTouchEnabled(true);
-
-                                    CustomMarkerView mv = new CustomMarkerView(LineChartItem.this, R.layout.content_marker);
-                                    lineChart.setMarkerView(mv);
-
-                                    dataset.setColors(ColorTemplate.COLORFUL_COLORS); //
-                                    dataset.setDrawCubic(true);
-                                    dataset.setDrawFilled(true);
-                                    dataset.setDrawValues(true);
-                                    dataset.setHighlightEnabled(true);
-
-                                    // set this to false to disable the drawing of highlight indicator (lines)
-                                    dataset.setDrawHighlightIndicators(true);
-                                    lineChart.setScaleEnabled(false);
-                                    lineChart.setDoubleTapToZoomEnabled(false);
-                                    lineChart.setMaxVisibleValueCount(result.length());
-                                    lineChart.setData(data);
-                                    lineChart.setDescription("Number of behaviours per each hour");
-                                    lineChart.animateY(1000);
-                                    lineChart.getLegend().setEnabled(false);
-                                    lineChart.fitScreen();
-                                    lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
-                                        @Override
-                                        public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
-
-                                            final int info = h.getXIndex();
-
-                                            try {
-                                                JSONObject behaviours = result.getJSONObject(info);
-                                                final String behaviour_name = behaviours.getString("DateField");
-                                                final Integer b_1 = behaviours.getInt("Bizarre body postures");
-                                                final Integer b_2 = behaviours.getInt("Body hitting (expect for the head) with any body part");
-                                                final Integer b_3 = behaviours.getInt("Clapping hands (inappropriately)");
-                                                final Integer b_4 = behaviours.getInt("Gazing at hands or objects");
-                                                final Integer b_5 = behaviours.getInt("Grimacing");
-                                                final Integer b_6 = behaviours.getInt("Hair pulling (tearing out patches of hair)");
-                                                final Integer b_7 = behaviours.getInt("Head hitting");
-                                                final Integer b_8 = behaviours.getInt("Inserting objects in nose, ears, anus, etc.");
-                                                final Integer b_9 = behaviours.getInt("Manipulating (e.g. twirling, spinning) objects");
-                                                final Integer b_10 = behaviours.getInt("Pacing, jumping, bouncing, running");
-                                                final Integer b_11 = behaviours.getInt("Pica (ingesting non-food items)");
-                                                final Integer b_12 = behaviours.getInt("Repetitive hand and/or finger movements");
-                                                final Integer b_13 = behaviours.getInt("Rocking, repetitive body movements");
-                                                final Integer b_14 = behaviours.getInt("Rubbing self");
-                                                final Integer b_15 = behaviours.getInt("Self-biting");
-                                                final Integer b_16 = behaviours.getInt("Self-scratching");
-                                                final Integer b_17 = behaviours.getInt("Sniffing objects, own body");
-                                                final Integer b_18 = behaviours.getInt("Teeth grinding (while awake)");
-                                                final Integer b_19 = behaviours.getInt("Waving or shaking arms");
-                                                final Integer b_20 = behaviours.getInt("Yelling and screaming");
-
-                                                //Pie chart declaration
-                                                PieChart pieChart = (PieChart) findViewById(R.id.chart2);
-                                                pieChart.setVisibility(View.VISIBLE);
-
-
-                                                Legend l = pieChart.getLegend();
-                                                l.setPosition(Legend.LegendPosition.BELOW_CHART_CENTER);
-                                                l.setWordWrapEnabled(true);
-                                                l.setMaxSizePercent(0.55f);
-
-                                                ArrayList<Entry> entries2 = new ArrayList<>();
-
-                                                ArrayList<String> labels2 = null;
-
-                                                bArray = new int[]{b_1, b_2, b_3, b_4, b_5, b_6, b_7, b_8, b_9, b_10, b_11, b_12, b_13, b_14, b_15, b_16, b_17, b_18, b_19, b_20};
-
-                                                bNameArray = new String[]{
-                                                        "Bizarre body postures",
-                                                        "Body hitting (expect head) with any body part",
-                                                        "Clapping hands (inappropriately)",
-                                                        "Gazing at hands or objects",
-                                                        "Grimacing",
-                                                        "Hair pulling (tearing out patches of hair)",
-                                                        "Head hitting",
-                                                        "Inserting objects in nose, ears, anus, etc.",
-                                                        "Manipulating (e.g. twirling, spinning) objects",
-                                                        "Pacing, jumping, bouncing, running",
-                                                        "Pica (ingesting non-food items)",
-                                                        "Repetitive hand and/or finger movements",
-                                                        "Rocking, repetitive body movements",
-                                                        "Rubbing self",
-                                                        "Self-biting",
-                                                        "Self-scratching",
-                                                        "Sniffing objects, own body",
-                                                        "Teeth grinding (while awake)",
-                                                        "Waving or shaking arms",
-                                                        "Yelling and screaming"
-                                                };
-
-                                                int ePos = 0;
-                                                labels2 = new ArrayList<>();
-                                                for (int i = 0; i < bArray.length; i++) {
-                                                    if (bArray[i] != 0) {
-                                                        entries2.add(new Entry(bArray[i], ePos));
-                                                        labels2.add(bNameArray[i]);
-
-                                                        ePos++;
-                                                    }
-                                                }
-
-                                                PieDataSet dataset2 = new PieDataSet(entries2, "");
-                                                dataset2.setValueFormatter(new MyValueFormatter());
-
-                                                PieData data2 = new PieData(labels2, dataset2);
-
-                                                dataset2.setColors(Colors.ALL_COLORS);
-                                                pieChart.setDrawHoleEnabled(false);
-                                                pieChart.setUsePercentValues(true);
-                                                pieChart.setData(data2);
-                                                pieChart.setDescription("Time: " + behaviour_name);
-                                                pieChart.setDescriptionTextSize(20);
-                                                pieChart.invalidate();
-                                                pieChart.setDrawSliceText(false);
-
-                                                dataset2.setDrawValues(true);
-                                                dataset2.setSliceSpace(3);
-                                                dataset2.setSelectionShift(5);
-
-
-                                                pieChart.animateY(2000);
-
-                                            } catch (JSONException e1) {
-                                                e1.printStackTrace();
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onNothingSelected() {
-
-                                        }
-                                    });
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                            // Get the JSONArray weather
-
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(LineChartItem.this, error.toString(), Toast.LENGTH_LONG).show();
-                        }
-                    }) {
-                @Override
-                protected Map<String, String> getParams() {
-                    Map<String, String> params = new HashMap<String, String>();
-                    params.put(KEY_DATE, date);
-                    return params;
-                }
-            };
-            RequestQueue requestQueue = Volley.newRequestQueue(this);
-            requestQueue.add(stringRequest);
-        }
+        else
+            return 0;
     }
 
-    private void storeDateDaily() throws JSONException {
-        final String date = (String) btnFirstDatePicker.getText();
-        final String endDate = (String) btnEndDatePicker.getText();
-
-        if (date.equals("First Day") && endDate.equals("End Day")) {
+    private int dailyValid(String date, String endDate){
+        if (date.equals("First Day") && endDate.equals("End Day")){
             Toast.makeText(LineChartItem.this,"Please input first date and end date",Toast.LENGTH_LONG).show();
+            return 1;
         }
-        else if(date.equals("First Day")) {
+
+        else if(date.equals("First Day")){
             Toast.makeText(LineChartItem.this,"Please input first date",Toast.LENGTH_LONG).show();
+            return 1;
         }
-        else if(endDate.equals("End Day")) {
+
+        else if(endDate.equals("End Day")){
             Toast.makeText(LineChartItem.this,"Please input end date",Toast.LENGTH_LONG).show();
+            return 1;
         }
-        else {
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, LINE_FILTER_DAILY,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
+        else
+            return 0;
 
-                            LineChart lineChart = (LineChart) findViewById(R.id.chart);
-                            lineChart.setVisibility(View.VISIBLE);
-
-                            //Toast.makeText(LineChartItem.this,response,Toast.LENGTH_LONG).show();
-
-                            JSONObject reader = null;
-                            try {
-                                reader = new JSONObject(response);
-
-                                result = reader.getJSONArray("result");
-                                if (result.length() == 0)
-                                    Toast.makeText(LineChartItem.this, "Sorry, no records this day(s)", Toast.LENGTH_LONG).show();
-                                else {
-
-                                    ArrayList<Entry> entries = new ArrayList<>();
-                                    ArrayList<String> labels = new ArrayList<>();
-
-                                    int count;
-                                    if (result.length() == 1) {
-                                        final JSONObject weather_object_0 = result.getJSONObject(0);
-                                        final String weather_0_description = weather_object_0.getString("counter");
-                                        final String weather_0_icon = weather_object_0.getString("updated_at");
-                                        count = Integer.parseInt(weather_0_description);
-
-                                        entries.add(new Entry(0, -1));
-                                        labels.add("");
-
-                                        entries.add(new Entry(count, 0));
-                                        labels.add(weather_0_icon);
-
-                                        entries.add(new Entry(0, 1));
-                                        labels.add("");
-                                    } else {
-
-                                        for (int i = 0; i < result.length(); i++) {
-                                            final JSONObject weather_object_0 = result.getJSONObject(i);
-                                            final String weather_0_description = weather_object_0.getString("counter");
-                                            final String weather_0_icon = weather_object_0.getString("updated_at");
-                                            count = Integer.parseInt(weather_0_description);
-
-                                            entries.add(new Entry(count, i));
-                                            labels.add(weather_0_icon);
-                                        }
-                                    }
-
-
-                                    LineDataSet dataset = new LineDataSet(entries, "Implementation in progress");
-                                    LineData data = new LineData(labels, dataset);
-
-                                    lineChart.setTouchEnabled(true);
-
-                                    CustomMarkerView mv = new CustomMarkerView(LineChartItem.this, R.layout.content_marker);
-                                    lineChart.setMarkerView(mv);
-
-                                    dataset.setColors(ColorTemplate.COLORFUL_COLORS); //
-                                    dataset.setDrawCubic(true);
-                                    dataset.setDrawFilled(true);
-                                    dataset.setDrawValues(true);
-                                    dataset.setHighlightEnabled(true);
-
-                                    // set this to false to disable the drawing of highlight indicator (lines)
-                                    dataset.setDrawHighlightIndicators(true);
-                                    lineChart.setScaleEnabled(false);
-                                    lineChart.setDoubleTapToZoomEnabled(false);
-                                    lineChart.setMaxVisibleValueCount(result.length());
-                                    lineChart.setData(data);
-                                    lineChart.setDescription("Number of behaviours per each day");
-                                    lineChart.animateY(1000);
-                                    lineChart.getLegend().setEnabled(false);
-                                    lineChart.fitScreen();
-                                    lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
-                                        @Override
-                                        public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
-
-                                            final int info = h.getXIndex();
-
-                                            try {
-                                                JSONObject behaviours = result.getJSONObject(info);
-                                                final String date_part = behaviours.getString("updated_at");
-                                                final Integer b_1 = behaviours.getInt("Bizarre body postures");
-                                                final Integer b_2 = behaviours.getInt("Body hitting (expect for the head) with any body part");
-                                                final Integer b_3 = behaviours.getInt("Clapping hands (inappropriately)");
-                                                final Integer b_4 = behaviours.getInt("Gazing at hands or objects");
-                                                final Integer b_5 = behaviours.getInt("Grimacing");
-                                                final Integer b_6 = behaviours.getInt("Hair pulling (tearing out patches of hair)");
-                                                final Integer b_7 = behaviours.getInt("Head hitting");
-                                                final Integer b_8 = behaviours.getInt("Inserting objects in nose, ears, anus, etc.");
-                                                final Integer b_9 = behaviours.getInt("Manipulating (e.g. twirling, spinning) objects");
-                                                final Integer b_10 = behaviours.getInt("Pacing, jumping, bouncing, running");
-                                                final Integer b_11 = behaviours.getInt("Pica (ingesting non-food items)");
-                                                final Integer b_12 = behaviours.getInt("Repetitive hand and/or finger movements");
-                                                final Integer b_13 = behaviours.getInt("Rocking, repetitive body movements");
-                                                final Integer b_14 = behaviours.getInt("Rubbing self");
-                                                final Integer b_15 = behaviours.getInt("Self-biting");
-                                                final Integer b_16 = behaviours.getInt("Self-scratching");
-                                                final Integer b_17 = behaviours.getInt("Sniffing objects, own body");
-                                                final Integer b_18 = behaviours.getInt("Teeth grinding (while awake)");
-                                                final Integer b_19 = behaviours.getInt("Waving or shaking arms");
-                                                final Integer b_20 = behaviours.getInt("Yelling and screaming");
-
-                                                //Pie chart declaration
-                                                PieChart pieChart = (PieChart) findViewById(R.id.chart2);
-                                                pieChart.setVisibility(View.VISIBLE);
-
-                                                Legend l = pieChart.getLegend();
-                                                l.setPosition(Legend.LegendPosition.BELOW_CHART_CENTER);
-                                            /*l.setXEntrySpace(7f);
-                                            l.setYEntrySpace(5f);
-                                            l.setYOffset(0f);*/
-                                                l.setWordWrapEnabled(true);
-                                                l.setMaxSizePercent(0.55f);
-
-                                                ArrayList<Entry> entries2 = new ArrayList<>();
-
-                                                ArrayList<String> labels2 = null;
-
-                                                bArray = new int[]{b_1, b_2, b_3, b_4, b_5, b_6, b_7, b_8, b_9, b_10, b_11, b_12, b_13, b_14, b_15, b_16, b_17, b_18, b_19, b_20};
-
-                                                bNameArray = new String[]{
-                                                        "Bizarre body postures",
-                                                        "Body hitting (expect head) with any body part",
-                                                        "Clapping hands (inappropriately)",
-                                                        "Gazing at hands or objects",
-                                                        "Grimacing",
-                                                        "Hair pulling (tearing out patches of hair)",
-                                                        "Head hitting",
-                                                        "Inserting objects in nose, ears, anus, etc.",
-                                                        "Manipulating (e.g. twirling, spinning) objects",
-                                                        "Pacing, jumping, bouncing, running",
-                                                        "Pica (ingesting non-food items)",
-                                                        "Repetitive hand and/or finger movements",
-                                                        "Rocking, repetitive body movements",
-                                                        "Rubbing self",
-                                                        "Self-biting",
-                                                        "Self-scratching",
-                                                        "Sniffing objects, own body",
-                                                        "Teeth grinding (while awake)",
-                                                        "Waving or shaking arms",
-                                                        "Yelling and screaming"
-                                                };
-
-                                                int ePos = 0;
-                                                labels2 = new ArrayList<>();
-                                                for (int i = 0; i < bArray.length; i++) {
-                                                    if (bArray[i] != 0) {
-                                                        entries2.add(new Entry(bArray[i], ePos));
-                                                        labels2.add(bNameArray[i]);
-
-                                                        ePos++;
-                                                    }
-                                                }
-
-                                                PieDataSet dataset2 = new PieDataSet(entries2, "");
-                                                dataset2.setValueFormatter(new MyValueFormatter());
-
-                                                PieData data2 = new PieData(labels2, dataset2);
-
-                                                dataset2.setColors(Colors.ALL_COLORS);
-                                                pieChart.setDrawHoleEnabled(false);
-                                                pieChart.setUsePercentValues(true);
-                                                pieChart.setData(data2);
-                                                pieChart.setDescription("Day: " + date_part);
-                                                pieChart.setDescriptionTextSize(20);
-                                                pieChart.invalidate();
-                                                pieChart.setDrawSliceText(false);
-
-                                                dataset2.setDrawValues(true);
-                                                dataset2.setSliceSpace(3);
-                                                dataset2.setSelectionShift(5);
-
-                                                pieChart.animateY(2000);
-
-                                            } catch (JSONException e1) {
-                                                e1.printStackTrace();
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onNothingSelected() {
-
-                                        }
-                                    });
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
-                            }
-
-                            // Get the JSONArray weather
-
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(LineChartItem.this, error.toString(), Toast.LENGTH_LONG).show();
-                        }
-                    }) {
-                @Override
-                protected Map<String, String> getParams() {
-                    Map<String, String> params = new HashMap<String, String>();
-                    params.put(KEY_DATE, date);
-                    params.put(KEY_END_DATE, endDate);
-                    return params;
-                }
-            };
-            RequestQueue requestQueue = Volley.newRequestQueue(this);
-            requestQueue.add(stringRequest);
-        }
     }
 
-    private void storeDateWeekly() throws JSONException {
-        final String date = (String) btnWeekPicker.getText();
-        final String amount = inputAmount.getText().toString().trim();
-
+    private int weeklyValid(String date, String amount){
         if(amount.isEmpty() && date.equals("First day of week")){
             Toast.makeText(LineChartItem.this,"Please input date and amount of weeks",Toast.LENGTH_LONG).show();
+            return 1;
         }
 
         else if (date.equals("First day of week")){
             Toast.makeText(LineChartItem.this,"Please input date",Toast.LENGTH_LONG).show();
+            return 1;
         }
 
         else if(amount.isEmpty()){
             Toast.makeText(LineChartItem.this,"Please input amount of weeks",Toast.LENGTH_LONG).show();
+            return 1;
         }
-        else {
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, LINE_FILTER_WEEKLY,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(final String response) {
-
-                            LineChart lineChart = (LineChart) findViewById(R.id.chart);
-                            lineChart.setVisibility(View.VISIBLE);
-                            //Toast.makeText(LineChartItem.this,response,Toast.LENGTH_LONG).show();
-                            JSONObject reader = null;
-                            try {
-                                reader = new JSONObject(response);
-
-                                result = reader.getJSONArray("result");
-                                if (result.length() == 0)
-                                    Toast.makeText(LineChartItem.this, "Sorry, no records this day(s)", Toast.LENGTH_LONG).show();
-                                else {
-                                    ArrayList<Entry> entries = new ArrayList<>();
-                                    ArrayList<String> labels = new ArrayList<>();
-
-                                    int count;
-
-                                    if (result.length() == 1) {
-                                        final JSONObject weather_object_0 = result.getJSONObject(0);
-                                        final String weather_0_description = weather_object_0.getString("counter");
-                                        final String weekNo = weather_object_0.getString("DatePart");
-                                        final String weather_0_icon = weather_object_0.getString("updated_at");
-                                        count = Integer.parseInt(weather_0_description);
-
-                                        entries.add(new Entry(0, -1));
-                                        labels.add("");
-
-                                        entries.add(new Entry(count, 0));
-                                        labels.add("Week " + weekNo);
-
-                                        entries.add(new Entry(0, 1));
-                                        labels.add("");
-                                    } else {
-
-                                        for (int i = 0; i < result.length(); i++) {
-                                            final JSONObject weather_object_0 = result.getJSONObject(i);
-                                            final String weather_0_description = weather_object_0.getString("counter");
-                                            final String weekNo = weather_object_0.getString("DatePart");
-                                            final String weather_0_icon = weather_object_0.getString("updated_at");
-                                            count = Integer.parseInt(weather_0_description);
-
-                                            entries.add(new Entry(count, i));
-                                            labels.add("Week " + weekNo);
-                                        }
-                                    }
-
-                                    LineDataSet dataset = new LineDataSet(entries, "Implementation in progress");
-                                    LineData data = new LineData(labels, dataset);
-
-                                    lineChart.setTouchEnabled(true);
-
-                                    CustomMarkerView mv = new CustomMarkerView(LineChartItem.this, R.layout.content_marker);
-                                    lineChart.setMarkerView(mv);
-
-                                    dataset.setColors(ColorTemplate.COLORFUL_COLORS); //
-                                    dataset.setDrawCubic(true);
-                                    dataset.setDrawFilled(true);
-                                    dataset.setDrawValues(true);
-                                    dataset.setHighlightEnabled(true);
-
-                                    // set this to false to disable the drawing of highlight indicator (lines)
-                                    dataset.setDrawHighlightIndicators(true);
-                                    lineChart.setScaleEnabled(false);
-                                    lineChart.setDoubleTapToZoomEnabled(false);
-                                    lineChart.setMaxVisibleValueCount(result.length());
-                                    lineChart.setData(data);
-                                    lineChart.setDescription("Number of behaviours per each week");
-                                    lineChart.animateY(1000);
-                                    lineChart.getLegend().setEnabled(false);
-                                    lineChart.fitScreen();
-                                    lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
-                                        @Override
-                                        public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
-
-                                            final int info = h.getXIndex();
-
-                                            try {
-                                                JSONObject behaviours = result.getJSONObject(info);
-                                                final String behaviour_name = behaviours.getString("DatePart");
-                                                final Integer b_1 = behaviours.getInt("Bizarre body postures");
-                                                final Integer b_2 = behaviours.getInt("Body hitting (expect for the head) with any body part");
-                                                final Integer b_3 = behaviours.getInt("Clapping hands (inappropriately)");
-                                                final Integer b_4 = behaviours.getInt("Gazing at hands or objects");
-                                                final Integer b_5 = behaviours.getInt("Grimacing");
-                                                final Integer b_6 = behaviours.getInt("Hair pulling (tearing out patches of hair)");
-                                                final Integer b_7 = behaviours.getInt("Head hitting");
-                                                final Integer b_8 = behaviours.getInt("Inserting objects in nose, ears, anus, etc.");
-                                                final Integer b_9 = behaviours.getInt("Manipulating (e.g. twirling, spinning) objects");
-                                                final Integer b_10 = behaviours.getInt("Pacing, jumping, bouncing, running");
-                                                final Integer b_11 = behaviours.getInt("Pica (ingesting non-food items)");
-                                                final Integer b_12 = behaviours.getInt("Repetitive hand and/or finger movements");
-                                                final Integer b_13 = behaviours.getInt("Rocking, repetitive body movements");
-                                                final Integer b_14 = behaviours.getInt("Rubbing self");
-                                                final Integer b_15 = behaviours.getInt("Self-biting");
-                                                final Integer b_16 = behaviours.getInt("Self-scratching");
-                                                final Integer b_17 = behaviours.getInt("Sniffing objects, own body");
-                                                final Integer b_18 = behaviours.getInt("Teeth grinding (while awake)");
-                                                final Integer b_19 = behaviours.getInt("Waving or shaking arms");
-                                                final Integer b_20 = behaviours.getInt("Yelling and screaming");
-
-                                                //Pie chart declaration
-                                                PieChart pieChart = (PieChart) findViewById(R.id.chart2);
-                                                pieChart.setVisibility(View.VISIBLE);
-
-                                                Legend l = pieChart.getLegend();
-                                                l.setPosition(Legend.LegendPosition.BELOW_CHART_CENTER);
-                                            /*l.setXEntrySpace(7f);
-                                            l.setYEntrySpace(5f);
-                                            l.setYOffset(0f);*/
-                                                l.setWordWrapEnabled(true);
-                                                l.setMaxSizePercent(0.55f);
-
-                                                ArrayList<Entry> entries2 = new ArrayList<>();
-
-                                                ArrayList<String> labels2 = null;
-
-                                                bArray = new int[]{b_1, b_2, b_3, b_4, b_5, b_6, b_7, b_8, b_9, b_10, b_11, b_12, b_13, b_14, b_15, b_16, b_17, b_18, b_19, b_20};
-
-                                                bNameArray = new String[]{
-                                                        "Bizarre body postures",
-                                                        "Body hitting (expect head) with any body part",
-                                                        "Clapping hands (inappropriately)",
-                                                        "Gazing at hands or objects",
-                                                        "Grimacing",
-                                                        "Hair pulling (tearing out patches of hair)",
-                                                        "Head hitting",
-                                                        "Inserting objects in nose, ears, anus, etc.",
-                                                        "Manipulating (e.g. twirling, spinning) objects",
-                                                        "Pacing, jumping, bouncing, running",
-                                                        "Pica (ingesting non-food items)",
-                                                        "Repetitive hand and/or finger movements",
-                                                        "Rocking, repetitive body movements",
-                                                        "Rubbing self",
-                                                        "Self-biting",
-                                                        "Self-scratching",
-                                                        "Sniffing objects, own body",
-                                                        "Teeth grinding (while awake)",
-                                                        "Waving or shaking arms",
-                                                        "Yelling and screaming"
-                                                };
-
-                                                int ePos = 0;
-                                                labels2 = new ArrayList<>();
-                                                for (int i = 0; i < bArray.length; i++) {
-                                                    if (bArray[i] != 0) {
-                                                        entries2.add(new Entry(bArray[i], ePos));
-                                                        labels2.add(bNameArray[i]);
-
-                                                        ePos++;
-                                                    }
-                                                }
-
-                                                PieDataSet dataset2 = new PieDataSet(entries2, "");
-                                                dataset2.setValueFormatter(new MyValueFormatter());
-
-                                                PieData data2 = new PieData(labels2, dataset2);
-
-                                                dataset2.setColors(Colors.ALL_COLORS);
-                                                pieChart.setDrawHoleEnabled(false);
-                                                pieChart.setUsePercentValues(true);
-                                                pieChart.setData(data2);
-                                                pieChart.setDescription("Week: " + behaviour_name);
-                                                pieChart.setDescriptionTextSize(20);
-                                                pieChart.invalidate();
-                                                pieChart.setDrawSliceText(false);
-
-                                                dataset2.setDrawValues(true);
-                                                dataset2.setSliceSpace(3);
-                                                dataset2.setSelectionShift(5);
-
-                                                pieChart.animateY(2000);
-
-                                            } catch (JSONException e1) {
-                                                e1.printStackTrace();
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onNothingSelected() {
-
-                                        }
-                                    });
-
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                            // Get the JSONArray weather
-
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(LineChartItem.this, error.toString(), Toast.LENGTH_LONG).show();
-                        }
-                    }) {
-                @Override
-                protected Map<String, String> getParams() {
-                    Map<String, String> params = new HashMap<String, String>();
-                    params.put(KEY_DATE, date);
-                    params.put(KEY_AMOUNT, amount);
-                    return params;
-                }
-            };
-            RequestQueue requestQueue = Volley.newRequestQueue(this);
-            requestQueue.add(stringRequest);
-        }
-
+        else
+            return 0;
     }
 
-    private void storeDateMonthly() throws JSONException {
-        final String date = (String) btnMonthPicker.getText();
-        final String amount = inputAmount.getText().toString().trim();
-
-        if(amount.isEmpty() && date.equals("First day of month"))
+    private int monthlyValid(String date, String amount){
+        if(amount.isEmpty() && date.equals("First day of month")){
             Toast.makeText(LineChartItem.this,"Please input date and amount of months",Toast.LENGTH_LONG).show();
-
-        else if (date.equals("First day of month"))
-            Toast.makeText(LineChartItem.this,"Please input date",Toast.LENGTH_LONG).show();
-
-        else if(amount.isEmpty())
-            Toast.makeText(LineChartItem.this,"Please input amount of months",Toast.LENGTH_LONG).show();
-
-        else {
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, LINE_FILTER_MONTHLY,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(final String response) {
-
-                            LineChart lineChart = (LineChart) findViewById(R.id.chart);
-                            lineChart.setVisibility(View.VISIBLE);
-                            //Toast.makeText(LineChartItem.this,response,Toast.LENGTH_LONG).show();
-                            JSONObject reader = null;
-                            try {
-                                reader = new JSONObject(response);
-
-                                result = reader.getJSONArray("result");
-                                if (result.length() == 0)
-                                    Toast.makeText(LineChartItem.this, "Sorry, no records this day(s)", Toast.LENGTH_LONG).show();
-                                else {
-                                    ArrayList<Entry> entries = new ArrayList<>();
-                                    ArrayList<String> labels = new ArrayList<>();
-
-                                    int count;
-
-                                    if (result.length() == 1) {
-                                        final JSONObject weather_object_0 = result.getJSONObject(0);
-                                        final String weather_0_description = weather_object_0.getString("counter");
-                                        final String monthName = weather_object_0.getString("DatePart");
-                                        final String weather_0_icon = weather_object_0.getString("updated_at");
-                                        count = Integer.parseInt(weather_0_description);
-
-                                        entries.add(new Entry(0, -1));
-                                        labels.add("");
-
-                                        entries.add(new Entry(count, 0));
-                                        labels.add(monthName);
-
-                                        entries.add(new Entry(0, 1));
-                                        labels.add("");
-                                    } else {
-
-                                        for (int i = 0; i < result.length(); i++) {
-                                            final JSONObject weather_object_0 = result.getJSONObject(i);
-                                            final String weather_0_description = weather_object_0.getString("counter");
-                                            final String monthName = weather_object_0.getString("DatePart");
-                                            final String weather_0_icon = weather_object_0.getString("updated_at");
-                                            count = Integer.parseInt(weather_0_description);
-
-                                            entries.add(new Entry(count, i));
-                                            labels.add(monthName);
-                                        }
-                                    }
-
-                                    LineDataSet dataset = new LineDataSet(entries, "Implementation in progress");
-                                    LineData data = new LineData(labels, dataset);
-
-                                    lineChart.setTouchEnabled(true);
-
-                                    CustomMarkerView mv = new CustomMarkerView(LineChartItem.this, R.layout.content_marker);
-                                    lineChart.setMarkerView(mv);
-
-                                    dataset.setColors(ColorTemplate.COLORFUL_COLORS); //
-                                    dataset.setDrawCubic(true);
-                                    dataset.setDrawFilled(true);
-                                    dataset.setDrawValues(true);
-                                    dataset.setHighlightEnabled(true);
-
-                                    // set this to false to disable the drawing of highlight indicator (lines)
-                                    dataset.setDrawHighlightIndicators(true);
-                                    lineChart.setScaleEnabled(false);
-                                    lineChart.setDoubleTapToZoomEnabled(false);
-                                    lineChart.setMaxVisibleValueCount(result.length());
-                                    lineChart.setData(data);
-                                    lineChart.setDescription("Number of behaviours per each month");
-                                    lineChart.animateY(1000);
-                                    lineChart.getLegend().setEnabled(false);
-                                    lineChart.fitScreen();
-                                    lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
-                                        @Override
-                                        public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
-
-                                            final int info = h.getXIndex();
-
-                                            try {
-                                                JSONObject behaviours = result.getJSONObject(info);
-                                                final String behaviour_name = behaviours.getString("DatePart");
-                                                final Integer b_1 = behaviours.getInt("Bizarre body postures");
-                                                final Integer b_2 = behaviours.getInt("Body hitting (expect for the head) with any body part");
-                                                final Integer b_3 = behaviours.getInt("Clapping hands (inappropriately)");
-                                                final Integer b_4 = behaviours.getInt("Gazing at hands or objects");
-                                                final Integer b_5 = behaviours.getInt("Grimacing");
-                                                final Integer b_6 = behaviours.getInt("Hair pulling (tearing out patches of hair)");
-                                                final Integer b_7 = behaviours.getInt("Head hitting");
-                                                final Integer b_8 = behaviours.getInt("Inserting objects in nose, ears, anus, etc.");
-                                                final Integer b_9 = behaviours.getInt("Manipulating (e.g. twirling, spinning) objects");
-                                                final Integer b_10 = behaviours.getInt("Pacing, jumping, bouncing, running");
-                                                final Integer b_11 = behaviours.getInt("Pica (ingesting non-food items)");
-                                                final Integer b_12 = behaviours.getInt("Repetitive hand and/or finger movements");
-                                                final Integer b_13 = behaviours.getInt("Rocking, repetitive body movements");
-                                                final Integer b_14 = behaviours.getInt("Rubbing self");
-                                                final Integer b_15 = behaviours.getInt("Self-biting");
-                                                final Integer b_16 = behaviours.getInt("Self-scratching");
-                                                final Integer b_17 = behaviours.getInt("Sniffing objects, own body");
-                                                final Integer b_18 = behaviours.getInt("Teeth grinding (while awake)");
-                                                final Integer b_19 = behaviours.getInt("Waving or shaking arms");
-                                                final Integer b_20 = behaviours.getInt("Yelling and screaming");
-
-                                                //Pie chart declaration
-                                                PieChart pieChart = (PieChart) findViewById(R.id.chart2);
-                                                pieChart.setVisibility(View.VISIBLE);
-
-                                                Legend l = pieChart.getLegend();
-                                                l.setPosition(Legend.LegendPosition.BELOW_CHART_CENTER);
-                                            /*l.setXEntrySpace(7f);
-                                            l.setYEntrySpace(5f);
-                                            l.setYOffset(0f);*/
-                                                l.setWordWrapEnabled(true);
-                                                l.setMaxSizePercent(0.55f);
-
-                                                ArrayList<Entry> entries2 = new ArrayList<>();
-
-                                                ArrayList<String> labels2 = null;
-
-                                                bArray = new int[]{b_1, b_2, b_3, b_4, b_5, b_6, b_7, b_8, b_9, b_10, b_11, b_12, b_13, b_14, b_15, b_16, b_17, b_18, b_19, b_20};
-
-                                                bNameArray = new String[]{
-                                                        "Bizarre body postures",
-                                                        "Body hitting (expect head) with any body part",
-                                                        "Clapping hands (inappropriately)",
-                                                        "Gazing at hands or objects",
-                                                        "Grimacing",
-                                                        "Hair pulling (tearing out patches of hair)",
-                                                        "Head hitting",
-                                                        "Inserting objects in nose, ears, anus, etc.",
-                                                        "Manipulating (e.g. twirling, spinning) objects",
-                                                        "Pacing, jumping, bouncing, running",
-                                                        "Pica (ingesting non-food items)",
-                                                        "Repetitive hand and/or finger movements",
-                                                        "Rocking, repetitive body movements",
-                                                        "Rubbing self",
-                                                        "Self-biting",
-                                                        "Self-scratching",
-                                                        "Sniffing objects, own body",
-                                                        "Teeth grinding (while awake)",
-                                                        "Waving or shaking arms",
-                                                        "Yelling and screaming"
-                                                };
-
-                                                int ePos = 0;
-                                                labels2 = new ArrayList<>();
-                                                for (int i = 0; i < bArray.length; i++) {
-                                                    if (bArray[i] != 0) {
-                                                        entries2.add(new Entry(bArray[i], ePos));
-                                                        labels2.add(bNameArray[i]);
-
-                                                        ePos++;
-                                                    }
-                                                }
-
-                                                PieDataSet dataset2 = new PieDataSet(entries2, "");
-                                                dataset2.setValueFormatter(new MyValueFormatter());
-                                                //dataSet.setSelectionShift(0f);
-
-
-
-
-                                                PieData data2 = new PieData(labels2, dataset2);
-
-                                                dataset2.setColors(Colors.ALL_COLORS);
-                                                pieChart.setDrawHoleEnabled(false);
-                                                pieChart.setUsePercentValues(true);
-                                                pieChart.setData(data2);
-                                                pieChart.setDescription("Month: " + behaviour_name);
-                                                pieChart.setDescriptionTextSize(20);
-                                                pieChart.invalidate();
-                                                pieChart.setDrawSliceText(false);
-
-                                                dataset2.setDrawValues(true);
-                                                dataset2.setSliceSpace(3);
-                                                dataset2.setSelectionShift(5);
-
-                                                pieChart.animateY(2000);
-
-                                            } catch (JSONException e1) {
-                                                e1.printStackTrace();
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onNothingSelected() {
-
-                                        }
-                                    });
-
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                            // Get the JSONArray weather
-
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(LineChartItem.this, error.toString(), Toast.LENGTH_LONG).show();
-                        }
-                    }) {
-                @Override
-                protected Map<String, String> getParams() {
-                    Map<String, String> params = new HashMap<String, String>();
-                    params.put(KEY_DATE, date);
-                    params.put(KEY_AMOUNT, amount);
-                    return params;
-                }
-            };
-            RequestQueue requestQueue = Volley.newRequestQueue(this);
-            requestQueue.add(stringRequest);
+            return 1;
         }
+
+        else if (date.equals("First day of month")){
+            Toast.makeText(LineChartItem.this,"Please input date",Toast.LENGTH_LONG).show();
+            return 1;
+        }
+
+        else if(amount.isEmpty()){
+            Toast.makeText(LineChartItem.this,"Please input amount of months",Toast.LENGTH_LONG).show();
+            return 1;
+        }
+        else
+            return 0;
     }
+
     @Override
     public void onClick(View v) {
+        int mYear, mMonth, mDay;
+
         if (v == btnDatePicker) {
             // Get Current Date
             final Calendar c = Calendar.getInstance((TimeZone.getDefault()));
@@ -1264,40 +716,13 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
 
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            if(monthOfYear < 10){
-                                if(dayOfMonth < 10)
+                            if (monthOfYear < 10) {
+                                if (dayOfMonth < 10)
                                     btnDatePicker.setText(year + "-" + 0 + (monthOfYear + 1) + "-" + "0" + dayOfMonth);
                                 else
                                     btnDatePicker.setText(year + "-" + 0 + (monthOfYear + 1) + "-" + dayOfMonth);
-                            }
-                            else
+                            } else
                                 btnDatePicker.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
-
-                        }
-                    }, mYear, mMonth, mDay);
-
-            datePickerDialog.show();
-        }
-        if (v == btnFirstDatePicker) {
-            // Get Current Date
-            final Calendar c = Calendar.getInstance((TimeZone.getDefault()));
-            mYear = c.get(Calendar.YEAR);
-            mMonth = c.get(Calendar.MONTH);
-            mDay = c.get(Calendar.DAY_OF_MONTH);
-
-            DatePickerDialog datePickerDialog = new DatePickerDialog(this,
-                    new DatePickerDialog.OnDateSetListener() {
-
-                        @Override
-                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            if(monthOfYear < 10){
-                                if(dayOfMonth < 10)
-                                    btnFirstDatePicker.setText(year + "-" + 0 + (monthOfYear + 1) + "-" + "0" + dayOfMonth);
-                                else
-                                    btnFirstDatePicker.setText(year + "-" + 0 + (monthOfYear + 1) + "-" + dayOfMonth);
-                            }
-                            else
-                                btnFirstDatePicker.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
 
                         }
                     }, mYear, mMonth, mDay);
@@ -1316,13 +741,12 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
 
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            if(monthOfYear < 10){
-                                if(dayOfMonth < 10)
+                            if (monthOfYear < 10) {
+                                if (dayOfMonth < 10)
                                     btnEndDatePicker.setText(year + "-" + 0 + (monthOfYear + 1) + "-" + "0" + dayOfMonth);
                                 else
                                     btnEndDatePicker.setText(year + "-" + 0 + (monthOfYear + 1) + "-" + dayOfMonth);
-                            }
-                            else
+                            } else
                                 btnEndDatePicker.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
 
                         }
@@ -1330,78 +754,137 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
 
             datePickerDialog.show();
         }
-        if (v == btnWeekPicker) {
-            // Get Current Time
-            final Calendar c = Calendar.getInstance((TimeZone.getDefault()));
-            mYear = c.get(Calendar.YEAR);
-            mMonth = c.get(Calendar.MONTH);
-            mDay = c.get(Calendar.DAY_OF_MONTH);
-
-            DatePickerDialog datePickerDialog = new DatePickerDialog(this,
-                    new DatePickerDialog.OnDateSetListener() {
-
-                        @Override
-                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-
-
-                            if(monthOfYear < 10){
-                                if(dayOfMonth < 10)
-                                    btnWeekPicker.setText(year + "-" + 0 + (monthOfYear + 1) + "-" + "0" + dayOfMonth);
-                                else
-                                    btnWeekPicker.setText(year + "-" + 0 + (monthOfYear + 1) + "-" + dayOfMonth);
-                            }
-                            else
-                                btnWeekPicker.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
-                        }
-                    }, mYear, mMonth, mDay);
-
-            datePickerDialog.show();
-        }
-        if (v == btnMonthPicker) {
-            // Get Current Time
-            final Calendar c = Calendar.getInstance((TimeZone.getDefault()));
-            mYear = c.get(Calendar.YEAR);
-            mMonth = c.get(Calendar.MONTH);
-            mDay = c.get(Calendar.DAY_OF_MONTH);
-
-            DatePickerDialog datePickerDialog = new DatePickerDialog(this,
-                    new DatePickerDialog.OnDateSetListener() {
-
-                        @Override
-                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            if(monthOfYear < 10){
-                                if(dayOfMonth < 10)
-                                    btnMonthPicker.setText(year + "-" + 0 + (monthOfYear + 1) + "-" + "0" + dayOfMonth);
-                                else
-                                    btnMonthPicker.setText(year + "-" + 0 + (monthOfYear + 1) + "-" + dayOfMonth);
-                            }
-                            else
-                                btnMonthPicker.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
-
-                        }
-                    }, mYear, mMonth, mDay);
-
-            datePickerDialog.show();
-        }
     }
 
-    private void setTextByDefault(){
-        btnDatePicker.setText("Day");
-        btnFirstDatePicker.setText("First Day");
-        btnEndDatePicker.setText("End Day");
-        btnWeekPicker.setText("First day of week");
-        btnMonthPicker.setText("First day of month");
-        inputAmount.setText("");
+    private void hideButtons(){
+        btnDatePicker.setVisibility(View.GONE);
+        btnEndDatePicker.setVisibility(View.GONE);
+        inputAmount.setVisibility(View.GONE);
+        lineChart.setVisibility(View.GONE);
+        pieChart.setVisibility(View.GONE);
+    }
+
+    private void setTextForHourly(){
+        btnDatePicker.setText(R.string.day);
+    }
+
+    private void setTextForDaily(){
+        btnDatePicker.setText(R.string.first_day);
+        btnEndDatePicker.setText(R.string.end_day);
+    }
+
+    private void setTextForWeekly(){
+        btnDatePicker.setText(R.string.week);
+        inputAmount.setText(R.string.amount);
+    }
+
+    private void setTextForMonthly(){
+        btnDatePicker.setText(R.string.month);
+        inputAmount.setText(R.string.amount);
+    }
+
+    private void alertOnEmptyResponseHourly() throws JSONException {
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(LineChartItem.this);
+        builder1.setMessage("Sorry, we couldn't find results this day\n\n" +
+                "Graph will show data from your last record");
+        builder1.setCancelable(true);
+
+        builder1.setPositiveButton(
+                "Ok",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
+    }
+
+    private void alertOnEmptyResponseDaily() throws JSONException {
+
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(LineChartItem.this);
+
+        builder1.setMessage("Sorry, we couldn't find results this day(s)\n\n" +
+                "Graph will show data from your last found 7 days");
+        builder1.setCancelable(true);
+
+        builder1.setPositiveButton(
+                "Ok",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
+    }
+
+    private void alertOnEmptyResponseMonthly() throws JSONException {
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(LineChartItem.this);
+
+        builder1.setMessage("Sorry, we couldn't find results this month(s)\n\n" +
+                "Graph will show data from your last month records");
+        builder1.setCancelable(true);
+
+        builder1.setPositiveButton(
+                "Ok",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
+    }
+
+    private void alertOnEmptyResponseWeekly() throws JSONException {
+
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(LineChartItem.this);
+
+        builder1.setMessage("Sorry, we couldn't find results this week(s)\n\n" +
+                "Graph will show data from your last week records");
+        builder1.setCancelable(true);
+
+        builder1.setPositiveButton(
+                "Ok",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
+    }
+
+    private void alert(String url) throws JSONException {
+        switch (url) {
+            case EMPTY_LINE_FILTER_HOURLY:
+                alertOnEmptyResponseHourly();
+                break;
+            case EMPTY_LINE_FILTER_DAILY:
+                alertOnEmptyResponseDaily();
+                break;
+            case EMPTY_LINE_FILTER_WEEKLY:
+                alertOnEmptyResponseWeekly();
+                break;
+            case EMPTY_LINE_FILTER_MONTHLY:
+                alertOnEmptyResponseMonthly();
+                break;
+        }
     }
 
     private void showMessage(){
         AlertDialog.Builder builder1 = new AlertDialog.Builder(LineChartItem.this);
         builder1.setMessage("Instructions\n\n" +
                 "This report will demonstrate quantity of behaviours per period of time.\n\n" +
-                "*To display report please choose option for period of time (hourly, daily, weekly, monthly).\n\n" +
-                "*Then select date(s), for weekly and monthly options you will be asked to input amount of weeks or months.\n\n" +
-                "*After initialization of graph you will be able to track behaviours over particular period of time.\n\n" +
-                "*To do this simply choose any node on the chart and new graph with behaviours will be displayed.");
+                "- To display report please choose option for period of time (hourly, daily, weekly, monthly).\n\n" +
+                "- Then select date(s), for weekly and monthly options you will be asked to input amount of weeks or months.\n\n\n" +
+                "After initialization of graph you will be able to track behaviours over particular period of time.\n\n" +
+                "- To do this simply choose any node on the chart and new graph with behaviours will be displayed.");
         builder1.setCancelable(true);
 
         builder1.setPositiveButton(
@@ -1440,17 +923,11 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
                 case R.id.navigation_target:
                     finish();
                     intent = new Intent(LineChartItem.this, TargetBehaviour.class);
-                    /**intent.putExtra("SELECTED_ITEM", 3);
-                     intent.putExtra("SELECTED_ACTIVITY", "Target Behaviours");
-                     intent.putExtra("SELECTED_CONTENT", 1);**/
                     startActivity(intent);
                     return true;
                 case R.id.navigation_report:
                     finish();
                     intent = new Intent(LineChartItem.this, Report.class);
-                    /***intent.putExtra("SELECTED_ITEM", 4);
-                     intent.putExtra("SELECTED_ACTIVITY", "Generate Reports");
-                     intent.putExtra("SELECTED_CONTENT", 2);*/
                     startActivity(intent);
                     return true;
             }

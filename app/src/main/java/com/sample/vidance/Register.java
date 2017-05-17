@@ -15,7 +15,6 @@ import com.android.volley.Request.Method;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.sample.vidance.R;
 import com.sample.vidance.app.AppConfig;
 import com.sample.vidance.app.AppController;
 import com.sample.vidance.helper.SQLiteHandler;
@@ -117,7 +116,7 @@ public class Register extends AppCompatActivity {
 
             @Override
             public void onResponse(String response) {
-                Log.d(TAG, "Register Response: " + response.toString());
+                Log.d(TAG, "Register Response: " + response);
                 hideDialog();
 
                 try {
@@ -169,7 +168,7 @@ public class Register extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() {
                 // Posting params to register url
-                Map<String, String> params = new HashMap<String, String>();
+                Map<String, String> params = new HashMap<>();
                 params.put("name", name);
                 params.put("cname", cname);
                 params.put("password", password);

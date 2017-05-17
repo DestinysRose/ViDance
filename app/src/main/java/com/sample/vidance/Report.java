@@ -1,7 +1,6 @@
 package com.sample.vidance;
 
 
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -29,10 +28,6 @@ import com.sample.vidance.listcharts.PieChartItem;
 
 public class Report extends AppCompatActivity {
 
-    //Show dialog when fetching
-    private ProgressDialog pDialog;
-
-
     private SQLiteHandler db;
     private SessionManager session;
 
@@ -43,9 +38,6 @@ public class Report extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        pDialog = new ProgressDialog(this);
-        pDialog.setCancelable(false);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.resource_report);
@@ -132,9 +124,6 @@ public class Report extends AppCompatActivity {
                 case R.id.navigation_target:
                     finish();
                     intent = new Intent(Report.this, TargetBehaviour.class);
-                    /**intent.putExtra("SELECTED_ITEM", 3);
-                     intent.putExtra("SELECTED_ACTIVITY", "Target Behaviours");
-                     intent.putExtra("SELECTED_CONTENT", 1);**/
                     startActivity(intent);
                     return true;
                 case R.id.navigation_report:

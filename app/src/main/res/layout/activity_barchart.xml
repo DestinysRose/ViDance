@@ -15,52 +15,52 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
 
-                    <RadioButton
-                        android:id="@+id/hourly"
-                        android:layout_width="wrap_content"
-                        android:layout_height="35dp"
-                        android:layout_margin="5dp"
-                        android:layout_weight="0.25"
-                        android:background="@drawable/filter_selector"
-                        android:textColor="@color/text"
-                        android:button="@null"
-                        android:gravity="center"
-                        android:text="Hourly" />
-                    <RadioButton
-                        android:id="@+id/daily"
-                        android:layout_width="wrap_content"
-                        android:layout_height="35dp"
-                        android:layout_margin="5dp"
-                        android:layout_weight="0.25"
-                        android:background="@drawable/filter_selector"
-                        android:textColor="@color/text"
-                        android:button="@null"
-                        android:gravity="center"
-                        android:text="Daily" />
+                <RadioButton
+                    android:id="@+id/hourly"
+                    android:layout_width="wrap_content"
+                    android:layout_height="35dp"
+                    android:layout_margin="5dp"
+                    android:layout_weight="0.25"
+                    android:background="@drawable/filter_selector"
+                    android:textColor="@color/text"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="@string/hourly" />
+                <RadioButton
+                    android:id="@+id/daily"
+                    android:layout_width="wrap_content"
+                    android:layout_height="35dp"
+                    android:layout_margin="5dp"
+                    android:layout_weight="0.25"
+                    android:background="@drawable/filter_selector"
+                    android:textColor="@color/text"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="@string/daily" />
 
-                    <RadioButton
-                        android:id="@+id/weekly"
-                        android:layout_width="wrap_content"
-                        android:layout_height="35dp"
-                        android:layout_margin="5dp"
-                        android:layout_weight=".25"
-                        android:background="@drawable/filter_selector"
-                        android:textColor="@color/text"
-                        android:button="@null"
-                        android:gravity="center"
-                        android:text="Weekly" />
+                <RadioButton
+                    android:id="@+id/weekly"
+                    android:layout_width="wrap_content"
+                    android:layout_height="35dp"
+                    android:layout_margin="5dp"
+                    android:layout_weight=".25"
+                    android:background="@drawable/filter_selector"
+                    android:textColor="@color/text"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="@string/weekly" />
 
-                    <RadioButton
-                        android:id="@+id/monthly"
-                        android:layout_width="wrap_content"
-                        android:layout_height="35dp"
-                        android:layout_margin="5dp"
-                        android:layout_weight=".25"
-                        android:background="@drawable/filter_selector"
-                        android:textColor="@color/text"
-                        android:button="@null"
-                        android:gravity="center"
-                        android:text="Monthly" />
+                <RadioButton
+                    android:id="@+id/monthly"
+                    android:layout_width="wrap_content"
+                    android:layout_height="35dp"
+                    android:layout_margin="5dp"
+                    android:layout_weight=".25"
+                    android:background="@drawable/filter_selector"
+                    android:textColor="@color/text"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="@string/monthly" />
 
             </RadioGroup>
         </LinearLayout>
@@ -74,7 +74,6 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/button_rounded"
-            android:text="Day"
             android:textColor="@color/text"
             android:layout_weight="1"
             android:layout_margin="5dp"/>
@@ -86,7 +85,6 @@
             android:layout_margin="5dp"
             android:layout_weight="1"
             android:background="@drawable/button_rounded"
-            android:text="End Day"
             android:textColor="@color/text" />
 
         <EditText
@@ -95,7 +93,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="10"
-            android:hint="How many?"
             android:inputType="number" />
     </LinearLayout>
     <LinearLayout
@@ -107,7 +104,7 @@
             android:layout_width="257dp"
             android:layout_height="wrap_content"
             android:background="@drawable/button_rounded"
-            android:text="Show report"
+            android:text="@string/show_report"
             android:textColor="@color/text"
             android:layout_margin="5dp"
             android:layout_weight="0.58" />
@@ -117,9 +114,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/button_rounded_green"
-            android:text="Hint"
+            android:text="@string/hint"
             android:textColor="@color/text"
-            android:layout_margin="5dp" />
+            android:layout_margin="5dp"/>
     </LinearLayout>
 
     <com.github.mikephil.charting.charts.BarChart

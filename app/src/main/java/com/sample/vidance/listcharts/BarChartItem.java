@@ -95,13 +95,11 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
     public static final String EMPTY_BAR_FILTER_WEEKLY = "http://thevidance.com/filter/weekly/barChart(Last).php";
     public static final String EMPTY_BAR_FILTER_MONTHLY = "http://thevidance.com/filter/monthly/barChart(Last).php";
 
-    public static final String FIRST_RECORD = "http://thevidance.com/filter/firstRecord.php";
-    public static final String LAST_RECORD = "http://thevidance.com/filter/lastRecord.php";
+    public static final String RECORD_DATES = "http://thevidance.com/filter/lastRecord.php";
 
     public static final String KEY_BAR_DATE = "date1";
     public static final String KEY_BAR_END_DATE = "date2";
     public static final String KEY_BAR_AMOUNT = "amount";
-    public final String[] finalRecord = new String[25];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +109,7 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
             // Progress dialog
         pDialog = new ProgressDialog(this);
         pDialog.setCancelable(false);
+        pDialog.setMessage("Loading ...");
 
         String fontPath = "fonts/CatCafe.ttf";
         tf = Typeface.createFromAsset(getAssets(), fontPath);
@@ -122,13 +121,13 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
 
         //Set onClickListeners for date and time
         btnDatePicker = (Button)findViewById(R.id.setDate);
-        btnDatePicker.setOnClickListener((View.OnClickListener) this);
+        btnDatePicker.setOnClickListener(this);
         btnDatePicker.setTypeface(jf);
         btnDatePicker.setTextSize(25);
 
         //Set onClickListeners for date and time
         btnEndDatePicker = (Button)findViewById(R.id.setEndDate);
-        btnEndDatePicker.setOnClickListener((View.OnClickListener) this);
+        btnEndDatePicker.setOnClickListener(this);
         btnEndDatePicker.setTypeface(jf);
         btnEndDatePicker.setTextSize(25);
 
@@ -152,8 +151,6 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
         rbW.setTextSize(23);
         rbM.setTypeface(jf);
         rbM.setTextSize(23);
-
-        showMessage();
 
         Button hint = (Button) findViewById(R.id.hint);
         hint.setTypeface(jf);
@@ -186,23 +183,17 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                         hideButtons();
                         setTextForHourly();
                         btnDatePicker.setVisibility(View.VISIBLE);
-                        btnEndDatePicker.setVisibility(View.GONE);
-                        inputAmount.setVisibility(View.GONE);
-                        barChart.setVisibility(View.GONE);
-                        HbarChart.setVisibility(View.GONE);
 
                         Button filHour = (Button) findViewById(R.id.dateApply);
                         filHour.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 try {
-                                    //storeDateHourly();
                                     date = (String) btnDatePicker.getText();
                                     endDate = (String) btnEndDatePicker.getText();
                                     amount = inputAmount.getText().toString().trim();
                                     if(hourlyValid(date) == 0)
                                         storeDate(BAR_FILTER_HOURLY);
-                                    //Toast.makeText(getApplicationContext(), date, Toast.LENGTH_SHORT).show();
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                     Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
@@ -216,16 +207,12 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                         setTextForDaily();
                         btnDatePicker.setVisibility(View.VISIBLE);
                         btnEndDatePicker.setVisibility(View.VISIBLE);
-                        inputAmount.setVisibility(View.GONE);
-                        barChart.setVisibility(View.GONE);
-                        HbarChart.setVisibility(View.GONE);
 
                         Button filDay = (Button) findViewById(R.id.dateApply);
                         filDay.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 try {
-                                    //storeDateDaily();
                                     date = (String) btnDatePicker.getText();
                                     endDate = (String) btnEndDatePicker.getText();
                                     amount = inputAmount.getText().toString().trim();
@@ -243,17 +230,13 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                         hideButtons();
                         setTextForWeekly();
                         btnDatePicker.setVisibility(View.VISIBLE);
-                        btnEndDatePicker.setVisibility(View.GONE);
                         inputAmount.setVisibility(View.VISIBLE);
-                        barChart.setVisibility(View.GONE);
-                        HbarChart.setVisibility(View.GONE);
 
                         Button filWeek = (Button) findViewById(R.id.dateApply);
                         filWeek.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 try {
-                                    //storeDateWeekly();
                                     date = (String) btnDatePicker.getText();
                                     endDate = (String) btnEndDatePicker.getText();
                                     amount = inputAmount.getText().toString().trim();
@@ -271,17 +254,13 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                         hideButtons();
                         setTextForMonthly();
                         btnDatePicker.setVisibility(View.VISIBLE);
-                        btnEndDatePicker.setVisibility(View.GONE);
                         inputAmount.setVisibility(View.VISIBLE);
-                        barChart.setVisibility(View.GONE);
-                        HbarChart.setVisibility(View.GONE);
 
                         Button filMonth = (Button) findViewById(R.id.dateApply);
                         filMonth.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 try {
-                                    //storeDateMonthly();
                                     date = (String) btnDatePicker.getText();
                                     endDate = (String) btnEndDatePicker.getText();
                                     amount = inputAmount.getText().toString().trim();
@@ -300,43 +279,8 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-    private class MyBarDataSet extends BarDataSet {
-
-
-        private MyBarDataSet(List<BarEntry> yVals, String label) {
-            super(yVals, label);
-        }
-
-        @Override
-        public int getColor(int index) {
-
-            if(getEntryForXIndex(index).getVal() < 4) // less than 4 green
-                return mColors.get(0);
-            else if(getEntryForXIndex(index).getVal() < 7) // less than 7 orange
-                return mColors.get(1);
-            else // greater or equal than 7 red
-                return mColors.get(2);
-        }
-
-    }
-
-    private class MyValueFormatter implements ValueFormatter {
-
-        private DecimalFormat mFormat;
-
-        private MyValueFormatter() {
-            mFormat = new DecimalFormat("###,###,###"); // use no decimals
-        }
-
-        @Override
-        public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
-
-            return mFormat.format(value);
-        }
-    }
-
     private void storeDate(String url) throws JSONException {
-
+        showDialog();
         date = (String) btnDatePicker.getText();
         endDate = (String) btnEndDatePicker.getText();
         amount = inputAmount.getText().toString().trim();
@@ -367,12 +311,7 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-
-                            barChart = (BarChart) findViewById(R.id.chart);
-                            barChart.invalidate();
-
-
-                            JSONObject reader = null;
+                            JSONObject reader;
                             try {
                                 reader = new JSONObject(response);
 
@@ -380,16 +319,15 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                                 result = reader.getJSONArray("result");
                                 if (result.length() == 0) {
 
-                                    lastDateHourly(finalLastUrl);
                                     alert(finalLastUrl);
+                                    lastDateHourly(finalLastUrl);
 
                                 } else {
                                     ArrayList<BarEntry> barEntries = new ArrayList<>();
                                     ArrayList<String> pa = new ArrayList<>();
-                                    barChart.setVisibility(View.VISIBLE);
 
                                     int count;
-                                    MyBarDataSet barDataSet = null;
+                                    MyBarDataSet barDataSet;
                                     for (int i = 0; i < result.length(); i++) {
                                         final JSONObject barChartObj = result.getJSONObject(i);
                                         final String behaviour_counter = barChartObj.getString("counter");
@@ -399,27 +337,14 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                                         barEntries.add(new BarEntry(count, i));
 
                                         pa.add("");
-
-                                        barDataSet = new MyBarDataSet(barEntries, "Behaviours");
                                     }
 
+                                    barDataSet = new MyBarDataSet(barEntries, "Number of severities for each behaviour");
+                                    initBarSet(barDataSet);
+
                                     BarData theData = new BarData(pa, barDataSet);
-
-                                    barDataSet.setColors(new int[]{ContextCompat.getColor(BarChartItem.this, R.color.green),
-                                            ContextCompat.getColor(BarChartItem.this, R.color.yellow),
-                                            ContextCompat.getColor(BarChartItem.this, R.color.red)});
-                                    barDataSet.setValueFormatter(new BarChartItem.MyValueFormatter());
-
                                     barChart.setData(theData);
-                                    barDataSet.setBarSpacePercent(20f);
-
-                                    barChart.setDescription("");
-                                    YAxis yAxisRight = barChart.getAxisRight();
-                                    yAxisRight.setEnabled(false);
-                                    barChart.animateX(1500);
-                                    barChart.animateY(1500);
-                                    barChart.invalidate();
-                                    hideDialog();
+                                    initBarChart();
 
                                     barChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
                                         @Override
@@ -438,14 +363,10 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                                                 int count_moderate = Integer.parseInt(s_moderate);
                                                 int count_severe = Integer.parseInt(s_severe);
 
-                                                //Pie chart declaration
-                                                BarChart HbarChart = (BarChart) findViewById(R.id.chart2);
-                                                HbarChart.setVisibility(View.VISIBLE);
-
                                                 ArrayList<BarEntry> entries2 = new ArrayList<>();
 
                                                 ArrayList<String> labels2;
-                                                BarDataSet barSet = null;
+                                                BarDataSet barSet;
 
                                                 if (count_mild > 0 && count_severe > 0 && count_moderate > 0) {
                                                     entries2.add(new BarEntry(count_mild, 0));
@@ -504,41 +425,22 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                                                     labels2 = new ArrayList<>();
                                                     labels2.add("Mild");
                                                 }
-
                                                 barSet = new BarDataSet(entries2, "");
-                                                barSet.setDrawValues(false);
+                                                initHBarSet(barSet);
 
                                                 BarData data2 = new BarData(labels2, barSet);
                                                 HbarChart.setData(data2);
 
-                                                barSet.setBarSpacePercent(20f);
-
-                                                HbarChart.setDescription(behaviour_name);
-                                                HbarChart.setDescriptionPosition(700f, 18f);
-                                                HbarChart.setDescriptionTextSize(12f);
-                                                YAxis yAxisLeft = HbarChart.getAxisLeft();
-                                                yAxisLeft.setEnabled(false);
-                                                HbarChart.animateX(1500);
-                                                HbarChart.animateY(1500);
-                                                HbarChart.invalidate();
-                                                hideDialog();
-
-                                                Legend l = HbarChart.getLegend();
-                                                l.setEnabled(false);
-                                                barSet.setColors(Colors.H_BAR_COLOR);
-
+                                                initHBarChart(behaviour_name);
                                             } catch (JSONException e1) {
                                                 e1.printStackTrace();
                                             }
                                         }
-
                                         @Override
                                         public void onNothingSelected() {
-
                                         }
                                     });
                                 }
-
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -553,7 +455,7 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                     }) {
                 @Override
                 protected Map<String, String> getParams() {
-                    Map<String, String> params = new HashMap<String, String>();
+                    Map<String, String> params = new HashMap<>();
                     params.put(KEY_BAR_DATE, finalDate);
                     params.put(KEY_BAR_END_DATE, finalEndDate);
                     params.put(KEY_BAR_AMOUNT, finalAmount);
@@ -570,9 +472,7 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onResponse(String response) {
 
-                        BarChart barChart = (BarChart) findViewById(R.id.chart);
-
-                        JSONObject reader = null;
+                        JSONObject reader;
                         try {
                             reader = new JSONObject(response);
 
@@ -580,39 +480,24 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                             result = reader.getJSONArray("result");
                                 ArrayList<BarEntry> barEntries = new ArrayList<>();
                                 ArrayList<String> pa = new ArrayList<>();
-                                barChart.setVisibility(View.VISIBLE);
 
                                 int count;
-                                BarChartItem.MyBarDataSet barDataSet = null;
+                                BarChartItem.MyBarDataSet barDataSet;
                                 for (int i = 0; i < result.length(); i++) {
                                     final JSONObject barChartObj = result.getJSONObject(i);
                                     final String behaviour_counter = barChartObj.getString("counter");
 
                                     count = Integer.parseInt(behaviour_counter);
-
                                     barEntries.add(new BarEntry(count, i));
-
                                     pa.add("");
-
-                                    barDataSet = new BarChartItem.MyBarDataSet(barEntries, "Behaviours");
                                 }
 
+                                barDataSet = new BarChartItem.MyBarDataSet(barEntries, "Number of severities for each behaviour");
+                                initBarSet(barDataSet);
+
                                 BarData theData = new BarData(pa, barDataSet);
-
-                                barDataSet.setColors(new int[]{ContextCompat.getColor(BarChartItem.this, R.color.green),
-                                        ContextCompat.getColor(BarChartItem.this, R.color.yellow),
-                                        ContextCompat.getColor(BarChartItem.this, R.color.red)});
-                                barDataSet.setValueFormatter(new BarChartItem.MyValueFormatter());
-
                                 barChart.setData(theData);
-                                barDataSet.setBarSpacePercent(20f);
-
-                                barChart.setDescription("");
-                                YAxis yAxisRight = barChart.getAxisRight();
-                                yAxisRight.setEnabled(false);
-                                barChart.animateX(1500);
-                                barChart.animateY(1500);
-                                barChart.invalidate();
+                                initBarChart();
 
                                 barChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
                                     @Override
@@ -631,12 +516,7 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                                             int count_moderate = Integer.parseInt(s_moderate);
                                             int count_severe = Integer.parseInt(s_severe);
 
-                                            //Pie chart declaration
-                                            BarChart HbarChart = (BarChart) findViewById(R.id.chart2);
-                                            HbarChart.setVisibility(View.VISIBLE);
-
                                             ArrayList<BarEntry> entries2 = new ArrayList<>();
-
                                             ArrayList<String> labels2;
                                             BarDataSet barSet;
 
@@ -699,25 +579,11 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                                             }
 
                                             barSet = new BarDataSet(entries2, "");
-                                            barSet.setDrawValues(false);
+                                            initHBarSet(barSet);
 
                                             BarData data2 = new BarData(labels2, barSet);
                                             HbarChart.setData(data2);
-
-                                            barSet.setBarSpacePercent(20f);
-
-                                            HbarChart.setDescription(behaviour_name);
-                                            HbarChart.setDescriptionPosition(700f, 18f);
-                                            HbarChart.setDescriptionTextSize(12f);
-                                            YAxis yAxisLeft = HbarChart.getAxisLeft();
-                                            yAxisLeft.setEnabled(false);
-                                            HbarChart.animateX(1500);
-                                            HbarChart.animateY(1500);
-                                            HbarChart.invalidate();
-
-                                            Legend l = HbarChart.getLegend();
-                                            l.setEnabled(false);
-                                            barSet.setColors(Colors.H_BAR_COLOR);
+                                            initHBarChart(behaviour_name);
 
                                         } catch (JSONException e1) {
                                             e1.printStackTrace();
@@ -731,11 +597,8 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                                 });
                         } catch (JSONException e) {
                             e.printStackTrace();
-                            Toast.makeText(BarChartItem.this, "OOOOOpss...", Toast.LENGTH_LONG).show();
                         }
                     }
-
-
                     // Get the JSONArray weather
                 },
                 new Response.ErrorListener() {
@@ -746,12 +609,97 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                 }) {
             @Override
             protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
+                Map<String, String> params = new HashMap<>();
                 return params;
             }
         };
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(stringRequest);
+    }
+
+    private void initBarChart(){
+
+        barChart.setVisibility(View.VISIBLE);
+        barChart.setDescription("");
+        YAxis yAxisRight = barChart.getAxisRight();
+        yAxisRight.setEnabled(false);
+        barChart.setScaleEnabled(false);
+        barChart.setDoubleTapToZoomEnabled(false);
+        barChart.animateX(1500);
+        barChart.animateY(1500);
+        barChart.invalidate();
+
+        Legend l = barChart.getLegend();
+        l.setPosition(Legend.LegendPosition.ABOVE_CHART_LEFT);
+
+        hideDialog();
+    }
+
+    private void initBarSet(BarDataSet barDataSet){
+        barDataSet.setColors(new int[]{ContextCompat.getColor(BarChartItem.this, R.color.green),
+                ContextCompat.getColor(BarChartItem.this, R.color.yellow),
+                ContextCompat.getColor(BarChartItem.this, R.color.red)});
+        barDataSet.setValueFormatter(new BarChartItem.MyValueFormatter());
+
+        barDataSet.setBarSpacePercent(20f);
+    }
+
+    private void initHBarChart(String behaviour_name){
+        HbarChart.setVisibility(View.VISIBLE);
+        HbarChart.setDescription(behaviour_name);
+        HbarChart.setDescriptionPosition(700f, 18f);
+        HbarChart.setDescriptionTextSize(12f);
+        HbarChart.animateX(0);
+        HbarChart.animateY(1500);
+        HbarChart.invalidate();
+        HbarChart.setScaleEnabled(false);
+        HbarChart.setDoubleTapToZoomEnabled(false);
+
+        YAxis yAxisLeft = HbarChart.getAxisLeft();
+        yAxisLeft.setEnabled(false);
+
+        Legend l = HbarChart.getLegend();
+        l.setEnabled(false);
+    }
+
+    private void initHBarSet(BarDataSet barSet){
+        barSet.setColors(Colors.H_BAR_COLOR);
+        barSet.setBarSpacePercent(20f);
+        barSet.setDrawValues(false);
+    }
+
+    private class MyBarDataSet extends BarDataSet {
+
+        private MyBarDataSet(List<BarEntry> yVals, String label) {
+            super(yVals, label);
+        }
+
+        @Override
+        public int getColor(int index) {
+
+            if(getEntryForXIndex(index).getVal() < 4) // less than 4 green
+                return mColors.get(0);
+            else if(getEntryForXIndex(index).getVal() < 7) // less than 7 orange
+                return mColors.get(1);
+            else // greater or equal than 7 red
+                return mColors.get(2);
+        }
+
+    }
+
+    private class MyValueFormatter implements ValueFormatter {
+
+        private DecimalFormat mFormat;
+
+        private MyValueFormatter() {
+            mFormat = new DecimalFormat("###,###,###"); // use no decimals
+        }
+
+        @Override
+        public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+
+            return mFormat.format(value);
+        }
     }
 
     private int hourlyValid(String date){
@@ -887,36 +835,45 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setTextForHourly(){
-        btnDatePicker.setText("Day");
+        btnDatePicker.setText(R.string.day);
     }
+
     private void setTextForDaily(){
-        btnDatePicker.setText("First Day");
-        btnEndDatePicker.setText("End Day");
+        btnDatePicker.setText(R.string.first_day);
+        btnEndDatePicker.setText(R.string.end_day);
     }
+
     private void setTextForWeekly(){
-        btnDatePicker.setText("First day of week");
-        inputAmount.setText("");
+        btnDatePicker.setText(R.string.week);
+        inputAmount.setText(R.string.amount);
     }
+
     private void setTextForMonthly(){
-        btnDatePicker.setText("First day of month");
-        inputAmount.setText("");
+        btnDatePicker.setText(R.string.month);
+        inputAmount.setText(R.string.amount);
     }
 
     private void showMessage(){
         AlertDialog.Builder builder1 = new AlertDialog.Builder(BarChartItem.this);
         builder1.setMessage("Instructions\n\n" +
                 "This report will demonstrate quantity of severities for each behaviour per period of time.\n\n" +
-                "*To display report please choose option for period of time (hourly, daily, weekly, monthly).\n\n" +
-                "*Then select date(s), for weekly and monthly options you will be asked to input amount of weeks or months.\n\n" +
-                "*After initialization of graph you will be able to track severities over particular period of time.\n\n" +
-                "*To do this simply choose any node on the chart and new graph with severities will be displayed.");
+                "- To display report please choose option for period of time (hourly, daily, weekly, monthly).\n\n" +
+                "- Then select date(s), for weekly and monthly options you will be asked to input amount of weeks or months.\n\n\n" +
+                "After initialization of graph you will be able to track severities over particular period of time.\n\n" +
+                "- To do this simply choose any node on the chart and new graph with severities will be displayed.");
         builder1.setCancelable(true);
 
         builder1.setPositiveButton(
                 "Ok",
                 new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //dialog.cancel();
+                        try {
+                            Record();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
 
@@ -924,13 +881,13 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
         alert11.show();
     }
 
-    private String Record(final String url) throws JSONException {
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+    private void Record() throws JSONException {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, RECORD_DATES,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
 
-                        JSONObject reader = null;
+                        JSONObject reader;
                         try {
                             reader = new JSONObject(response);
 
@@ -938,23 +895,13 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                             result = reader.getJSONArray("result");
 
                             final JSONObject recordObj = result.getJSONObject(0);
-                            final String record = recordObj.getString("updated_at");
-
-                            finalRecord[0] = record;
-
-                            //Toast.makeText(BarChartItem.this, finalRecord[0], Toast.LENGTH_LONG).show();
+                            final String firstRecord = recordObj.getString("firstDate");
+                            final String lastRecord = recordObj.getString("lastDate");
 
                             AlertDialog.Builder builder1 = new AlertDialog.Builder(BarChartItem.this);
-
-                            /*if (url.equals(FIRST_RECORD)){
-                                String firstRecord = "Your first record: ";
-                                builder1.setMessage(firstRecord + finalRecord[0]);
-                            }
-                            else{
-                                String lastRecord = "Your last record: ";
-                                builder1.setMessage(lastRecord + finalRecord[0]);
-                            }*/
-
+                            builder1.setMessage(
+                                    "Your First record was found on: " + firstRecord + "\n\n" +
+                                    "Your Last record was found on: " + lastRecord);
                             builder1.setCancelable(true);
 
                             builder1.setPositiveButton(
@@ -989,7 +936,6 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(stringRequest);
-        return finalRecord[0];
     }
 
 
@@ -1009,9 +955,6 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
 
         AlertDialog alert11 = builder1.create();
         alert11.show();
-
-        //Record(FIRST_RECORD);
-        //Record(LAST_RECORD);
     }
 
     private void alertOnEmptyResponseMonthly() throws JSONException {
@@ -1031,9 +974,6 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
 
         AlertDialog alert11 = builder1.create();
         alert11.show();
-
-        //Record(FIRST_RECORD);
-        //Record(LAST_RECORD);
     }
 
     private void alertOnEmptyResponseWeekly() throws JSONException {
@@ -1054,9 +994,6 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
 
         AlertDialog alert11 = builder1.create();
         alert11.show();
-
-        //Record(FIRST_RECORD);
-        //Record(LAST_RECORD);
     }
 
     private void alert(String url) throws JSONException {

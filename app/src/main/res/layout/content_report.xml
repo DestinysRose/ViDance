@@ -16,7 +16,7 @@
         android:id="@+id/bName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="left"
+        android:gravity="start"
         android:paddingBottom="6dip"
         android:textStyle="bold" />
 
