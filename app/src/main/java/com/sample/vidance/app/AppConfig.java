@@ -11,7 +11,4 @@ public class AppConfig {
     // Server user register url
     public static String URL_REGISTER = "http://thevidance.com/register.php";
 
-    // Server user register url
-    public static String URL_BEH_TEST = "http://thevidance.com/store_b.php";
-
 }

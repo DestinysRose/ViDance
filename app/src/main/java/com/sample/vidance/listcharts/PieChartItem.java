@@ -51,7 +51,7 @@ public class PieChartItem extends AppCompatActivity{
 
     TextView byBehaviour, mild, moderate, severe, mildCount, moderateCount, severeCount;
 
-    Typeface jf;
+    Typeface jf, tf;
 
     private String arrayBehaviour[];
     private int bArray[];
@@ -61,6 +61,8 @@ public class PieChartItem extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_piechart);
 
+        String fontPath = "fonts/CatCafe.ttf";
+        tf = Typeface.createFromAsset(getAssets(), fontPath);
         String fontPath2 = "fonts/James_Fajardo.ttf";
         jf = Typeface.createFromAsset(getAssets(), fontPath2);
 
@@ -88,6 +90,7 @@ public class PieChartItem extends AppCompatActivity{
         byS.setTypeface(jf);
         byS.setTextSize(23);
 
+        setTypeface();
         hideChart();
 
         RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radio);
@@ -156,7 +159,8 @@ public class PieChartItem extends AppCompatActivity{
                                 PieDataSet dataset = new PieDataSet(entries, "");
                                 PieData data = new PieData(labels, dataset);
 
-                                initPieChartS(data, dataset);
+                                setPieDataSet(dataset);
+                                initPieChartS(data);
 
                                 pieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
                                     @Override
@@ -172,20 +176,15 @@ public class PieChartItem extends AppCompatActivity{
                                                 bArray[i] = behaviourList.getInt(bNameArray[i]);
                                             }
 
-                                            TextView getBehaviours = (TextView)findViewById(R.id.getBehaviours);
                                             getBehaviours.setText("");
-                                            TextView getBehavioursCount = (TextView)findViewById(R.id.getBehavioursCount);
                                             getBehavioursCount.setText("");
-
-                                            TextView Severity = (TextView) findViewById(R.id.severity);
                                             Severity.setText("Severity: " + severity);
-
 
                                             getBehaviours.setVisibility(View.VISIBLE);
                                             getBehavioursCount.setVisibility(View.VISIBLE);
                                             Severity.setVisibility(View.VISIBLE);
 
-                                            for(int i = 0; i < bNameArray.length; i++) {
+                                            for(int i = 0; i < bArray.length; i++) {
                                                 if(bArray[i] != 0)
                                                 {
                                                     getBehaviours.append(bNameArray[i] + "\n");
@@ -195,17 +194,21 @@ public class PieChartItem extends AppCompatActivity{
 
                                         } catch (JSONException es) {
                                             es.printStackTrace();
+                                            Toast.makeText(PieChartItem.this, "Unexpected error. Please retry", Toast.LENGTH_LONG).show();
                                         }
                                     }
 
                                     @Override
                                     public void onNothingSelected() {
-
+                                        getBehaviours.setVisibility(View.GONE);
+                                        getBehavioursCount.setVisibility(View.GONE);
+                                        Severity.setVisibility(View.GONE);
                                     }
                                 });
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
+                            Toast.makeText(PieChartItem.this, "Unexpected error. Please retry", Toast.LENGTH_LONG).show();
                         }
                     }
 
@@ -215,7 +218,7 @@ public class PieChartItem extends AppCompatActivity{
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(PieChartItem.this,error.toString(),Toast.LENGTH_LONG).show();
+                        Toast.makeText(PieChartItem.this, "Unexpected error. Please retry", Toast.LENGTH_LONG).show();
                     }
                 });
         RequestQueue requestQueue = Volley.newRequestQueue(this);
@@ -226,20 +229,20 @@ public class PieChartItem extends AppCompatActivity{
         private DecimalFormat mFormat;
 
         MyValueFormatter() {
-            mFormat = new DecimalFormat("###,###,###"); // use no decimals
+            mFormat = new DecimalFormat("###,###,##0.0"); // use no decimals
         }
 
         @Override
         public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
 
-            if(value < 5)
+            if(value <= 4)
                 return "";
             else
                 return mFormat.format(value) + "%";
         }
     }
 
-    private void initPieChartS(PieData data, PieDataSet dataset){
+    private void initPieChartS(PieData data){
 
         Legend l = pieChart.getLegend();
         l.setPosition(Legend.LegendPosition.RIGHT_OF_CHART_CENTER);
@@ -249,12 +252,13 @@ public class PieChartItem extends AppCompatActivity{
         l.setXOffset(80f);
         l.setWordWrapEnabled(true);
         l.setMaxSizePercent(0.55f);
+        l.setTypeface(tf);
 
-        dataset.setColors(Colors.ALL_COLORS);
         pieChart.setDrawHoleEnabled(false);
         pieChart.setUsePercentValues(true);
         pieChart.setData(data);
         pieChart.setDescription("By Severity");
+        pieChart.setDescriptionTypeface(tf);
         pieChart.setDescriptionTextSize(20);
         pieChart.invalidate();
         pieChart.setDrawSliceText(false);
@@ -262,11 +266,6 @@ public class PieChartItem extends AppCompatActivity{
         pieChart.offsetLeftAndRight(0);
         pieChart.setExtraOffsets(0,0,80,0);
         pieChart.getCircleBox().offset(0,0);
-
-        dataset.setDrawValues(true);
-        dataset.setSliceSpace(3);
-        dataset.setSelectionShift(5);
-        dataset.setValueFormatter(new PieChartItem.MyValueFormatter());
         pieChart.animateY(2000);
     }
 
@@ -307,7 +306,8 @@ public class PieChartItem extends AppCompatActivity{
                                 PieDataSet dataset = new PieDataSet(entries, "");
                                 PieData data = new PieData(labels, dataset);
 
-                                initPieChartB(data, dataset);
+                                setPieDataSet(dataset);
+                                initPieChartB(data);
 
                                 pieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
                                     @Override
@@ -321,22 +321,11 @@ public class PieChartItem extends AppCompatActivity{
                                             final String s_moderate = behaviourList.getString("Moderate");
                                             final String s_severe = behaviourList.getString("Severe");
 
-
-
-                                            TextView byBehaviour = (TextView)findViewById(R.id.bName);
                                             byBehaviour.setText(" " + behaviour_name);
 
-                                            TextView mildCount = (TextView)findViewById(R.id.mildCount);
                                             mildCount.setText(s_mild + " time(s)");
-                                            TextView moderateCount = (TextView)findViewById(R.id.moderateCount);
                                             moderateCount.setText(s_moderate + " time(s)");
-                                            TextView severeCount = (TextView)findViewById(R.id.severeCount);
                                             severeCount.setText(s_severe + " time(s)");
-
-                                            TextView mild = (TextView)findViewById(R.id.mild);
-                                            TextView moderate = (TextView)findViewById(R.id.moderate);
-                                            TextView severe = (TextView)findViewById(R.id.severe);
-
 
                                             byBehaviour.setVisibility(View.VISIBLE);
                                             mild.setVisibility(View.VISIBLE);
@@ -348,17 +337,25 @@ public class PieChartItem extends AppCompatActivity{
 
                                         } catch (JSONException es) {
                                             es.printStackTrace();
+                                            Toast.makeText(PieChartItem.this, "Unexpected error. Please retry", Toast.LENGTH_LONG).show();
                                         }
                                     }
 
                                     @Override
                                     public void onNothingSelected() {
-
+                                        byBehaviour.setVisibility(View.GONE);
+                                        mild.setVisibility(View.GONE);
+                                        moderate.setVisibility(View.GONE);
+                                        severe.setVisibility(View.GONE);
+                                        mildCount.setVisibility(View.GONE);
+                                        moderateCount.setVisibility(View.GONE);
+                                        severeCount.setVisibility(View.GONE);
                                     }
                                 });
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
+                            Toast.makeText(PieChartItem.this, "Unexpected error. Please retry", Toast.LENGTH_LONG).show();
                         }
                     }
                     // Get the JSONArray weather
@@ -366,14 +363,22 @@ public class PieChartItem extends AppCompatActivity{
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(PieChartItem.this,error.toString(),Toast.LENGTH_LONG).show();
+                        Toast.makeText(PieChartItem.this, "Unexpected error. Please retry", Toast.LENGTH_LONG).show();
                     }
                 });
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(stringRequest);
     }
 
-    private void initPieChartB(PieData data, PieDataSet dataset){
+    private void setPieDataSet(PieDataSet dataset){
+        dataset.setDrawValues(true);
+        dataset.setValueFormatter(new PieChartItem.MyValueFormatter());
+        dataset.setSliceSpace(3);
+        dataset.setSelectionShift(5);
+        dataset.setColors(Colors.ALL_COLORS);
+    }
+
+    private void initPieChartB(PieData data){
 
         Legend l = pieChart.getLegend();
         l.setPosition(Legend.LegendPosition.LEFT_OF_CHART);
@@ -383,25 +388,33 @@ public class PieChartItem extends AppCompatActivity{
         l.setXOffset(10f);
         l.setWordWrapEnabled(true);
         l.setMaxSizePercent(0.55f);
+        l.setTypeface(tf);
 
-        dataset.setColors(Colors.ALL_COLORS);
         pieChart.setDrawHoleEnabled(false);
         pieChart.setUsePercentValues(true);
         pieChart.setData(data);
         pieChart.setDescription("By Behaviour");
+        pieChart.setDescriptionTypeface(tf);
         pieChart.setDescriptionTextSize(20);
         pieChart.invalidate();
         pieChart.setDrawSliceText(false);
-
         pieChart.offsetLeftAndRight(0);
         pieChart.setExtraOffsets(180,0,0,0);
         pieChart.getCircleBox().offset(0,0);
-
-        dataset.setDrawValues(true);
-        dataset.setSliceSpace(3);
-        dataset.setSelectionShift(5);
-
         pieChart.animateY(2000);
+    }
+
+    private void setTypeface(){
+        getBehaviours.setTypeface(tf);
+        getBehavioursCount.setTypeface(tf);
+        Severity.setTypeface(tf);
+        byBehaviour.setTypeface(tf);
+        mild.setTypeface(tf);
+        moderate.setTypeface(tf);
+        severe.setTypeface(tf);
+        mildCount.setTypeface(tf);
+        moderateCount.setTypeface(tf);
+        severeCount.setTypeface(tf);
     }
 
     private void hideChart(){

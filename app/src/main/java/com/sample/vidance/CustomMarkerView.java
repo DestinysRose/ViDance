@@ -32,6 +32,6 @@ public class CustomMarkerView extends MarkerView {
 
     @Override
     public int getYOffset(float ypos) {
-        return -getHeight();
+        return -getHeight() - 10;
     }
 }

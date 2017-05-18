@@ -52,12 +52,6 @@ public class SQLiteHandler extends SQLiteOpenHelper {
                 + KEY_CREATED_AT + " TEXT" + ")";
         db.execSQL(CREATE_LOGIN_TABLE);
 
-        String CREATE_BTEST_TABLE = "CREATE TABLE " + TABLE_BHTEST + "("
-                + BehaviourHandler.TAG_BID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT," + KEY_CNAME + " TEXT, "
-                + BehaviourHandler.TAG_BNAME + " TEXT," + BehaviourHandler.TAG_SEVER + " TEXT,"
-                + KEY_UPDATED_AT + " TEXT" + ")";
-        db.execSQL(CREATE_BTEST_TABLE);
-
         Log.d(TAG, "Database tables created");
     }
 
@@ -66,8 +60,6 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
-
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BHTEST);
 
         // Create tables again
         onCreate(db);
@@ -90,22 +82,6 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         db.close(); // Closing database connection
 
         Log.d(TAG, "New user inserted into sqlite: " + id);
-    }
-
-    public void addBehaviour(String name, String cname, String bName, String role, String updated_at) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_NAME, name); // Name
-        values.put(KEY_CNAME, cname); // Child Name
-        values.put(BehaviourHandler.TAG_BNAME, bName);
-        values.put(BehaviourHandler.TAG_SEVER, role);
-        values.put(KEY_UPDATED_AT, updated_at);
-
-        long id = db.insert(TABLE_BHTEST, null, values);
-        db.close(); // Closing database connection
-
-        Log.d(TAG, "Behaviours inserted into sqlite: " + id);
     }
 
     /**
@@ -132,31 +108,6 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         Log.d(TAG, "Fetching user from Sqlite: " + user.toString());
 
         return user;
-    }
-
-    public HashMap<String, String> getBehaviourDetails() {
-        HashMap<String, String> behaviour = new HashMap<String, String>();
-        String selectQueryFromBTest = "SELECT * FROM " + TABLE_BHTEST;
-
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(selectQueryFromBTest, null);
-        // Move to first row
-        cursor.moveToFirst();
-        if (cursor.getCount() > 0) {
-            //behaviour.put("bc_id", cursor.getString(1));
-            behaviour.put("name", cursor.getString(1));
-            behaviour.put("cname", cursor.getString(2));
-            behaviour.put("bName", cursor.getString(3));
-            behaviour.put("severity", cursor.getString(4));
-            behaviour.put("updated_at", cursor.getString(5));
-        }
-
-        cursor.close();
-        db.close();
-        // return behaviour
-        Log.d(TAG, "Fetching btest from Sqlite: " + behaviour.toString());
-
-        return behaviour;
     }
 
     /**

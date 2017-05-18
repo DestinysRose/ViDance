@@ -1,5 +1,7 @@
 package com.sample.vidance;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -21,6 +23,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -45,9 +48,7 @@ import java.util.Map;
 
 public class TargetBehaviour  extends AppCompatActivity {
 
-    ArrayList<HashMap<String, String>> dataList;
-
-    public static final String TARGET_CURR_WEEK = "http://thevidance.com/targetBehaviour.php";
+    public static final String TARGET_WEEK = "http://thevidance.com/targetBehaviour.php";
 
     //JSON Array
     private JSONArray result;
@@ -56,6 +57,9 @@ public class TargetBehaviour  extends AppCompatActivity {
     private SessionManager session;
 
     private TextView mTextMessage;
+    TextView selectedBehaviour, byBehaviour;
+
+    Typeface tf;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,16 +67,20 @@ public class TargetBehaviour  extends AppCompatActivity {
 
         String fontPath = "fonts/CatCafe.ttf";
         TextView txtCat = (TextView) findViewById(R.id.catcafe);
+
         // Loading Font Face
-        Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
+        tf = Typeface.createFromAsset(getAssets(), fontPath);
+
         // Applying font
         txtCat.setTypeface(tf);
+        selectedBehaviour = (TextView)findViewById(R.id.selectedB);
+        byBehaviour = (TextView)findViewById(R.id.bName);
+        selectedBehaviour.setTypeface(tf);
+        byBehaviour.setTypeface(tf);
 
         mTextMessage = (TextView) findViewById(R.id.message);
         mTextMessage.setText(R.string.title_target);
         mTextMessage.setTypeface(tf);
-
-        dataList = new ArrayList<HashMap<String,String>>();
 
         try {
             storeDateHourly();
@@ -80,18 +88,13 @@ public class TargetBehaviour  extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        Button toReport = (Button) findViewById(R.id.toReport);
-        toReport.setOnClickListener(new View.OnClickListener() {
+        Button hint = (Button) findViewById(R.id.hint);
+        hint.setTypeface(tf);
+        hint.setTextSize(25);
+        hint.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
-                Intent intent = new Intent(TargetBehaviour.this, Report.class);
-                startActivity(intent);
-            }
-        });
-        Button toHome = (Button) findViewById(R.id.toHome);
-        toHome.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(TargetBehaviour.this, Dashboard.class);
-                startActivity(intent);
+                showMessage();
             }
         });
 
@@ -117,7 +120,7 @@ public class TargetBehaviour  extends AppCompatActivity {
 
         final ArrayList<ILineDataSet> lineDataSets = new ArrayList<>();
 
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, TARGET_CURR_WEEK,
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, TARGET_WEEK,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
@@ -133,12 +136,22 @@ public class TargetBehaviour  extends AppCompatActivity {
 
                                     int count;
                                     for (int i = 0; i < result.length(); i++) {
-                                        final JSONObject weather_object_0 = result.getJSONObject(i);
-                                        final String weather_0_description = weather_object_0.getString("counter");
-                                        count = Integer.parseInt(weather_0_description);
+                                        final JSONObject targetObj = result.getJSONObject(i);
+                                        final String severCounter = targetObj.getString("counter");
+                                        count = Integer.parseInt(severCounter);
 
                                         current.add(new Entry(count, i));
-                                        target.add(new Entry(1,i));
+                                        if(count >= 14)
+                                            target.add(new Entry(count-3,i));
+                                        else if(count >=10)
+                                            target.add(new Entry(count-2,i));
+                                        else if(count > 1)
+                                            target.add(new Entry(count-1,i));
+                                        else if(count == 1)
+                                            target.add(new Entry(count,i));
+                                        else
+                                            Toast.makeText(TargetBehaviour.this, "Seems that you don't have any records last week...", Toast.LENGTH_LONG).show();
+
                                         labels.add("");
                                     }
 
@@ -147,7 +160,6 @@ public class TargetBehaviour  extends AppCompatActivity {
                                     for(int i = 0; i<labels.size(); i++){
                                         xaxes[i] = labels.get(i);
                                     }
-
 
                                     LineDataSet lineDataSet1 = new LineDataSet(current, "Current behaviour");
                                     lineDataSet1.setDrawCircles(false);
@@ -171,12 +183,17 @@ public class TargetBehaviour  extends AppCompatActivity {
                                     lineChart.setDoubleTapToZoomEnabled(false);
                                     lineChart.setMaxVisibleValueCount(result.length());
                                     lineChart.setDescription("Comparison number of behaviours from last week with target number");
+                                    lineChart.setDescriptionTypeface(tf);
+                                    lineChart.setDescriptionPosition(700f, 15f);
                                     lineChart.animateY(1000);
                                     lineChart.getLegend().setEnabled(true);
+                                    lineChart.fitScreen();
+
+                                    Legend l = lineChart.getLegend();
+                                    l.setTypeface(tf);
+
                                     YAxis yAxisRight = lineChart.getAxisRight();
                                     yAxisRight.setEnabled(false);
-
-                                    lineChart.fitScreen();
 
                                     lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
                                         @Override
@@ -186,31 +203,34 @@ public class TargetBehaviour  extends AppCompatActivity {
                                                 JSONObject behaviourList = result.getJSONObject(info);
                                                 final String behaviour_name = behaviourList.getString("bName");
 
-                                                TextView byBehaviour = (TextView)findViewById(R.id.bName);
+                                                selectedBehaviour.setVisibility(View.VISIBLE);
+                                                byBehaviour.setVisibility(View.VISIBLE);
+
+                                                selectedBehaviour.setText("Selected: ");
                                                 byBehaviour.setText(behaviour_name);
                                             } catch (JSONException es) {
                                                 es.printStackTrace();
+                                                Toast.makeText(TargetBehaviour.this, "Unexpected error. Please retry", Toast.LENGTH_LONG).show();
                                             }
                                         }
 
                                         @Override
                                         public void onNothingSelected() {
-
+                                            selectedBehaviour.setVisibility(View.INVISIBLE);
+                                            byBehaviour.setVisibility(View.INVISIBLE);
                                         }
                                     });
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
+                                Toast.makeText(TargetBehaviour.this, "Unexpected error. Please retry", Toast.LENGTH_LONG).show();
                             }
-
-                            // Get the JSONArray weather
-
                         }
                     },
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(TargetBehaviour.this, error.toString(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(TargetBehaviour.this, "Unexpected error. Please retry", Toast.LENGTH_LONG).show();
                         }
                     }) {
                 @Override
@@ -222,6 +242,27 @@ public class TargetBehaviour  extends AppCompatActivity {
             RequestQueue requestQueue = Volley.newRequestQueue(this);
             requestQueue.add(stringRequest);
         }
+
+    private void showMessage(){
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(TargetBehaviour.this);
+        builder1.setMessage("Instructions\n\n" +
+                "Target behaviour shows your results from previous week and compares to target." +
+                "Results includes number of severities for each behaviour.\n\n" +
+                "Target behaviour calculated to track your results and represent using line chart.\n\n" +
+                "To display behaviour simply select any node inside chart.");
+        builder1.setCancelable(true);
+
+        builder1.setPositiveButton(
+                "Ok",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
+    }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {

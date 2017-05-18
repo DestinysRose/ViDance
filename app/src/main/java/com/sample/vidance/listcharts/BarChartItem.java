@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -29,6 +30,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
@@ -137,9 +139,9 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
 
         hideButtons();
 
-        RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radio);
+        final RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radio);
         RadioButton rbH=(RadioButton)findViewById(R.id.hourly);
-        RadioButton rbD=(RadioButton)findViewById(R.id.daily);
+        final RadioButton rbD=(RadioButton)findViewById(R.id.daily);
         RadioButton rbW=(RadioButton)findViewById(R.id.weekly);
         RadioButton rbM=(RadioButton)findViewById(R.id.monthly);
 
@@ -152,12 +154,13 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
         rbM.setTypeface(jf);
         rbM.setTextSize(23);
 
-        Button hint = (Button) findViewById(R.id.hint);
+        final Button hint = (Button) findViewById(R.id.hint);
         hint.setTypeface(jf);
         hint.setTextSize(25);
         hint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideGraphs();
                 showMessage();
             }
         });
@@ -178,6 +181,7 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 // checkedId is the RadioButton selected
                 RadioButton rb=(RadioButton)findViewById(checkedId);
+
                 switch(rb.getId()) {
                     case R.id.hourly:
                         hideButtons();
@@ -434,15 +438,20 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                                                 initHBarChart(behaviour_name);
                                             } catch (JSONException e1) {
                                                 e1.printStackTrace();
+                                                hideDialog();
+                                                Toast.makeText(BarChartItem.this, "Unexpected error. Please retry", Toast.LENGTH_LONG).show();
                                             }
                                         }
                                         @Override
                                         public void onNothingSelected() {
+                                            HbarChart.setVisibility(View.GONE);
                                         }
                                     });
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
+                                hideDialog();
+                                Toast.makeText(BarChartItem.this, "Unexpected error. Please retry", Toast.LENGTH_LONG).show();
                             }
                         }
                         // Get the JSONArray weather
@@ -450,7 +459,8 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(BarChartItem.this, error.toString(), Toast.LENGTH_LONG).show();
+                            hideDialog();
+                            Toast.makeText(BarChartItem.this, "Unexpected error. Please retry", Toast.LENGTH_LONG).show();
                         }
                     }) {
                 @Override
@@ -587,16 +597,20 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
 
                                         } catch (JSONException e1) {
                                             e1.printStackTrace();
+                                            Toast.makeText(BarChartItem.this, "Unexpected error. Please retry", Toast.LENGTH_LONG).show();
+                                            hideDialog();
                                         }
                                     }
 
                                     @Override
                                     public void onNothingSelected() {
-
+                                        HbarChart.setVisibility(View.GONE);
                                     }
                                 });
                         } catch (JSONException e) {
                             e.printStackTrace();
+                            Toast.makeText(BarChartItem.this, "Unexpected error. Please retry", Toast.LENGTH_LONG).show();
+                            hideDialog();
                         }
                     }
                     // Get the JSONArray weather
@@ -604,7 +618,8 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(BarChartItem.this, error.toString(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(BarChartItem.this, "Unexpected error. Please retry", Toast.LENGTH_LONG).show();
+                        hideDialog();
                     }
                 }) {
             @Override
@@ -631,6 +646,9 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
 
         Legend l = barChart.getLegend();
         l.setPosition(Legend.LegendPosition.ABOVE_CHART_LEFT);
+        l.setYOffset(10f);
+        l.setTextSize(10);
+        l.setTypeface(tf);
 
         hideDialog();
     }
@@ -647,6 +665,7 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
     private void initHBarChart(String behaviour_name){
         HbarChart.setVisibility(View.VISIBLE);
         HbarChart.setDescription(behaviour_name);
+        HbarChart.setDescriptionTypeface(tf);
         HbarChart.setDescriptionPosition(700f, 18f);
         HbarChart.setDescriptionTextSize(12f);
         HbarChart.animateX(0);
@@ -658,8 +677,12 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
         YAxis yAxisLeft = HbarChart.getAxisLeft();
         yAxisLeft.setEnabled(false);
 
+        XAxis xAxis = HbarChart.getXAxis();
+        xAxis.setTypeface(tf);
+
         Legend l = HbarChart.getLegend();
         l.setEnabled(false);
+        l.setTypeface(tf);
     }
 
     private void initHBarSet(BarDataSet barSet){
@@ -830,6 +853,11 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
         btnDatePicker.setVisibility(View.GONE);
         btnEndDatePicker.setVisibility(View.GONE);
         inputAmount.setVisibility(View.GONE);
+        barChart.setVisibility(View.GONE);
+        HbarChart.setVisibility(View.GONE);
+    }
+
+    private void hideGraphs(){
         barChart.setVisibility(View.GONE);
         HbarChart.setVisibility(View.GONE);
     }

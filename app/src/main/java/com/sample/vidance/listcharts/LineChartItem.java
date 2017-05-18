@@ -93,6 +93,8 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
     public static final String EMPTY_LINE_FILTER_WEEKLY = "http://thevidance.com/filter/weekly/lineChart(Empty).php";
     public static final String EMPTY_LINE_FILTER_MONTHLY = "http://thevidance.com/filter/monthly/lineChart(Empty).php";
 
+    public static final String RECORD_DATES = "http://thevidance.com/filter/lastRecord.php";
+
     public static final String KEY_DATE = "date1";
     public static final String KEY_END_DATE = "date2";
     public static final String KEY_AMOUNT = "amount";
@@ -152,10 +154,10 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
         bArray = new int[arrayBehaviour.length];
 
         RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radio);
-        RadioButton rbH=(RadioButton)findViewById(R.id.hourly);
-        RadioButton rbD=(RadioButton)findViewById(R.id.daily);
-        RadioButton rbW=(RadioButton)findViewById(R.id.weekly);
-        RadioButton rbM=(RadioButton)findViewById(R.id.monthly);
+        final RadioButton rbH=(RadioButton)findViewById(R.id.hourly);
+        final RadioButton rbD=(RadioButton)findViewById(R.id.daily);
+        final RadioButton rbW=(RadioButton)findViewById(R.id.weekly);
+        final RadioButton rbM=(RadioButton)findViewById(R.id.monthly);
 
         rbH.setTypeface(jf);
         rbH.setTextSize(23);
@@ -165,6 +167,7 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
         rbW.setTextSize(23);
         rbM.setTypeface(jf);
         rbM.setTextSize(23);
+        rbH.setVisibility(View.VISIBLE);
 
         hideButtons();
 
@@ -184,6 +187,7 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
         hint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideGraphs();
                 showMessage();
             }
         });
@@ -357,13 +361,13 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
                                 } else {
 
                                     for (int i = 0; i < result.length(); i++) {
-                                        final JSONObject weather_object_0 = result.getJSONObject(i);
-                                        final String weather_0_description = weather_object_0.getString("counter");
-                                        final String weather_0_icon = weather_object_0.getString("OutputDate");
-                                        count = Integer.parseInt(weather_0_description);
+                                        final JSONObject severObj = result.getJSONObject(i);
+                                        final String severCounter = severObj.getString("counter");
+                                        final String outputDate = severObj.getString("OutputDate");
+                                        count = Integer.parseInt(severCounter);
 
                                         entries.add(new Entry(count, i));
-                                        labels.add(weather_0_icon);
+                                        labels.add(outputDate);
                                     }
                                 }
                                 LineDataSet dataset = new LineDataSet(entries, "Implementation in progress");
@@ -422,27 +426,30 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
 
                                         } catch (JSONException e1) {
                                             e1.printStackTrace();
+                                            Toast.makeText(LineChartItem.this, "Unexpected error. Please retry", Toast.LENGTH_LONG).show();
+                                            hideDialog();
                                         }
                                     }
 
                                     @Override
                                     public void onNothingSelected() {
-
+                                        pieChart.setVisibility(View.GONE);
                                     }
                                 });
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
+                            Toast.makeText(LineChartItem.this, "Unexpected error. Please retry", Toast.LENGTH_LONG).show();
+                            hideDialog();
                         }
-
-                        // Get the JSONArray weather
 
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(LineChartItem.this, error.toString(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(LineChartItem.this, "Unexpected error. Please retry", Toast.LENGTH_LONG).show();
+                        hideDialog();
                     }
                 }) {
             @Override
@@ -459,7 +466,7 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
     }
 
     private void lastDateIfEmpty(String url, final String lineDesc, final String pieDesc) throws JSONException {
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+            StringRequest lineRequest = new StringRequest(Request.Method.POST, url,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
@@ -487,13 +494,13 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
                                     } else {
 
                                         for (int i = 0; i < result.length(); i++) {
-                                            final JSONObject weather_object_0 = result.getJSONObject(i);
-                                            final String weather_0_description = weather_object_0.getString("counter");
-                                            final String weather_0_icon = weather_object_0.getString("OutputDate");
-                                            count = Integer.parseInt(weather_0_description);
+                                            final JSONObject severObj = result.getJSONObject(i);
+                                            final String severCounter = severObj.getString("counter");
+                                            final String outputDate = severObj.getString("OutputDate");
+                                            count = Integer.parseInt(severCounter);
 
                                             entries.add(new Entry(count, i));
-                                            labels.add(weather_0_icon);
+                                            labels.add(outputDate);
                                         }
                                     }
                                     LineDataSet dataset = new LineDataSet(entries, "Implementation in progress");
@@ -551,23 +558,27 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
 
                                             } catch (JSONException e1) {
                                                 e1.printStackTrace();
+                                                hideDialog();
                                             }
                                         }
 
                                         @Override
                                         public void onNothingSelected() {
-
+                                            pieChart.setVisibility(View.GONE);
                                         }
                                     });
                             } catch (JSONException e) {
                                 e.printStackTrace();
+                                Toast.makeText(LineChartItem.this, "Unexpected error. Please retry", Toast.LENGTH_LONG).show();
+                                hideDialog();
                             }
                         }
                     },
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(LineChartItem.this, error.toString(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(LineChartItem.this, "Unexpected error. Please retry", Toast.LENGTH_LONG).show();
+                            hideDialog();
                         }
                     }) {
                 @Override
@@ -577,7 +588,7 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
                 }
             };
             RequestQueue requestQueue = Volley.newRequestQueue(this);
-            requestQueue.add(stringRequest);
+            requestQueue.add(lineRequest);
     }
 
     private class MyValueFormatter implements ValueFormatter {
@@ -585,7 +596,7 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
         private DecimalFormat mFormat;
 
         MyValueFormatter() {
-            mFormat = new DecimalFormat("###,###,###"); // use no decimals
+            mFormat = new DecimalFormat("###,###,##0.0"); // use decimals
         }
 
         @Override
@@ -606,6 +617,7 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
         lineChart.setDoubleTapToZoomEnabled(false);
         lineChart.setMaxVisibleValueCount(result.length());
         lineChart.setDescription(lineDesc);
+        lineChart.setDescriptionTypeface(tf);
         lineChart.animateY(1000);
         lineChart.getLegend().setEnabled(false);
         lineChart.fitScreen();
@@ -623,10 +635,12 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
         l.setPosition(Legend.LegendPosition.BELOW_CHART_CENTER);
         l.setWordWrapEnabled(true);
         l.setMaxSizePercent(0.55f);
+        l.setTypeface(tf);
 
         pieChart.setDrawHoleEnabled(false);
         pieChart.setUsePercentValues(true);
         pieChart.setDescription(pieDesc + behaviour_name);
+        pieChart.setDescriptionTypeface(tf);
         pieChart.setDescriptionTextSize(20);
         pieChart.invalidate();
         pieChart.setDrawSliceText(false);
@@ -764,6 +778,11 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
         pieChart.setVisibility(View.GONE);
     }
 
+    private void hideGraphs(){
+        lineChart.setVisibility(View.GONE);
+        pieChart.setVisibility(View.GONE);
+    }
+
     private void setTextForHourly(){
         btnDatePicker.setText(R.string.day);
     }
@@ -891,12 +910,73 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
                 "Ok",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
+                        try {
+                            Record();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
 
         AlertDialog alert11 = builder1.create();
         alert11.show();
+    }
+
+    private void Record() throws JSONException {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, RECORD_DATES,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        JSONObject reader;
+                        try {
+                            reader = new JSONObject(response);
+
+                            // Get the JSONArray
+                            result = reader.getJSONArray("result");
+
+                            final JSONObject recordObj = result.getJSONObject(0);
+                            final String firstRecord = recordObj.getString("firstDate");
+                            final String lastRecord = recordObj.getString("lastDate");
+
+                            AlertDialog.Builder builder1 = new AlertDialog.Builder(LineChartItem.this);
+                            builder1.setMessage(
+                                    "Your First record was found on: " + firstRecord + "\n\n" +
+                                            "Your Last record was found on: " + lastRecord);
+                            builder1.setCancelable(true);
+
+                            builder1.setPositiveButton(
+                                    "Ok",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            dialog.cancel();
+                                        }
+                                    });
+
+                            AlertDialog alert11 = builder1.create();
+                            alert11.show();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    // Get the JSONArray weather
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(LineChartItem.this, error.toString(), Toast.LENGTH_LONG).show();
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                return params;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener

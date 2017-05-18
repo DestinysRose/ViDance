@@ -24,66 +24,72 @@
                 android:id="@+id/message"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/activity_vertical_margin"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:text="@string/title_target"
                 android:textSize="30sp" />
-
-            <TextView
-                android:id="@+id/catcafe"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="59dp"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:text="Target behaviour shows the goals of tutorials after finishing each part of therapy"
-                android:textSize="16sp" />
+                android:layout_height="79dp"
+                android:orientation="horizontal"
+                android:weightSum="1"
+                android:layout_weight="0.03">
+
+                <TextView
+                    android:id="@+id/catcafe"
+                    android:layout_width="221dp"
+                    android:layout_height="59dp"
+                    android:layout_marginStart="@dimen/activity_vertical_margin"
+                    android:layout_marginLeft="@dimen/activity_vertical_margin"
+                    android:text="Target behaviour shows the goals of tutorials after finishing each week of therapy"
+                    android:textSize="16sp"
+                    android:layout_weight="0.48" />
+
+                <Button
+                    android:id="@+id/hint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:layout_marginStart="@dimen/activity_vertical_margin"
+                    android:layout_marginLeft="@dimen/activity_vertical_margin"
+                    android:layout_marginRight="@dimen/activity_vertical_margin"
+                    android:background="@drawable/button_rounded_green"
+                    android:text="@string/hint"
+                    android:textColor="@color/text" />
+
+            </LinearLayout>
 
             <com.github.mikephil.charting.charts.LineChart
                 android:id="@+id/chart"
                 android:layout_width="match_parent"
-                android:layout_height="150dp" />
+                android:layout_height="150dp"
+                android:layout_weight="0.63" />
 
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/activity_vertical_margin">
-
-                <Button
-                    android:id="@+id/toReport"
-                    android:layout_width="match_parent"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:orientation="horizontal"
+                android:weightSum="1">
+                <TextView
+                    android:id="@+id/selectedB"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/button_rounded"
-                    android:onClick="onClickAdd"
-                    android:text="Report"
-                    android:textColor="#FFFFFF"
-                    android:textSize="20sp" />
-
-                <Button
-                    android:id="@+id/toHome"
-                    android:layout_width="match_parent"
+                    android:gravity="start"
+                    android:layout_marginStart="@dimen/activity_vertical_margin"
+                    android:layout_marginLeft="@dimen/activity_vertical_margin"
+                    android:textSize="12sp"
+                    android:layout_weight="0.15" />
+                <TextView
+                    android:id="@+id/bName"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/button_rounded"
-                    android:onClick="onClickAdd"
-                    android:text="Home"
-                    android:textColor="#ffffff"
-                    android:textSize="20sp" />
+                    android:gravity="start"
+                    android:textSize="12sp"
+                    android:layout_weight="0.85" />
             </LinearLayout>
-
-            <TextView
-                android:id="@+id/bName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="13dp"
-                android:gravity="center"
-                android:textSize="25sp" />
         </LinearLayout>
         <android.support.design.widget.BottomNavigationView
             android:id="@+id/navigation"
