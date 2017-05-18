@@ -12,86 +12,28 @@
     tools:context=".Report"
     android:weightSum="1">
 
-
-
-    <!--<TextView
-        android:id="@+id/dateStart"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Choose start date" />
-
-    <EditText
-        android:id="@+id/getStartDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="date" />
-
-    <TextView
-        android:id="@+id/dateEnd"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Choose end date" />
-
-    <EditText
-        android:id="@+id/getEndDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="date" />
-
-    <Button
-        android:id="@+id/buttonGet"
-        android:layout_width="306dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.00"
-        android:text="Get" />-->
-
-    <TextView
-        android:id="@+id/bc_id"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="6dip"
-        android:paddingTop="6dip"
-        android:textStyle="bold" />
-
-    <!--<TextView
-        android:id="@+id/name"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="2dip"
-        android:paddingTop="6dip"
-        android:textStyle="bold" />
-
-
-    <TextView
-        android:id="@+id/cname"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="2dip"
-        android:textStyle="bold"/>-->
-
-
     <TextView
         android:id="@+id/bName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="left"
+        android:gravity="start"
         android:paddingBottom="6dip"
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/severity"
+        android:id="@+id/mild"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textStyle="bold"/>
-
-
-    <!--<TextView
-        android:id="@+id/updated_at"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/moderate"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:gravity="left"
-        android:textStyle="bold" />-->
+        android:textStyle="bold"/>
+    <TextView
+        android:id="@+id/severe"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"/>
 
 </LinearLayout>

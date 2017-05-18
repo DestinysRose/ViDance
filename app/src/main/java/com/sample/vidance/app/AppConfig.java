@@ -25,7 +25,4 @@ public class AppConfig {
     public static String URL_TEST = "http://thevidance.com/test/updateBehaviours.php";
 
 
-    // Server user register url
-    public static String URL_BEH_TEST = "http://thevidance.com/store_b.php";
-
 }

@@ -8,10 +8,7 @@
     <uses-feature android:name="android.hardware.camera.AUTOFOCUS" />
 
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -45,37 +42,49 @@
         <activity
             android:name=".Dashboard"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".Features"
+            android:label="@string/title_activity_features" />
         <activity
             android:name=".Gallery"
-            android:label="@string/app_name" />
-        <activity
-            android:name=".Preview"
-            android:label="@string/app_name" />
+            android:label="@string/app_name" >
+        </activity>
         <activity
             android:name=".Record"
-            android:label="@string/app_name" />
+            android:label="@string/app_name" >
+        </activity>
         <activity
             android:name=".ReceiveInput"
-            android:label="@string/app_name" />
+            android:label="@string/app_name" >
+        </activity>
         <activity
             android:name=".Update"
-            android:label="@string/app_name" />
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name=".listcharts.BarChartItem"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <activity
+            android:name=".listcharts.LineChartItem"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
+        </activity>
         <activity
             android:name=".Report"
-            android:label="@string/app_name" />
+            android:label="@string/app_name" >
+        </activity>
         <activity
             android:name=".TargetBehaviour"
             android:label="@string/app_name" />
         <activity
-            android:name=".MenuItems"
-            android:label="@string/app_name" />
-        <activity
-            android:name=".Child"
-            android:label="@string/app_name" />
-        <activity
-            android:name=".Settings"
-            android:label="@string/app_name" />
+            android:name=".listcharts.PieChartItem"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape" />
     </application>
 
 </manifest>

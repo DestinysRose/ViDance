@@ -8,6 +8,10 @@
     <color name="text">#6B5D40</color>
     <color name="white">#FFFFFF</color>
 
+    <color name="green">#429F00</color>
+    <color name="yellow">#FFFF11</color>
+    <color name="red">#D90000</color>
+
     <color name="button_normal">#FF1FAA70</color>
     <color name="button_pressed">#FF3DED91</color>
 </resources>

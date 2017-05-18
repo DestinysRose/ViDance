@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.sample.vidance.listcharts.PieChartItem">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="1">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+            <RadioGroup
+                android:id="@+id/radio"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginBottom="15dp"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/byBehaviour"
+                    android:layout_width="wrap_content"
+                    android:layout_height="35dp"
+                    android:layout_margin="5dp"
+                    android:layout_weight="0.25"
+                    android:background="@drawable/filter_selector"
+                    android:textColor="@color/text"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="@string/by_behaviour" />
+                <RadioButton
+                    android:id="@+id/bySeverity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="35dp"
+                    android:layout_margin="5dp"
+                    android:layout_weight="0.25"
+                    android:background="@drawable/filter_selector"
+                    android:textColor="@color/text"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:text="@string/by_severity" />
+
+            </RadioGroup>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="421dp"
+            android:orientation="horizontal">
+
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/pieChart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/bName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:textSize="20sp"
+                android:layout_marginTop="25dp"
+                android:layout_marginBottom="5dp"
+                android:textStyle="bold" />
+            <TableRow>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/mild"
+                        android:layout_width="89dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/severity_mild"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:textStyle="normal" />
+
+                    <TextView
+                        android:id="@+id/mildCount"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textStyle="normal" />
+                </LinearLayout>
+            </TableRow>
+            <TableRow>
+                <LinearLayout android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/moderate"
+                    android:layout_width="89dp"
+                    android:layout_height="wrap_content"
+                    android:textStyle="normal"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/severity_moderate"/>
+                <TextView
+                    android:id="@+id/moderateCount"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="normal"/>
+                </LinearLayout>
+            </TableRow>
+            <TableRow>
+                <LinearLayout android:orientation="horizontal"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin">
+                <TextView
+                    android:id="@+id/severe"
+                    android:layout_width="89dp"
+                    android:layout_height="wrap_content"
+                    android:textStyle="normal"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/severity_severe" />
+                <TextView
+                    android:id="@+id/severeCount"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="normal" />
+                </LinearLayout>
+            </TableRow>
+            <TextView
+                android:id="@+id/severity"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginLeft="5dp"
+                android:gravity="start"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TableRow>
+                <LinearLayout android:orientation="horizontal"
+                    android:weightSum="100"
+                    android:layout_weight="1">
+                    <TextView
+                        android:id="@+id/getBehaviours"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:textStyle="normal"
+                        android:layout_weight="60" />
+
+                    <TextView
+                        android:id="@+id/getBehavioursCount"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:gravity="start"
+                        android:textStyle="normal"
+                        android:layout_weight="40" />
+                </LinearLayout>
+            </TableRow>
+        </TableLayout>
+    </LinearLayout>
+</ScrollView>
