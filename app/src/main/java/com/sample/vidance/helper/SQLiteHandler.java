@@ -11,6 +11,7 @@ import java.util.HashMap;
 
 /**
  * Created by Danil on 27.03.2017.
+ * Collaboration by Michelle on 27.04.2017.
  */
 
 public class SQLiteHandler extends SQLiteOpenHelper {
