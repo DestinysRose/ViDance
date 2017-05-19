@@ -1,8 +1,8 @@
 package com.sample.vidance;
 
-
+import android.app.Activity;
 import android.graphics.Typeface;
-import android.support.v7.app.AppCompatActivity;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -13,35 +13,35 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.Request.Method;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.sample.vidance.app.AppConfig;
+import com.sample.vidance.helper.SessionManager;
 import com.sample.vidance.app.AppController;
 import com.sample.vidance.helper.SQLiteHandler;
-import com.sample.vidance.helper.SessionManager;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by Danil on 27.03.2017.
+ * Modified by Michelle on 08.03.2017.
  */
 
-public class Login extends AppCompatActivity {
+public class Login extends Activity {
     private static final int TIME_LIMIT = 1500;
     private static long backPressed;
     private static final String TAG = Register.class.getSimpleName();
-    private Button btnLogin;
-    private Button btnLinkToRegister;
-    private Button btnButtonToSkip;
-    private EditText inputFullName;
-    private EditText inputChildName;
-    private EditText inputPassword;
+    private Button btnLogin, btnLinkToRegister, btnButtonToSkip;
+    private EditText inputFullName, inputPassword;
     private ProgressDialog pDialog;
     private SessionManager session;
     private SQLiteHandler db;
@@ -51,18 +51,25 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        inputFullName = (EditText) findViewById(R.id.name);
-        inputChildName = (EditText) findViewById(R.id.cname);
+        inputFullName = (EditText) findViewById(R.id.username);
         inputPassword = (EditText) findViewById(R.id.password);
         btnLogin = (Button) findViewById(R.id.btnLogin);
         btnLinkToRegister = (Button) findViewById(R.id.btnLinkToRegisterScreen);
-        btnButtonToSkip = (Button) findViewById(R.id.btnButtonToSkip);
+
+        // Reset Image to prevent visual bugs
+        ImageView iv = (ImageView)findViewById(R.id.title);
+        iv.setImageResource(R.drawable.ic_vidance);
 
         // Change font for title
         String fontPath = "fonts/CatCafe.ttf";
         TextView txtCat = (TextView) findViewById(R.id.catcafe);
         Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
         txtCat.setTypeface(tf);
+        btnLinkToRegister.setTypeface(tf);
+        // Change font for title
+        String fontPath2 = "fonts/James_Fajardo.ttf";
+        Typeface jf = Typeface.createFromAsset(getAssets(), fontPath2);
+        btnLogin.setTypeface(jf);
 
         // Progress dialog
         pDialog = new ProgressDialog(this);
@@ -86,12 +93,11 @@ public class Login extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View view) {
-                String name = inputFullName.getText().toString().trim();
-                String cname = inputChildName.getText().toString().trim();
+                String username = inputFullName.getText().toString().trim();
                 String password = inputPassword.getText().toString().trim();
 
-                if (!name.isEmpty() && !cname.isEmpty() && !password.isEmpty()) {
-                    checkLogin(name, cname, password);
+                if (!username.isEmpty() && !password.isEmpty()) {
+                    checkLogin(username, password);
                 } else {
                     Toast.makeText(getApplicationContext(), "Please enter your details!", Toast.LENGTH_LONG).show();
                 }
@@ -104,27 +110,15 @@ public class Login extends AppCompatActivity {
         btnLinkToRegister.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), Register.class);
-                startActivity(i);
-                finish();
+                changeActivity(Register.class);
             }
         });
-
-        btnButtonToSkip.setOnClickListener(new View.OnClickListener() {
-
-            public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), Dashboard.class);
-                startActivity(i);
-                finish();
-            }
-        });
-
     }
 
     /**
      * function to verify login details in mysql db
      * */
-    private void checkLogin(final String name, final String cname, final String password) {
+    private void checkLogin(final String username, final String password) {
         // Tag used to cancel the request
         String tag_string_req = "req_login";
 
@@ -152,17 +146,16 @@ public class Login extends AppCompatActivity {
                         String uid = jObj.getString("uid");
 
                         JSONObject user = jObj.getJSONObject("user");
-                        String name = user.getString("name");
-                        String cname = user.getString("cname");
+                        String username = user.getString("username");
                         String created_at = user.getString("created_at");
 
                         // Inserting row in users table
-                        db.addUser(name, cname, uid, created_at);
+                        db.addUser(uid, username, created_at);
+                        // Set User
+                        db.setUser(username);
+                        db.setUserID(uid);
 
-                        // Launch main activity
-                        finish();
-                        Intent intent = new Intent(Login.this, Dashboard.class);
-                        startActivity(intent);
+                        changeActivity(Settings.class);
                     } else {
                         // Error in login. Get the error message
                         String errorMsg = jObj.getString("error_msg");
@@ -189,8 +182,7 @@ public class Login extends AppCompatActivity {
             protected Map<String, String> getParams() {
                 // Posting parameters to login url
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("name", name);
-                params.put("cname", cname);
+                params.put("username", username);
                 params.put("password", password);
 
                 return params;
@@ -210,6 +202,13 @@ public class Login extends AppCompatActivity {
         if (pDialog.isShowing())
             pDialog.dismiss();
     }
+
+    public void changeActivity(Class activity) {
+        finish();
+        Intent intent = new Intent(this, activity);
+        startActivity(intent);
+    }
+
 
     @Override
     public void onBackPressed() {

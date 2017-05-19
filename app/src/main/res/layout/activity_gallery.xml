@@ -4,15 +4,63 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.sample.vidance.Gallery"
+    tools:context=".Gallery"
     android:weightSum="2"
     android:padding="5dp" >
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:id="@+id/galleryChoice">
+        <Button
+            android:id="@+id/frmInstruct"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_dashed_border"
+            android:text="@string/frmInstruct"
+            android:textColor="#FFFFFF"
+            android:textSize="50sp"
+            android:textStyle="bold"
+            android:padding="10dp"/>
 
+        <Button
+            android:id="@+id/frmUser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/button_dashed_border"
+            android:text="@string/frmUser"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:layout_margin="20dp"
+            android:padding="10dp"
+            android:textSize="50sp" />
+        <Button
+            android:id="@+id/frmGallery"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/button_dashed_border"
+            android:text="@string/frmGallery"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:layout_margin="20dp"
+            android:padding="10dp"
+            android:textSize="50sp" />
+    </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="420dp"
         android:orientation="horizontal"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:id="@+id/galleryPreview">
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/storyList"/>
 
         <LinearLayout
             android:layout_width="240dp"
@@ -46,7 +94,8 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:id="@+id/galleryList">
 
             <TextView
                 android:id="@+id/videoList"
@@ -72,7 +121,19 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="5dp"
-        android:layout_weight="0.5">
+        android:layout_weight="0.5"
+        android:id="@+id/galleryButtons">
+
+        <Button
+            android:id="@+id/btnDownload"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/video_download"
+            android:textColor="@color/white"
+            android:background="@drawable/button_rounded"
+            android:layout_margin="2dp"
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/btnSend"
@@ -82,7 +143,8 @@
             android:text="@string/video_send"
             android:textColor="@color/white"
             android:background="@drawable/button_rounded"
-            android:layout_margin="2dp"/>
+            android:layout_margin="2dp"
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/btnFull"
@@ -92,7 +154,8 @@
             android:text="@string/fullscreen"
             android:textColor="@color/text"
             android:background="@drawable/button_rounded"
-            android:layout_margin="2dp"/>
+            android:layout_margin="2dp"
+            android:textSize="20sp" />
     </LinearLayout>
 
     <Button
@@ -103,6 +166,7 @@
         android:text="@string/cancel"
         android:textColor="@color/white"
         android:background="@drawable/button_rounded_red"
-        android:layout_margin="2dp"/>
+        android:layout_margin="2dp"
+        android:textSize="25sp" />
 
 </LinearLayout>

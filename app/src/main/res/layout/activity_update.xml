@@ -4,12 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.sample.vidance.Update">
+    tools:context=".Update">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -141,7 +144,7 @@
                         android:text="Update Behaviours"
                         android:textColor="#FFFFFF"
                         android:layout_margin="5dp"
-                        android:textSize="20sp"/>
+                        android:textSize="25sp"/>
 
                     <TextView
                         android:id="@+id/limitReached"

@@ -11,6 +11,7 @@ import java.util.HashMap;
 
 /**
  * Created by Danil on 27.03.2017.
+ * Altered by Michelle on 27.04.2017.
  */
 
 public class SQLiteHandler extends SQLiteOpenHelper {
@@ -27,17 +28,13 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     // Login table name
     private static final String TABLE_USER = "user";
 
-    // Child behaviour table name
-    private static final String TABLE_BHTEST = "child_btest";
-
     // Table Columns names
     private static final String KEY_ID = "id";
-    private static final String KEY_NAME = "name";
-    private static final String KEY_CNAME = "cname";
-    private static final String KEY_EMAIL = "email";
+    private static final String KEY_USERNAME = "username";
+    private static final String KEY_CHILD = "cname";
     private static final String KEY_UID = "uid";
+    private static final String KEY_CID = "cid";
     private static final String KEY_CREATED_AT = "created_at";
-    private static final String KEY_UPDATED_AT = "updated_at";
 
     public SQLiteHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -46,9 +43,9 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     // Creating Tables
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_LOGIN_TABLE = "CREATE TABLE " + TABLE_USER + "("
-                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT," + KEY_CNAME + " TEXT, "
-                + KEY_EMAIL + " TEXT UNIQUE," + KEY_UID + " TEXT,"
+        String  CREATE_LOGIN_TABLE = "CREATE TABLE " + TABLE_USER + "("
+                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_USERNAME + " TEXT,"
+                + KEY_CHILD + " TEXT," + KEY_UID + " TEXT," + KEY_CID + " TEXT,"
                 + KEY_CREATED_AT + " TEXT" + ")";
         db.execSQL(CREATE_LOGIN_TABLE);
 
@@ -68,13 +65,13 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     /**
      * Storing user details in database
      * */
-    public void addUser(String name, String cname, /*String email,*/ String uid, String created_at) {
+    public void addUser(String uid, String username,  String created_at) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_NAME, name); // Name
-        values.put(KEY_CNAME, cname); // Child Name
-        //values.put(KEY_EMAIL, email); // Email
-        values.put(KEY_UID, uid); // Email
+        values.put(KEY_USERNAME, username); // UserName
+        values.put(KEY_CHILD," "); // Child not selected by default
+        values.put(KEY_UID, uid); // Userid
+        values.put(KEY_CID," "); // Childid
         values.put(KEY_CREATED_AT, created_at); // Created At
 
         // Inserting Row
@@ -85,8 +82,102 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Getting user data from database
+     * Setting User ID in database
      * */
+    public String setUser(String user) {
+        String selectQuery = "UPDATE user SET username='"+user+"'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL(selectQuery);
+        Log.d(TAG, "Setting username from Sqlite: " + user);
+        return user;
+    }
+
+    /**
+     * Setting User ID in database
+     * */
+    public String setUserID(String userID) {
+        String selectQuery = "UPDATE user SET uid='"+userID+"'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL(selectQuery);
+        Log.d(TAG, "Setting uid from Sqlite: " + userID);
+        return userID;
+    }
+
+
+    /**
+     * Getting User ID from database
+     * */
+    public String getUserID() {
+        String userID = "";
+        String selectQuery = "SELECT uid FROM " + TABLE_USER;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            userID = cursor.getString(0);
+            cursor.close();
+        }
+        Log.d(TAG, "Fetching userID from Sqlite: " + userID);
+        return userID;
+    }
+
+    /**
+     * Setting Child Name from database
+     * */
+    public void setChild(String child) {
+        String selectQuery = "UPDATE user SET cname='"+child+"'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL(selectQuery);
+        Log.d(TAG, "Setting child from Sqlite: " + child);
+    }
+
+    /**
+     * Getting Child Name from database
+     * */
+    public String getChild() {
+        String childName = "";
+        String selectQuery = "SELECT cname FROM " + TABLE_USER;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            childName = cursor.getString(0);
+            cursor.close();
+        }
+        Log.d(TAG, "Fetching child from Sqlite: " + childName);
+        return childName;
+    }
+
+    /**
+     * Setting childID in database
+     * */
+    public void setChildID(String child) {
+        String selectQuery = "UPDATE user SET cid='"+child+"'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL(selectQuery);
+        Log.d(TAG, "Setting childID from Sqlite: " + child);
+    }
+
+    /**
+     * Getting childID from SQLite database
+     * */
+    public String getChildID() {
+        String childID = "";
+        String selectQuery = "SELECT cid FROM " + TABLE_USER;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            childID = cursor.getString(0);
+            cursor.close();
+        }
+        Log.d(TAG, "Fetching childID from Sqlite: " + childID);
+        return childID;
+    }
+
+    /**
+     * Getting user data from database
+     *
     public HashMap<String, String> getUserDetails() {
         HashMap<String, String> user = new HashMap<String, String>();
         String selectQuery = "SELECT  * FROM " + TABLE_USER;
@@ -97,10 +188,10 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         cursor.moveToFirst();
         if (cursor.getCount() > 0) {
             user.put("name", cursor.getString(1));
-            user.put("cname", cursor.getString(2));
+            //user.put("cname", cursor.getString(2));
             //user.put("email", cursor.getString(3));
-            user.put("uid", cursor.getString(3));
-            user.put("created_at", cursor.getString(4));
+            user.put("uid", cursor.getString(2));
+            user.put("created_at", cursor.getString(3));
         }
         cursor.close();
         db.close();
@@ -108,10 +199,10 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         Log.d(TAG, "Fetching user from Sqlite: " + user.toString());
 
         return user;
-    }
+    }**/
 
     /**
-     * Re crate database Delete all tables and create them again
+     * Delete all tables and create them again
      * */
     public void deleteUsers() {
         SQLiteDatabase db = this.getWritableDatabase();

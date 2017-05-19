@@ -27,12 +27,16 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.sample.vidance.app.AppController;
 import com.sample.vidance.helper.SQLiteHandler;
 import com.sample.vidance.helper.SessionManager;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.TimeZone;
 
 /**
@@ -43,9 +47,12 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
     private TextView mTextMessage,  tv;
     private View toggle,  toggle2;
     private String value, missing;
-    private String arraySeverity[], arrayBehaviour[], arrayDuration[];
+    private String rDate, rStart, rEnd; //Results to be sent
+    private ArrayList<String> rBehaviours = new ArrayList<>(); //Behaviour array
+    private ArrayList<String> rSeverity = new ArrayList<>(); //Severity array
+    private String arraySeverity[], arrayBehaviour[], arrayDuration[]; //Spinner arrays
     Button btnDatePicker, btnTimePicker;
-    private Boolean validation, timeChange;
+    private Boolean validation, timeChange = false;
     private Typeface jf, cc;
     private int mYear, mMonth, mDay, mHour, mMinute, durMinute, durHour;
     private SQLiteHandler db;
@@ -60,13 +67,24 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.getMenu().getItem(2).setChecked(true);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        // Session manager
+        session = new SessionManager(getApplicationContext());
+
+        // SQLite database handler
+        db = new SQLiteHandler(getApplicationContext());
+
         //Receive input and update content appropriately
         mTextMessage = (TextView) findViewById(R.id.message);
+        TextView mText2 = (TextView) findViewById(R.id.instructions);
+        TextView mText3 = (TextView) findViewById(R.id.textView);
         mTextMessage.setText(R.string.title_input);
         //Set Font Cat Cafe
         String fontPath = "fonts/CatCafe.ttf";
         cc = Typeface.createFromAsset(getAssets(), fontPath);
         mTextMessage.setTypeface(cc);
+        mText2.setTypeface(cc);
+        mText3.setTypeface(cc);
         //Set Font James Farjardo
         fontPath = "fonts/James_Fajardo.ttf";
         jf = Typeface.createFromAsset(getAssets(), fontPath);
@@ -78,23 +96,25 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
         mText.setTypeface(jf);
         mText = (Button) findViewById(R.id.updateBehaviour);
         mText.setTypeface(jf);
+
         //Initialise date and time
         Button btnDate = (Button) findViewById(R.id.setDate);
-        SimpleDateFormat date = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
         btnDate.setText(date.format(new Date()));
         Button btnTime = (Button) findViewById(R.id.setTime);
         SimpleDateFormat time = new SimpleDateFormat("hh:mm a");
         btnTime.setText(time.format(new Date()));
+
         //Set onClickListeners for date and time
         btnDatePicker = (Button)findViewById(R.id.setDate);
         btnTimePicker = (Button)findViewById(R.id.setTime);
         btnDatePicker.setOnClickListener(this);
         btnTimePicker.setOnClickListener(this);
+
         // Progress dialog
         pDialog = new ProgressDialog(this);
         pDialog.setCancelable(false);
-        // SQLite database handler
-        db = new SQLiteHandler(getApplicationContext());
+
         //Run functions for the form
         createQuestions();
         toggleSeverity();
@@ -128,10 +148,11 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                 TextView tv = (TextView) view;
                 if(position == 0){
                     tv.setTextColor(Color.GRAY); // Set the hint text color gray
+                    tv.setTypeface(cc);
                 }
                 else {
-                    tv.setTextColor(Color.parseColor("#6B5D40")); // Set default font color
-                    tv.setTypeface(null);
+                    tv.setTextColor(Color.parseColor("#23C8B2")); // Set default font color
+                    tv.setTypeface(cc);
                 }
                 return view;
             }
@@ -220,6 +241,7 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                     TextView tv = (TextView) view;
                     if(position == 0){
                         tv.setTextColor(Color.GRAY); // Set the hint text color gray
+                        tv.setTypeface(cc);
                     }
                     else {
                         tv.setTextColor(Color.parseColor("#23C8B2")); // Set default font color
@@ -315,8 +337,6 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                     v = findViewById(resID);
                     if (v.getVisibility() == View.GONE) {
                         v.setVisibility(View.VISIBLE);
-
-
                         break;
                     }
                     else if (i == 20 && v.getVisibility() == View.VISIBLE) { //When maximum questions is reached
@@ -419,6 +439,8 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                                 Spinner spinner2 = (Spinner) findViewById(spinID2);
                                 if (x == i) {
                                     value = value + "\n\nBehaviour " + String.valueOf(i) + " : " + bhv + "\nSeverity: " + rb.getText();
+                                    rBehaviours.add(bhv);
+                                    rSeverity.add(i + "|" + rb.getText().toString());
                                     validation = true;
                                     break;
                                 }
@@ -446,16 +468,31 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                             }
 
                             cal.add(Calendar.MINUTE, min);
-                            
+
                             mHour = cal.get(Calendar.HOUR_OF_DAY);
                             mMinute = cal.get(Calendar.MINUTE);
 
                             int hour = mHour % 12;
 
-
-                            String endTime = String.format("%02d:%02d %s", hour == 0 ? 12 : hour, mMinute, mHour < 12 ? "am" : "pm");
+                            String endTime = String.format("%02d:%02d %s", hour == 0 ? 12 : hour, mMinute, mHour < 12 ? "AM" : "PM");
 
                             value = "Date: " + btnDatePicker.getText() + " Duration: " + dur +  "\nStart Time: " + btnTimePicker.getText() + " End Time: " + endTime + "\n\nBehaviour " + String.valueOf(i) + " : " + bhv + "\nSeverity: " + rb.getText();
+
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                            SimpleDateFormat date24Format = new SimpleDateFormat("HH:mm");
+                            try { // Convert time into 24Hour format for storing
+                                rStart = date24Format.format(date24Format.parse(btnTimePicker.getText().toString()));
+                                rEnd = date24Format.format(date24Format.parse(endTime));
+                                rDate = dateFormat.format(dateFormat.parse(btnDatePicker.getText().toString()));
+                            } catch (ParseException pe) {
+                                pe.printStackTrace();
+                            }
+
+                            rStart = (rDate + " " + rStart);
+                            rEnd = (rDate + " " + rEnd);
+                            rBehaviours.add(bhv);
+                            rSeverity.add(i + "|" + rb.getText().toString());
+
                             validation = true;
                         }
                     }
@@ -464,11 +501,15 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                         break;
                     }
                 }
-                if (validation == true) {
+                if (validation) {
                     finish();
                     Intent intent = new Intent(Update.this, ReceiveInput.class);
                     intent.putExtra("TITLE", "Update Behaviours");
                     intent.putExtra("RESULT", value);
+                    intent.putExtra("STARTTIME", rStart);
+                    intent.putExtra("ENDTIME", rEnd);
+                    intent.putStringArrayListExtra("BEHAVIOURS", rBehaviours);
+                    intent.putStringArrayListExtra("SEVERITY", rSeverity);
                     startActivity(intent);
                 }
                 else {
@@ -492,7 +533,14 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
 
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            btnDatePicker.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
+                            SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+                            String currentDate = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
+                            try { // Convert time into 24Hour format for storing
+                                currentDate = date.format(date.parse(currentDate));
+                            } catch (ParseException pe) {
+                                pe.printStackTrace();
+                            }
+                            btnDatePicker.setText(currentDate);
                         }
                     }, mYear, mMonth, mDay);
             datePickerDialog.show();
@@ -520,21 +568,10 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
         }
     }
 
-    private void logoutUser() {
-        // SqLite database handler
-        db = new SQLiteHandler(getApplicationContext());
-
-        // session manager
-        session = new SessionManager(getApplicationContext());
-
-        session.setLogin(false);
-
-        db.deleteUsers();
-
-        // Launching the login activity
-        Intent intent = new Intent(Update.this, Login.class);
-        startActivity(intent);
-        finish();
+    public void alertStyle(AlertDialog ad) {
+        ad.show(); //Show it
+        ad.getButton(ad.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#E77F7E"));
+        ad.getButton(ad.BUTTON_POSITIVE).setTextColor(Color.parseColor("#23C8B2"));
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -544,33 +581,19 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_dashboard:
-                    finish();
-                    Intent intent = new Intent(Update.this, Dashboard.class); //Record Session page
-                    startActivity(intent);
+                    changeActivity(Dashboard.class);
                     return true;
                 case R.id.navigation_record:
-                    finish();
-                    intent = new Intent(Update.this, Record.class);
-                    startActivity(intent);
+                    changeActivity(Record.class);
                     return true;
                 case R.id.navigation_input:
                     //Do Nothing
                     return true;
                 case R.id.navigation_target:
-                    finish();
-                    intent = new Intent(Update.this, TargetBehaviour.class);
-                    /**intent.putExtra("SELECTED_ITEM", 3);
-                    intent.putExtra("SELECTED_ACTIVITY", "Target Behaviours");
-                    intent.putExtra("SELECTED_CONTENT", 1);**/
-                    startActivity(intent);
+                    changeActivity(TargetBehaviour.class);
                     return true;
                 case R.id.navigation_report:
-                    finish();
-                    intent = new Intent(Update.this, Report.class);
-                    /***intent.putExtra("SELECTED_ITEM", 4);
-                    intent.putExtra("SELECTED_ACTIVITY", "Generate Reports");
-                    intent.putExtra("SELECTED_CONTENT", 2);*/
-                    startActivity(intent);
+                    changeActivity(Report.class);
                     return true;
             }
             return false;
@@ -616,17 +639,30 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
         return true;
     }
 
+    public void logoutUser() {
+        // SqLite database handler
+        db = new SQLiteHandler(getApplicationContext());
+        // session manager
+        session = new SessionManager(getApplicationContext());
+        session.setLogin(false);
+        db.deleteUsers();
+        changeActivity(Login.class);
+    }
+
+    public void changeActivity(Class activity) {
+        finish();
+        Intent intent = new Intent(this, activity);
+        startActivity(intent);
+    }
+
     @Override
     public void onBackPressed() {
-        //Prompt user to send video
+        //Prompt user for confirmation
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Update.this);
-        //Set title
-        alertDialogBuilder.setTitle("Cancel?");
-        //Set dialog message
-        alertDialogBuilder
-                .setMessage("Are you sure you cancel your submission and go back?")
+        alertDialogBuilder.setTitle("Cancel?")
+                .setMessage("Are you sure you want to cancel your submission and go back?")
                 .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // if this button is clicked, close
                         // current activity
@@ -636,16 +672,14 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                         dialog.cancel();
                     }
                 })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                .setNegativeButton("NO", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // if this button is clicked, just close
                         // the dialog box and do nothing
                         dialog.cancel();
                     }
                 });
-        //Create alert dialog
         AlertDialog alertDialog = alertDialogBuilder.create();
-        //Show it
-        alertDialog.show();
+        alertStyle(alertDialog);
     }
 }

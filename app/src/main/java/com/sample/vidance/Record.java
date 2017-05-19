@@ -1,11 +1,16 @@
 package com.sample.vidance;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AlertDialog;
@@ -16,6 +21,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.sample.vidance.app.AppController;
 import com.sample.vidance.helper.SQLiteHandler;
 import com.sample.vidance.helper.SessionManager;
 
@@ -32,22 +38,28 @@ public class Record extends AppCompatActivity {
 
     private Button btnRecord, btnSend;
     private int ACTIVITY_START_CAMERA_APP = 0; //Initialise camera
+    private static final int SELECT_VIDEO = 3; //Set to allow video selection
+    private String userName;
     private Uri videoUri = null;
-    String CAPTURE_TITLE;
+    private File dir;
+    private String CAPTURE_TITLE, selectedPath;
     private SQLiteHandler db;
     private SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_record);
+        setContentView(com.sample.vidance.R.layout.activity_record);
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(com.sample.vidance.R.id.navigation);
         navigation.getMenu().getItem(1).setChecked(true);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        btnRecord = (Button) findViewById(R.id.btnRecord);
-        btnSend = (Button) findViewById(R.id.btnSend);
+        btnRecord = (Button) findViewById(com.sample.vidance.R.id.btnRecord);
+        btnSend = (Button) findViewById(com.sample.vidance.R.id.btnSend);
+
+        // Session manager
+        session = new SessionManager(getApplicationContext());
 
         // Set font
         String fontPath = "fonts/James_Fajardo.ttf";
@@ -55,10 +67,14 @@ public class Record extends AppCompatActivity {
         btnRecord.setTypeface(tf);
         btnSend.setTypeface(tf);
 
-        File dir = new File (Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES) + File.separator + "ViDance");
+        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            dir = new File(getCacheDir(), "ViDance"); //Install to internal storage
+        } else {
+            dir = new File (Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES) + File.separator + "ViDance"); //Install to SD
+        }
         boolean success = true;
         if (!dir.exists()) {
-            success = dir.mkdir();
+            success = dir.mkdirs();
         }
         if (success) {
             // Folder exists
@@ -72,48 +88,21 @@ public class Record extends AppCompatActivity {
                 // Set video name as date & time
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
                 CAPTURE_TITLE = sdf.format(new Date()) + ".mp4";
-
-
                 File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES) + File.separator + "ViDance", CAPTURE_TITLE);
                 Uri outputFileUri = Uri.fromFile(file);
                 Intent callVideoIntent = new Intent(android.provider.MediaStore.ACTION_VIDEO_CAPTURE);
                 callVideoIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, outputFileUri);
                 startActivityForResult(callVideoIntent, ACTIVITY_START_CAMERA_APP);
-
             }
         });
 
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (videoUri != null) {
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Record.this);
-                    // set title
-                    alertDialogBuilder.setTitle("Upload video");
-                    // set dialog message
-                    alertDialogBuilder
-                            .setMessage("Are you sure you want to send the previously recorded video to the instructor for viewing?")
-                            .setCancelable(false)
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    // Send to database
-                                    Toast.makeText(getApplicationContext(), "Not yet implemented~", Toast.LENGTH_SHORT).show();
-                                }
-                            })
-                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    // Do Nothing
-                                    dialog.cancel();
-                                }
-                            });
-                    // create alert dialog
-                    AlertDialog alertDialog = alertDialogBuilder.create();
-                    // show it
-                    alertDialog.show();
-                }
-                else {
-                    Toast.makeText(getApplicationContext(), "Video not yet recorded, click 'Record Video' to record video!", Toast.LENGTH_SHORT).show();
-                }
+                Intent intent = new Intent();
+                intent.setType("video/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select a Video "), SELECT_VIDEO);
             }
         });
     }
@@ -123,36 +112,112 @@ public class Record extends AppCompatActivity {
         if (requestCode == ACTIVITY_START_CAMERA_APP && resultCode == RESULT_OK) {
             videoUri = data.getData();
             sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, videoUri)); // Update to show video in gallery.
-
-            Toast.makeText(getApplicationContext(), "Video successfully saved!" , Toast.LENGTH_SHORT).show();
-            //Prompt user to send video
+            //Get the videoPath to sent to uploadVideo() so that the f
+            File video = new File(videoUri.getPath());
+            selectedPath = video.getAbsolutePath();
+            Toast.makeText(getApplicationContext(), "Video saved to Gallery!", Toast.LENGTH_SHORT).show();
+            //Create an alert to ask user if they wish to upload the video recorded
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Record.this);
-            //Set title
-            alertDialogBuilder.setTitle("Upload video");
-            //Set dialog message
-            alertDialogBuilder
+            alertDialogBuilder.setTitle("Upload video")
                     .setMessage("Do you wish to send the recorded video to the instructor for viewing?")
                     .setCancelable(false)
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                // Send to database
-                                Toast.makeText(getApplicationContext(), "Not yet implemented~", Toast.LENGTH_SHORT).show();
+                                uploadVideo(); //Send to database
                             }
                         })
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                // Do Nothing
-                                dialog.cancel();
+                                dialog.cancel(); //Do Nothing
+                                Toast.makeText(getApplicationContext(), "Video not sent!", Toast.LENGTH_SHORT).show();
                             }
                         });
             //Create alert dialog
             AlertDialog alertDialog = alertDialogBuilder.create();
             //Show it
-            alertDialog.show();
+            alertStyle(alertDialog);
         }
-        else {
-            Toast.makeText(getApplicationContext(), "Video not yet recorded, click 'Record Video' to record video!", Toast.LENGTH_SHORT).show();
+        else if (requestCode == SELECT_VIDEO && resultCode == RESULT_OK) {
+            System.out.println("SELECT_VIDEO");
+            Uri selectedImageUri = data.getData();
+            selectedPath = getPath(selectedImageUri);
+            String filename = selectedPath.substring(selectedPath.lastIndexOf("/")+1); //Retrieve filename from filepath
+            //Create an alert to ask user if they wish to upload the video selected
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Record.this);
+            alertDialogBuilder.setTitle("Upload video")
+                    .setMessage("Video " + filename + " selected, do you wish to send to the instructor for viewing?")
+                    .setCancelable(false)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            uploadVideo(); // Send to database
+                        }
+                    })
+                    .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel(); // Do Nothing
+                            Toast.makeText(getApplicationContext(), "Video not sent!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+            //Create alert dialog
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            //Show it
+            alertStyle(alertDialog);
         }
+    }
+
+    public String getPath(Uri uri) {
+        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+        if(cursor!=null && cursor.getCount()>0 ) {
+            cursor.moveToFirst();
+        }
+        String document_id = cursor.getString(0);
+        document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
+        cursor.close();
+
+
+        cursor = getContentResolver().query(
+                android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI,  null,
+                MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+        if(cursor!=null && cursor.getCount()>0 ) {
+            cursor.moveToFirst();
+        }
+        String path = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATA));
+        cursor.close();
+        return path;
+    }
+
+    private void uploadVideo() {
+        class UploadVideo extends AsyncTask<Void, Void, String> {
+
+            ProgressDialog uploading;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                uploading = ProgressDialog.show(Record.this, "Uploading File", "Please wait...", false, false);
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                uploading.dismiss();
+                //super.onPostExecute(s);
+                Toast.makeText(getApplicationContext(), "Video successfully uploaded!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            protected String doInBackground(Void... params) {
+                Upload u = new Upload();
+                return u.uploadVideo(selectedPath, userName);
+            }
+        }
+        UploadVideo uv = new UploadVideo();
+        uv.execute();
+    }
+
+    public void alertStyle(AlertDialog ad) {
+        ad.show(); //Show it
+        ad.getButton(ad.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#E77F7E"));
+        ad.getButton(ad.BUTTON_POSITIVE).setTextColor(Color.parseColor("#23C8B2"));
     }
 
     @Override
@@ -164,7 +229,7 @@ public class Record extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent = new Intent(Record.this, Features.class);
+        Intent intent = new Intent(Record.this, MenuItems.class);
         switch(item.getItemId()) {
             case R.id.action_notifications:
                 Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
@@ -173,7 +238,7 @@ public class Record extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.action_contact:
-                finish();
+                changeActivity(Report.class);
                 intent.putExtra("SELECTED_ACTIVITY", "Contact");
                 startActivity(intent);
                 break;
@@ -201,36 +266,19 @@ public class Record extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_dashboard:
-                    finish();
-                    Intent intent = new Intent(Record.this, Dashboard.class); //Record Session page
-                    startActivity(intent);
+                    changeActivity(Dashboard.class);
                     return true;
                 case R.id.navigation_record:
                     //Do Nothing
                     return true;
                 case R.id.navigation_input:
-                    finish();
-                    intent = new Intent(Record.this, Update.class);
-                    intent.putExtra("SELECTED_ITEM", 2);
-                    intent.putExtra("SELECTED_ACTIVITY", "Update Behaviours");
-                    intent.putExtra("SELECTED_CONTENT", 0);
-                    startActivity(intent);
+                    changeActivity(Update.class);
                     return true;
                 case R.id.navigation_target:
-                    finish();
-                    intent = new Intent(Record.this, TargetBehaviour.class);
-                    intent.putExtra("SELECTED_ITEM", 3);
-                    intent.putExtra("SELECTED_ACTIVITY", "Target Behaviours");
-                    intent.putExtra("SELECTED_CONTENT", 1);
-                    startActivity(intent);
+                    changeActivity(TargetBehaviour.class);
                     return true;
                 case R.id.navigation_report:
-                    finish();
-                    intent = new Intent(Record.this, Report.class);
-                    intent.putExtra("SELECTED_ITEM", 4);
-                    intent.putExtra("SELECTED_ACTIVITY", "Generate Reports");
-                    intent.putExtra("SELECTED_CONTENT", 2);
-                    startActivity(intent);
+                    changeActivity(Report.class);
                     return true;
             }
             return false;
@@ -240,18 +288,17 @@ public class Record extends AppCompatActivity {
     private void logoutUser() {
         // SqLite database handler
         db = new SQLiteHandler(getApplicationContext());
-
         // session manager
         session = new SessionManager(getApplicationContext());
-
         session.setLogin(false);
-
         db.deleteUsers();
+        changeActivity(Login.class);
+    }
 
-        // Launching the login activity
-        Intent intent = new Intent(Record.this, Login.class);
-        startActivity(intent);
+    public void changeActivity(Class activity) {
         finish();
+        Intent intent = new Intent(this, activity);
+        startActivity(intent);
     }
 
     @Override

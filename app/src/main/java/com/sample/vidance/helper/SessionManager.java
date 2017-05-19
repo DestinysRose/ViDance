@@ -47,4 +47,6 @@ public class SessionManager extends Application {
     public boolean isLoggedIn(){
         return pref.getBoolean(KEY_IS_LOGGED_IN, false);
     }
+
 }
+

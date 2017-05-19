@@ -1,6 +1,7 @@
 package com.sample.vidance.app;
 
 import android.app.Application;
+import android.content.Intent;
 import android.text.TextUtils;
 
 import com.android.volley.Request;
@@ -9,14 +10,16 @@ import com.android.volley.toolbox.Volley;
 
 /**
  * Created by Danil on 27.03.2017.
+ * Collaboration by Michelle on 01.05.2017.
  */
 
 public class AppController extends Application {
     public static final String TAG = AppController.class.getSimpleName();
 
     private RequestQueue mRequestQueue;
-
     private static AppController mInstance;
+    private String username;
+    private String childname;
 
     @Override
     public void onCreate() {
