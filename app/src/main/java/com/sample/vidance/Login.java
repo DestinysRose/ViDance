@@ -55,7 +55,6 @@ public class Login extends Activity {
         inputPassword = (EditText) findViewById(R.id.password);
         btnLogin = (Button) findViewById(R.id.btnLogin);
         btnLinkToRegister = (Button) findViewById(R.id.btnLinkToRegisterScreen);
-        btnButtonToSkip = (Button) findViewById(R.id.btnButtonToSkip);
 
         // Reset Image to prevent visual bugs
         ImageView iv = (ImageView)findViewById(R.id.title);
@@ -66,6 +65,11 @@ public class Login extends Activity {
         TextView txtCat = (TextView) findViewById(R.id.catcafe);
         Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
         txtCat.setTypeface(tf);
+        btnLinkToRegister.setTypeface(tf);
+        // Change font for title
+        String fontPath2 = "fonts/James_Fajardo.ttf";
+        Typeface jf = Typeface.createFromAsset(getAssets(), fontPath2);
+        btnLogin.setTypeface(jf);
 
         // Progress dialog
         pDialog = new ProgressDialog(this);
@@ -109,14 +113,6 @@ public class Login extends Activity {
                 changeActivity(Register.class);
             }
         });
-
-        btnButtonToSkip.setOnClickListener(new View.OnClickListener() {
-
-            public void onClick(View view) {
-                changeActivity(Dashboard.class);
-            }
-        });
-
     }
 
     /**
@@ -155,6 +151,9 @@ public class Login extends Activity {
 
                         // Inserting row in users table
                         db.addUser(uid, username, created_at);
+                        // Set User
+                        db.setUser(username);
+                        db.setUserID(uid);
 
                         changeActivity(Settings.class);
                     } else {

@@ -6,11 +6,9 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -25,14 +23,10 @@ import com.sample.vidance.app.AppController;
 import com.sample.vidance.helper.SQLiteHandler;
 import com.sample.vidance.helper.SessionManager;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -48,7 +42,6 @@ public class Child extends AppCompatActivity {
     private RadioButton rb1, rb2;
     private RadioGroup rg;
     private ProgressDialog pDialog;
-    private ArrayList<LinkedHashMap<String, String>> behaviourTest = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -56,15 +56,25 @@ public class Preview extends AppCompatActivity {
         */
 
         String title = getIntent().getStringExtra("FOLDER");;
+
+        btnCancel = (Button) findViewById(R.id.btnCancel);
+        btnImage = (Button) findViewById(R.id.btnImage);
+        btnAudio = (Button) findViewById(R.id.btnAudio);
+
+        //Set Font Cat Cafe
         String fontPath = "fonts/CatCafe.ttf";
         Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
         TextView text = (TextView) findViewById(R.id.videoName);
         text.setText(title);
         text.setTypeface(tf);
 
-        btnCancel = (Button) findViewById(R.id.btnCancel);
-        btnImage = (Button) findViewById(R.id.btnImage);
-        btnAudio = (Button) findViewById(R.id.btnAudio);
+        //Set Font James Farjardo
+        fontPath = "fonts/James_Fajardo.ttf";
+        Typeface jf = Typeface.createFromAsset(getAssets(), fontPath);
+        btnCancel.setTypeface(jf);
+        btnImage.setTypeface(jf);
+        btnAudio.setTypeface(jf);
+
         buttonPress();
     }
     /*

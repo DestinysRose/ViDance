@@ -76,11 +76,15 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
 
         //Receive input and update content appropriately
         mTextMessage = (TextView) findViewById(R.id.message);
+        TextView mText2 = (TextView) findViewById(R.id.instructions);
+        TextView mText3 = (TextView) findViewById(R.id.textView);
         mTextMessage.setText(R.string.title_input);
         //Set Font Cat Cafe
         String fontPath = "fonts/CatCafe.ttf";
         cc = Typeface.createFromAsset(getAssets(), fontPath);
         mTextMessage.setTypeface(cc);
+        mText2.setTypeface(cc);
+        mText3.setTypeface(cc);
         //Set Font James Farjardo
         fontPath = "fonts/James_Fajardo.ttf";
         jf = Typeface.createFromAsset(getAssets(), fontPath);
@@ -144,10 +148,11 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                 TextView tv = (TextView) view;
                 if(position == 0){
                     tv.setTextColor(Color.GRAY); // Set the hint text color gray
+                    tv.setTypeface(cc);
                 }
                 else {
-                    tv.setTextColor(Color.parseColor("#6B5D40")); // Set default font color
-                    tv.setTypeface(null);
+                    tv.setTextColor(Color.parseColor("#23C8B2")); // Set default font color
+                    tv.setTypeface(cc);
                 }
                 return view;
             }
@@ -236,6 +241,7 @@ public class Update extends AppCompatActivity implements View.OnClickListener {
                     TextView tv = (TextView) view;
                     if(position == 0){
                         tv.setTextColor(Color.GRAY); // Set the hint text color gray
+                        tv.setTypeface(cc);
                     }
                     else {
                         tv.setTextColor(Color.parseColor("#23C8B2")); // Set default font color

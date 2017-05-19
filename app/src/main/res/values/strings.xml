@@ -17,12 +17,15 @@
     </string>
     <string name="about">ViDance is a Dance and Learn application made for special children with the intention of sharing videos with instructors and storing with ease their behaviours shown.</string>
 
-    <!-- Login -->
+    <!-- Login/Reg -->
     <string name="hint_username">Username</string>
-    <string name="hint_fullname">Full Name</string>
     <string name="hint_password">Password</string>
-    <string name="hint_cfmPassword">Confirm Password</string>
-    <string name="hint_email">E-mail</string>
+
+    <string name="hint_reg_username">Username (4~16 characters)</string>
+    <string name="hint_fullname">Full Name</string>
+    <string name="hint_reg_password">Password (6~20 characters)</string>
+    <string name="hint_cfmPassword">Confirm Password </string>
+    <string name="hint_email">E-mail  (Ex: yourname@gmail.com)</string>
     <string name="hint_cname">Child Name</string>
     <string name="hint_cAge">Child Age</string>
     <string name="gender">Child Gender:</string>

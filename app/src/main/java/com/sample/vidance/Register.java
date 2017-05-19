@@ -83,6 +83,11 @@ public class Register extends Activity {
         TextView txtCat = (TextView) findViewById(R.id.catcafe);
         Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
         txtCat.setTypeface(tf);
+        btnLinkToLogin.setTypeface(tf);
+        // Change font for title
+        String fontPath2 = "fonts/James_Fajardo.ttf";
+        Typeface jf = Typeface.createFromAsset(getAssets(), fontPath2);
+        btnRegister.setTypeface(jf);
 
         // Progress dialog
         pDialog = new ProgressDialog(this);
@@ -110,7 +115,22 @@ public class Register extends Activity {
                 email = inputEmail.getText().toString().trim();
 
                 if (!username.isEmpty() && !fullname.isEmpty() && !password.isEmpty() && !cfmpassword.isEmpty() && !email.isEmpty()) {
-                    registerUser(username, fullname, password, email);
+                    if(username.length() >= 4 && username.length() <= 16) {
+                        if(password.length() >= 6 && password.length() <= 20) {
+                            if(email.contains("@") && email.contains(".")) {
+                                registerUser(username, fullname, password, email);
+                            }
+                            else {
+                                Toast.makeText(getApplication(), "Please enter a valid e-mail address", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                        else {
+                            Toast.makeText(getApplication(), "Please enter a valid password between 6 and 20 characters long", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                    else {
+                        Toast.makeText(getApplication(), "Please enter a valid password between 4 and 16 characters long", Toast.LENGTH_LONG).show();
+                    }
                 } else {
                     Toast.makeText(getApplicationContext(), "Please fill in all information!", Toast.LENGTH_LONG).show();
                 }
@@ -150,17 +170,6 @@ public class Register extends Activity {
                     JSONObject jObj = new JSONObject(response);
                     boolean error = jObj.getBoolean("error");
                     if (!error) {
-                        // User successfully stored in MySQL
-                        // Now store the user in sqlite
-                        String uid = jObj.getString("uid");
-
-                        JSONObject user = jObj.getJSONObject("user");
-                        String name = user.getString("username");
-                        String created_at = user.getString("created_at");
-
-                        // Inserting row in users table
-                        db.addUser(name, uid, created_at);
-
                         Toast.makeText(getApplicationContext(), "User successfully registered. Try login now!", Toast.LENGTH_LONG).show();
 
                         // Launch login activity

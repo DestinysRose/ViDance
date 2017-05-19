@@ -4,6 +4,7 @@ import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -47,6 +48,7 @@ public class Settings extends AppCompatActivity {
     private List<String> childrenList;
     private LinkedHashMap<String, String> IDchecker;
     private ListView lv;
+    private Typeface cc, jf;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +83,19 @@ public class Settings extends AppCompatActivity {
         });
 
         child = (TextView) findViewById(R.id.child);
+        TextView title = (TextView) findViewById(R.id.catcafe);
+
+        //Set Font Cat Cafe
+        String fontPath = "fonts/CatCafe.ttf";
+        cc = Typeface.createFromAsset(getAssets(), fontPath);
+        child.setTypeface(cc);
+        title.setTypeface(cc);
+        //Set Font James Farjardo
+        fontPath = "fonts/James_Fajardo.ttf";
+        jf = Typeface.createFromAsset(getAssets(), fontPath);
+        Button mText = (Button) findViewById(R.id.toggleView);
+        addChild.setTypeface(jf);
+        cancel.setTypeface(jf);
 
         if (db.getChild().equals(" ") && childrenList.size() > 0) {
             child.setText(childrenList.get(0));

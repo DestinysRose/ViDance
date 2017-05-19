@@ -11,7 +11,7 @@ import java.util.HashMap;
 
 /**
  * Created by Danil on 27.03.2017.
- * Collaboration by Michelle on 27.04.2017.
+ * Altered by Michelle on 27.04.2017.
  */
 
 public class SQLiteHandler extends SQLiteOpenHelper {
@@ -27,9 +27,6 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 
     // Login table name
     private static final String TABLE_USER = "user";
-
-    // Child behaviour table name
-    private static final String TABLE_BHTEST = "child_btest";
 
     // Table Columns names
     private static final String KEY_ID = "id";
@@ -85,7 +82,30 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Getting user data from database
+     * Setting User ID in database
+     * */
+    public String setUser(String user) {
+        String selectQuery = "UPDATE user SET username='"+user+"'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL(selectQuery);
+        Log.d(TAG, "Setting username from Sqlite: " + user);
+        return user;
+    }
+
+    /**
+     * Setting User ID in database
+     * */
+    public String setUserID(String userID) {
+        String selectQuery = "UPDATE user SET uid='"+userID+"'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL(selectQuery);
+        Log.d(TAG, "Setting uid from Sqlite: " + userID);
+        return userID;
+    }
+
+
+    /**
+     * Getting User ID from database
      * */
     public String getUserID() {
         String userID = "";
@@ -99,11 +119,10 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         }
         Log.d(TAG, "Fetching userID from Sqlite: " + userID);
         return userID;
-
     }
 
     /**
-     * Getting user data from database
+     * Setting Child Name from database
      * */
     public void setChild(String child) {
         String selectQuery = "UPDATE user SET cname='"+child+"'";
@@ -113,7 +132,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Getting childname from database
+     * Getting Child Name from database
      * */
     public String getChild() {
         String childName = "";
@@ -130,7 +149,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Getting user data from database
+     * Setting childID in database
      * */
     public void setChildID(String child) {
         String selectQuery = "UPDATE user SET cid='"+child+"'";
@@ -140,7 +159,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Getting childname from database
+     * Getting childID from SQLite database
      * */
     public String getChildID() {
         String childID = "";
@@ -158,7 +177,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 
     /**
      * Getting user data from database
-     * */
+     *
     public HashMap<String, String> getUserDetails() {
         HashMap<String, String> user = new HashMap<String, String>();
         String selectQuery = "SELECT  * FROM " + TABLE_USER;
@@ -180,10 +199,10 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         Log.d(TAG, "Fetching user from Sqlite: " + user.toString());
 
         return user;
-    }
+    }**/
 
     /**
-     * Re crate database Delete all tables and create them again
+     * Delete all tables and create them again
      * */
     public void deleteUsers() {
         SQLiteDatabase db = this.getWritableDatabase();
