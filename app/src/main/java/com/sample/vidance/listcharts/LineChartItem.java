@@ -140,10 +140,10 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
         inputAmount.setHint("How many?");
         inputAmount.setTypeface(tf);
 
-        final String lineDescHourly = "Number of behaviours per each hour";
-        final String lineDescDaily = "Number of behaviours per each day";
-        final String lineDescWeekly = "Number of behaviours per each week";
-        final String lineDescMonthly = "Number of behaviours per each month";
+        final String lineDescHourly = "Number of severities per each hour";
+        final String lineDescDaily = "Number of severities per each day";
+        final String lineDescWeekly = "Number of severities per each week";
+        final String lineDescMonthly = "Number of severities per each month";
 
         final String pieDescHourly = "Time: ";
         final String pieDescDaily = "Day: ";
@@ -899,7 +899,7 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
     private void showMessage(){
         AlertDialog.Builder builder1 = new AlertDialog.Builder(LineChartItem.this);
         builder1.setMessage("Instructions\n\n" +
-                "This report will demonstrate quantity of behaviours per period of time.\n\n" +
+                "This report will demonstrate quantity of severities per period of time.\n\n" +
                 "- To display report please choose option for period of time (hourly, daily, weekly, monthly).\n\n" +
                 "- Then select date(s), for weekly and monthly options you will be asked to input amount of weeks or months.\n\n\n" +
                 "After initialization of graph you will be able to track behaviours over particular period of time.\n\n" +

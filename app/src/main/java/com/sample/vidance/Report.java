@@ -26,31 +26,33 @@ import com.sample.vidance.listcharts.PieChartItem;
  * Created by Danil on 06.04.2017.
  */
 
+//Class is used to show options how to display user records using graphs
 public class Report extends AppCompatActivity {
 
+    //These fields used to get data of user
     private SQLiteHandler db;
     private SessionManager session;
 
-    Typeface tf;
-    Typeface jf;
-
-    private TextView mTextMessage;
+    Typeface tf, jf;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.resource_report);
+        setContentView(R.layout.activity_report);
 
+        //Load typefaces from project resources
         String fontPath = "fonts/CatCafe.ttf";
         tf = Typeface.createFromAsset(getAssets(), fontPath);
         String fontPath2 = "fonts/James_Fajardo.ttf";
         jf = Typeface.createFromAsset(getAssets(), fontPath2);
 
-        mTextMessage = (TextView) findViewById(R.id.textView2);
+        //Title initialization and styling
+        TextView mTextMessage = (TextView) findViewById(R.id.textView2);
         mTextMessage.setText(R.string.title_report);
         mTextMessage.setTypeface(tf);
 
+        //Button options init and styling
         TextView txtJf1 = (TextView) findViewById(R.id.textView3);
         TextView txtJf2 = (TextView) findViewById(R.id.textView4);
         TextView txtJf3 = (TextView) findViewById(R.id.textView5);
@@ -61,10 +63,12 @@ public class Report extends AppCompatActivity {
         txtJf3.setTypeface(tf);
         txtJf3.setTextSize(15);
 
+        //Bottom navigation
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.getMenu().getItem(4).setChecked(true);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
+        //Button on click listeners to intent to graph activities and styling
         Button btn = (Button) findViewById(R.id.btn);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,6 +104,7 @@ public class Report extends AppCompatActivity {
         btnToPie.setTextSize(25);
     }
 
+    //Bottom naviagtion on click listeners to intent main activities (Created by Michelle)
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -134,6 +139,7 @@ public class Report extends AppCompatActivity {
         }
     };
 
+    //Function to log out user
     private void logoutUser() {
         // SqLite database handler
         db = new SQLiteHandler(getApplicationContext());
@@ -153,11 +159,12 @@ public class Report extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        // Inflate the menu; this adds items to the action bar if it is present. (Created by Michelle)
         getMenuInflater().inflate(R.menu.menu_dashboard, menu);
         return true;
     }
 
+    //Top left corner navigation (Created by Michelle)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent = new Intent(Report.this, MenuItems.class);
@@ -190,6 +197,7 @@ public class Report extends AppCompatActivity {
         return true;
     }
 
+    //on back button pressed (Created by Michelle)
     @Override
     public void onBackPressed() {
         //Prompt user to send video

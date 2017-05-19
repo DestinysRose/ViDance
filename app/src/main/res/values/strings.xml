@@ -86,12 +86,12 @@
     <string name="by_severity">By Severity</string>
 
     <!-- Report -->
-    <string name="num_behaviours">Behaviours per severity</string>
-    <string name="num_severities">Severities per behaviour</string>
+    <string name="num_behaviours">Severities per behaviour</string>
+    <string name="num_severities">Severities over time</string>
     <string name="total">Total</string>
-    <string name="chart1desc">First graph will show number of behaviours and its severity over time</string>
-    <string name="chart2desc">Second graph will show number of severities for each behaviour over time</string>
-    <string name="chart3desc">Final graph combines first and second graphs to show all your records</string>
+    <string name="chart1desc">First graph will show number of severities and its behaviours over time</string>
+    <string name="chart2desc">Second graph will show number of severities for particular period time</string>
+    <string name="chart3desc">Third graph combines filter by behaviour and by severity to show all your filtered records</string>
 
     <!-- Behaviour Severity Information -->
     <string name="severity_info">

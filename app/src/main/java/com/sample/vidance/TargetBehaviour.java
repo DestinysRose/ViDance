@@ -46,6 +46,7 @@ import java.util.Map;
  * Created by Danil on 10.04.2017.
  */
 
+//Implementation of target behaviour activity to show user weekly targets and current
 public class TargetBehaviour  extends AppCompatActivity {
 
     public static final String TARGET_WEEK = "http://thevidance.com/targetBehaviour.php";
