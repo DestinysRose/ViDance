@@ -16,15 +16,17 @@ public class CustomMarkerView extends MarkerView {
     public TextView tvContent;
     public CustomMarkerView (Context context, int layoutResource) {
         super(context, layoutResource);
-        // this markerview only displays a textview
+        //This markerview only displays a textview
         tvContent = (TextView) findViewById(R.id.tvContent);
     }
 
     @Override
     public void refreshContent(Entry e, Highlight highlight) {
+        //Set text for marker as value on node or slice of chart
         tvContent.setText("" + e.getVal());
     }
 
+    //Style marker using axes offsets
     @Override
     public int getXOffset(float xpos) {
         return -(getWidth() / 2);

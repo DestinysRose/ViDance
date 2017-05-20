@@ -31,6 +31,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.sample.vidance.app.AppConfig;
 import com.sample.vidance.helper.SQLiteHandler;
 import com.sample.vidance.helper.SessionManager;
 
@@ -49,15 +50,13 @@ import java.util.Map;
 //Implementation of target behaviour activity to show user weekly targets and current
 public class TargetBehaviour  extends AppCompatActivity {
 
-    public static final String TARGET_WEEK = "http://thevidance.com/targetBehaviour.php";
-
     //JSON Array
     private JSONArray result;
 
     private SQLiteHandler db;
     private SessionManager session;
 
-    private TextView mTextMessage;
+    //Text views to show behaviours on chart node select
     TextView selectedBehaviour, byBehaviour;
 
     Typeface tf;
@@ -72,23 +71,32 @@ public class TargetBehaviour  extends AppCompatActivity {
         // Loading Font Face
         tf = Typeface.createFromAsset(getAssets(), fontPath);
 
-        // Applying font
+        // Session manager
+        session = new SessionManager(getApplicationContext());
+
+        // SQLite database handler
+        db = new SQLiteHandler(getApplicationContext());
+
+        // Text views init and styling
         txtCat.setTypeface(tf);
         selectedBehaviour = (TextView)findViewById(R.id.selectedB);
         byBehaviour = (TextView)findViewById(R.id.bName);
         selectedBehaviour.setTypeface(tf);
         byBehaviour.setTypeface(tf);
 
-        mTextMessage = (TextView) findViewById(R.id.message);
+        //Title initialization and styling
+        TextView mTextMessage = (TextView) findViewById(R.id.message);
         mTextMessage.setText(R.string.title_target);
         mTextMessage.setTypeface(tf);
 
+        //Initialize graph with online data
         try {
-            storeDateHourly();
+            targetBehaviour();
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
+        //Hint button to show instructions if user get lost
         Button hint = (Button) findViewById(R.id.hint);
         hint.setTypeface(tf);
         hint.setTextSize(25);
@@ -111,8 +119,10 @@ public class TargetBehaviour  extends AppCompatActivity {
         finish();
     }
 
-    private void storeDateHourly() throws JSONException {
+    //Function, that do query response, initialize graph with responded data and chart styling
+    private void targetBehaviour() throws JSONException {
 
+        //init final variables
         final LineChart lineChart = (LineChart) findViewById(R.id.chart);
 
         final ArrayList<Entry> current = new ArrayList<>();
@@ -121,26 +131,32 @@ public class TargetBehaviour  extends AppCompatActivity {
 
         final ArrayList<ILineDataSet> lineDataSets = new ArrayList<>();
 
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, TARGET_WEEK,
+        //String request, reference to Volley library, that post user details to fetch data
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, AppConfig.TARGET_WEEK,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
 
-                            JSONObject reader = null;
+                            //JSON object to read response
+                            JSONObject reader;
                             try {
                                 reader = new JSONObject(response);
 
-                                result = reader.getJSONArray("result");
-                                if (result.length() == 0)
-                                    Toast.makeText(TargetBehaviour.this, "Sorry, no records this day(s)", Toast.LENGTH_LONG).show();
-                                else {
+                                //Read responded data using JSON array 'result'
+                                result = reader.getJSONArray(AppConfig.JSON_ARRAY);
 
+                                //Validation if no data for that user
+                                if (result.length() == 0)
+                                    Toast.makeText(TargetBehaviour.this, "Seems that you don't have any records...", Toast.LENGTH_LONG).show();
+                                else {
                                     int count;
+                                    //Assign data from response to local variables
                                     for (int i = 0; i < result.length(); i++) {
                                         final JSONObject targetObj = result.getJSONObject(i);
                                         final String severCounter = targetObj.getString("counter");
                                         count = Integer.parseInt(severCounter);
 
+                                        //Calculation of target behaviour variables
                                         current.add(new Entry(count, i));
                                         if(count >= 14)
                                             target.add(new Entry(count-3,i));
@@ -150,18 +166,20 @@ public class TargetBehaviour  extends AppCompatActivity {
                                             target.add(new Entry(count-1,i));
                                         else if(count == 1)
                                             target.add(new Entry(count,i));
-                                        else
-                                            Toast.makeText(TargetBehaviour.this, "Seems that you don't have any records last week...", Toast.LENGTH_LONG).show();
 
+                                        //Empty labels (requirements of MPAndroidChart library)
                                         labels.add("");
                                     }
 
+                                    //local variable that keeps size of chart labels (chart size)
                                     String[] xaxes = new String[labels.size()];
 
+                                    //Assign label index to local variable
                                     for(int i = 0; i<labels.size(); i++){
                                         xaxes[i] = labels.get(i);
                                     }
 
+                                    //Double lines initialization with its colors
                                     LineDataSet lineDataSet1 = new LineDataSet(current, "Current behaviour");
                                     lineDataSet1.setDrawCircles(false);
                                     lineDataSet1.setColor(Color.RED);
@@ -170,16 +188,19 @@ public class TargetBehaviour  extends AppCompatActivity {
                                     lineDataSet2.setDrawCircles(false);
                                     lineDataSet2.setColor(Color.BLUE);
 
+                                    //Add lines into one data set
                                     lineDataSets.add(lineDataSet1);
                                     lineDataSets.add(lineDataSet2);
 
+                                    //Setting data set into chart
                                     lineChart.setData(new LineData(xaxes, lineDataSets));
 
-                                    lineChart.setTouchEnabled(true);
-
+                                    //Custom marker on node click
                                     CustomMarkerView mv = new CustomMarkerView(TargetBehaviour.this, R.layout.content_marker);
-                                    lineChart.setMarkerView(mv);
 
+                                    //Line chart styling
+                                    lineChart.setTouchEnabled(true);
+                                    lineChart.setMarkerView(mv);
                                     lineChart.setScaleEnabled(false);
                                     lineChart.setDoubleTapToZoomEnabled(false);
                                     lineChart.setMaxVisibleValueCount(result.length());
@@ -190,23 +211,30 @@ public class TargetBehaviour  extends AppCompatActivity {
                                     lineChart.getLegend().setEnabled(true);
                                     lineChart.fitScreen();
 
+                                    //Legend of chart styling
                                     Legend l = lineChart.getLegend();
                                     l.setTypeface(tf);
 
+                                    //Removing right axis from line chart
                                     YAxis yAxisRight = lineChart.getAxisRight();
                                     yAxisRight.setEnabled(false);
 
+                                    //On node click listener
                                     lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
                                         @Override
                                         public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
+                                            //Assigning local variable values of clicked node
                                             final int info = h.getXIndex();
                                             try {
+                                                //Init JSON object and assigning response to local variable
                                                 JSONObject behaviourList = result.getJSONObject(info);
-                                                final String behaviour_name = behaviourList.getString("bName");
+                                                final String behaviour_name = behaviourList.getString("behaviour_name");
 
+                                                //Set visible on click
                                                 selectedBehaviour.setVisibility(View.VISIBLE);
                                                 byBehaviour.setVisibility(View.VISIBLE);
 
+                                                //Setting text for text fields from response
                                                 selectedBehaviour.setText("Selected: ");
                                                 byBehaviour.setText(behaviour_name);
                                             } catch (JSONException es) {
@@ -215,6 +243,7 @@ public class TargetBehaviour  extends AppCompatActivity {
                                             }
                                         }
 
+                                        //Hide Text views when node not clicked
                                         @Override
                                         public void onNothingSelected() {
                                             selectedBehaviour.setVisibility(View.INVISIBLE);
@@ -236,14 +265,18 @@ public class TargetBehaviour  extends AppCompatActivity {
                     }) {
                 @Override
                 protected Map<String, String> getParams() {
-                    Map<String, String> params = new HashMap<String, String>();
+                    //Sending local variables to MySQL query
+                    Map<String, String> params = new HashMap<>();
+                    params.put(AppConfig.KEY_CID, db.getChildID());
                     return params;
                 }
             };
+            //Adding request to queue (Volley library)
             RequestQueue requestQueue = Volley.newRequestQueue(this);
             requestQueue.add(stringRequest);
         }
 
+    //Instruction alert box
     private void showMessage(){
         AlertDialog.Builder builder1 = new AlertDialog.Builder(TargetBehaviour.this);
         builder1.setMessage("Instructions\n\n" +
@@ -265,6 +298,7 @@ public class TargetBehaviour  extends AppCompatActivity {
         alert11.show();
     }
 
+    //Bottom navigation (Created by Michelle)
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -273,7 +307,7 @@ public class TargetBehaviour  extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.navigation_dashboard:
                     finish();
-                    Intent intent = new Intent(TargetBehaviour.this, Dashboard.class); //Record Session page
+                    Intent intent = new Intent(TargetBehaviour.this, Dashboard.class);
                     startActivity(intent);
                     return true;
                 case R.id.navigation_record:
@@ -299,6 +333,7 @@ public class TargetBehaviour  extends AppCompatActivity {
         }
     };
 
+    //Log out function
     private void logoutUser() {
         // SqLite database handler
         db = new SQLiteHandler(getApplicationContext());

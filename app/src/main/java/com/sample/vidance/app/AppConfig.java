@@ -24,5 +24,19 @@ public class AppConfig {
     // URL to get list of children registered under user
     public static String URL_TEST = "http://thevidance.com/test/updateBehaviours.php";
 
+    // URL to get list of recorded updates by child to show current records and target
+    public static String TARGET_WEEK = "http://thevidance.com/targetBehaviour.php";
+
+    // URL to get list of recorded updates dates
+    public static String RECORD_DATES = "http://thevidance.com/recordDates.php";
+
+    // URL to post values to PHP
+    public static String KEY_CID = "childId";
+    public static String KEY_DATE = "date1";
+    public static String KEY_END_DATE = "date2";
+    public static String KEY_AMOUNT = "amount";
+
+    //JSON array name
+    public static String JSON_ARRAY = "result";
 
 }
