@@ -43,7 +43,7 @@
             android:layout_marginBottom="10dp"
             android:background="#958ed2"
             android:hint="@string/hint_reg_username"
-            android:inputType="textCapWords"
+            android:inputType="text"
             android:padding="10dp"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
@@ -56,7 +56,7 @@
             android:layout_marginBottom="10dp"
             android:background="#958ed2"
             android:hint="@string/hint_fullname"
-            android:inputType="textCapWords"
+            android:inputType="textPersonName|textCapWords"
             android:padding="10dp"
             android:textColor="@color/white"
             android:textColorHint="@color/white"/>
@@ -94,7 +94,8 @@
             android:hint="@string/hint_email"
             android:padding="10dp"
             android:textColor="@color/white"
-            android:textColorHint="@color/white" />
+            android:textColorHint="@color/white"
+            android:inputType="textEmailAddress" />
 
         <!-- Register Button -->
 
