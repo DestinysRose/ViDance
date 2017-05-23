@@ -81,7 +81,7 @@ public class ReceiveInput extends AppCompatActivity {
         String fontPath = "fonts/CatCafe.ttf";
         Typeface tf = Typeface.createFromAsset(getAssets(), fontPath);
         title.setTypeface(tf);
-        title.setTextSize(30);
+        title.setTextSize(25);
         fontPath = "fonts/James_Fajardo.ttf";
         Typeface jf = Typeface.createFromAsset(getAssets(), fontPath);
         btnSend.setTypeface(jf);
