@@ -1,29 +1,16 @@
 package com.sample.vidance;
 
 import android.util.Log;
-import android.widget.Toast;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 
 /**
  * Created by Michelle on 20/4/2017.
@@ -31,7 +18,7 @@ import java.util.ArrayList;
 
 public class Upload {
 
-    public static final String UPLOAD_URL = "http://thevidance.com/test/upload.php";
+    public static final String UPLOAD_URL = "http://thevidance.com/zid/pages/upload.php";
 
     private int serverResponseCode;
 

@@ -13,13 +13,13 @@ public class AppConfig {
     public static String URL_REGUSER = "http://thevidance.com/test/reg_user.php";
 
     // URL to register child
-    public static String URL_REGCHILD = "http://thevidance.com/test/reg_child.php";
+    public static String URL_REGCHILD = "http://thevidance.com/zid/pages/reg_child.php";
 
     // URL to get list of children registered under user
     public static String URL_GETCHILD = "http://thevidance.com/test/get_child.php";
 
     // URL to get list of children registered under user
-    public static String URL_GETSTORY = "http://thevidance.com/test/get_stories.php";
+    public static String URL_GETSTORY = "http://thevidance.com/zid/pages/get_stories.php";
 
     // URL to get list of children registered under user
     public static String URL_TEST = "http://thevidance.com/test/updateBehaviours.php";

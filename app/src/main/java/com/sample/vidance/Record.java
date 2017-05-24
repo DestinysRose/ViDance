@@ -21,7 +21,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.sample.vidance.app.AppController;
 import com.sample.vidance.helper.SQLiteHandler;
 import com.sample.vidance.helper.SessionManager;
 
@@ -39,7 +38,7 @@ public class Record extends AppCompatActivity {
     private Button btnRecord, btnSend;
     private int ACTIVITY_START_CAMERA_APP = 0; //Initialise camera
     private static final int SELECT_VIDEO = 3; //Set to allow video selection
-    private String userName;
+    private String userID;
     private Uri videoUri = null;
     private File dir;
     private String CAPTURE_TITLE, selectedPath;
@@ -60,6 +59,12 @@ public class Record extends AppCompatActivity {
 
         // Session manager
         session = new SessionManager(getApplicationContext());
+
+        // SQLite database handler
+        db = new SQLiteHandler(getApplicationContext());
+
+         // Get current user
+         userID = db.getUserID();
 
         // Set font
         String fontPath = "fonts/James_Fajardo.ttf";
@@ -112,7 +117,7 @@ public class Record extends AppCompatActivity {
         if (requestCode == ACTIVITY_START_CAMERA_APP && resultCode == RESULT_OK) {
             videoUri = data.getData();
             sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, videoUri)); // Update to show video in gallery.
-            //Get the videoPath to sent to uploadVideo() so that the f
+            //Get the videoPath to sent to uploadVideo()
             File video = new File(videoUri.getPath());
             selectedPath = video.getAbsolutePath();
             Toast.makeText(getApplicationContext(), "Video saved to Gallery!", Toast.LENGTH_SHORT).show();
@@ -207,7 +212,7 @@ public class Record extends AppCompatActivity {
             @Override
             protected String doInBackground(Void... params) {
                 Upload u = new Upload();
-                return u.uploadVideo(selectedPath, userName);
+                return u.uploadVideo(selectedPath, userID);
             }
         }
         UploadVideo uv = new UploadVideo();
@@ -235,7 +240,7 @@ public class Record extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.action_settings:
-                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
+                changeActivity(Settings.class);
                 break;
             case R.id.action_contact:
                 changeActivity(Report.class);

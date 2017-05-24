@@ -1,8 +1,6 @@
 package com.sample.vidance;
 
-import android.app.DialogFragment;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -119,7 +117,15 @@ public class Settings extends AppCompatActivity {
                 lv.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        db.setChild(lv.getItemAtPosition(position).toString());
+                        String selectedchild = lv.getItemAtPosition(position).toString();
+                         db.setChild(selectedchild);
+                        for (HashMap.Entry<String,String> entry : IDchecker.entrySet()) {
+                            String childID = entry.getKey();
+                            String childName = entry.getValue();
+                            if (childName.equals(selectedchild)){
+                                db.setChildID(childID);
+                            }
+                        }
                         changeActivity(Settings.class);
                     }
                 });
@@ -151,7 +157,6 @@ public class Settings extends AppCompatActivity {
                     JSONObject jObj = new JSONObject(response);
                     boolean error = jObj.getBoolean("error");
                     boolean empty = jObj.getBoolean("empty");
-                    List<String> childList = new ArrayList<String>();
                     if (!error) {
                         if (!empty){
                             JSONArray childinfo = jObj.getJSONArray("child");
@@ -162,6 +167,7 @@ public class Settings extends AppCompatActivity {
                                 String fullname = idNname.getString("fullname");
                                 IDchecker.put(childid, fullname);
                             }
+
                         } else {
                             finish();
                             Intent intent = new Intent(Settings.this, Child.class);
