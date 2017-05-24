@@ -42,6 +42,7 @@ import com.sample.vidance.CustomMarkerView;
 import com.sample.vidance.Login;
 import com.sample.vidance.MenuItems;
 import com.sample.vidance.R;
+import com.sample.vidance.Settings;
 import com.sample.vidance.app.AppConfig;
 import com.sample.vidance.app.Colors;
 import com.sample.vidance.helper.SQLiteHandler;
@@ -528,22 +529,26 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
 
                                 result = reader.getJSONArray(AppConfig.JSON_ARRAY);
 
-                                    ArrayList<Entry> entries = new ArrayList<>();
-                                    ArrayList<String> labels = new ArrayList<>();
+                                ArrayList<Entry> entries = new ArrayList<>();
+                                ArrayList<String> labels = new ArrayList<>();
 
-                                    int count;
-                                    if (result.length() == 1) {
-                                        final JSONObject severObj = result.getJSONObject(0);
-                                        final String severCounter = severObj.getString("counter");
-                                        final String outputDate = severObj.getString("OutputDate");
-                                        count = Integer.parseInt(severCounter);
+                                int count;
+                                if (result.length() == 1) {
+                                    final JSONObject severObj = result.getJSONObject(0);
+                                    final String severCounter = severObj.getString("counter");
+                                    final String outputDate = severObj.getString("OutputDate");
+                                    count = Integer.parseInt(severCounter);
 
-                                        entries.add(new Entry(count, 0));
-                                        labels.add(outputDate);
+                                    entries.add(new Entry(count, 0));
+                                    labels.add(outputDate);
 
-                                        entries.add(new Entry(0, 1));
-                                        labels.add("");
-                                    } else {
+                                    entries.add(new Entry(0, 1));
+                                    labels.add("");
+                                } else if(result.length() == 0) {
+                                    //check if no records found
+                                    hideDialog();
+                                    Toast.makeText(LineChartItem.this, "Seems that you don't have records...", Toast.LENGTH_LONG).show();
+                                } else {
 
                                         for (int i = 0; i < result.length(); i++) {
                                             final JSONObject severObj = result.getJSONObject(i);
@@ -1018,6 +1023,10 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
                             //Get the JSONArray
                             result = reader.getJSONArray(AppConfig.JSON_ARRAY);
 
+                            //check if no result found
+                            if(result.length() == 0)
+                                Toast.makeText(LineChartItem.this, "Seems that you don't have records...", Toast.LENGTH_LONG).show();
+
                             //As response consist of one array element JSONObject uses first element of JSON array
                             final JSONObject recordObj = result.getJSONObject(0);
                             //Assign response to local variables
@@ -1097,7 +1106,7 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
                 Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.action_settings:
-                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
+                changeActivity(Settings.class);
                 break;
             case R.id.action_contact:
                 finish();
@@ -1119,6 +1128,12 @@ public class LineChartItem extends AppCompatActivity implements View.OnClickList
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    public void changeActivity(Class activity) {
+        finish();
+        Intent intent = new Intent(this, activity);
+        startActivity(intent);
     }
 
     private void showDialog() {

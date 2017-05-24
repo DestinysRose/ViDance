@@ -366,7 +366,7 @@ public class TargetBehaviour  extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.action_settings:
-                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
+                changeActivity(Settings.class);
                 break;
             case R.id.action_contact:
                 finish();
@@ -388,5 +388,11 @@ public class TargetBehaviour  extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    public void changeActivity(Class activity) {
+        finish();
+        Intent intent = new Intent(this, activity);
+        startActivity(intent);
     }
 }

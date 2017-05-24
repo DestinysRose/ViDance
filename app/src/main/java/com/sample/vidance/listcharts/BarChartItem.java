@@ -40,6 +40,7 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.sample.vidance.Login;
 import com.sample.vidance.MenuItems;
 import com.sample.vidance.R;
+import com.sample.vidance.Settings;
 import com.sample.vidance.app.AppConfig;
 import com.sample.vidance.app.Colors;
 import com.sample.vidance.helper.SQLiteHandler;
@@ -83,9 +84,9 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
     private String date, endDate, amount;
 
     //URL init to get filtered data
-    public static final String BAR_FILTER_DAILY = "http://thevidance.com/charts/bar_chart/hBarChart.php";
-    public static final String BAR_FILTER_WEEKLY = "http://thevidance.com/charts/bar_chart/dBarChart.php";
-    public static final String BAR_FILTER_HOURLY = "http://thevidance.com/charts/bar_chart/wBarChart.php";
+    public static final String BAR_FILTER_HOURLY = "http://thevidance.com/charts/bar_chart/hBarChart.php";
+    public static final String BAR_FILTER_DAILY = "http://thevidance.com/charts/bar_chart/dBarChart.php";
+    public static final String BAR_FILTER_WEEKLY = "http://thevidance.com/charts/bar_chart/wBarChart.php";
     public static final String BAR_FILTER_MONTHLY = "http://thevidance.com/charts/bar_chart/mBarChart.php";
 
     //URL init to get filtered data if result is empty
@@ -530,8 +531,14 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
 
                             // Get the JSONArray
                             result = reader.getJSONArray(AppConfig.JSON_ARRAY);
-                                ArrayList<BarEntry> barEntries = new ArrayList<>();
-                                ArrayList<String> pa = new ArrayList<>();
+                            ArrayList<BarEntry> barEntries = new ArrayList<>();
+                            ArrayList<String> pa = new ArrayList<>();
+
+                            //check if no records found
+                            if(result.length() == 0) {
+                                hideDialog();
+                                Toast.makeText(BarChartItem.this, "Seems that you don't have records...", Toast.LENGTH_LONG).show();
+                            } else {
 
                                 int count;
                                 BarChartItem.MyBarDataSet barDataSet;
@@ -637,6 +644,7 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                                         HbarChart.setVisibility(View.GONE);
                                     }
                                 });
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                             Toast.makeText(BarChartItem.this, "Unexpected error. Please retry", Toast.LENGTH_LONG).show();
@@ -750,9 +758,9 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
         @Override
         public int getColor(int index) {
             //Validation which colors need to be assign to each values under X axes
-            if(getEntryForXIndex(index).getVal() < 4) // less than 4 green
+            if(getEntryForXIndex(index).getVal() < 7) // less than 4 green
                 return mColors.get(0);
-            else if(getEntryForXIndex(index).getVal() < 7) // less than 7 yellow
+            else if(getEntryForXIndex(index).getVal() < 16) // less than 7 yellow
                 return mColors.get(1);
             else // greater or equal than 7 red
                 return mColors.get(2);
@@ -981,30 +989,35 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                                 //Get the JSONArray
                                 result = reader.getJSONArray(AppConfig.JSON_ARRAY);
 
-                                //As response consist of one array element JSONObject uses first element of JSON array
-                                final JSONObject recordObj = result.getJSONObject(0);
-                                //Assign response to local variables
-                                final String firstRecord = recordObj.getString("firstDate");
-                                final String lastRecord = recordObj.getString("lastDate");
+                                //check if no result found
+                                if(result.length() == 0)
+                                    Toast.makeText(BarChartItem.this, "Seems that you don't have records...", Toast.LENGTH_LONG).show();
 
-                                //Show dates
-                                AlertDialog.Builder builder1 = new AlertDialog.Builder(BarChartItem.this);
-                                builder1.setMessage(
-                                        "Your First record was found on: " + firstRecord + "\n\n" +
-                                        "Your Last record was found on: " + lastRecord);
-                                builder1.setCancelable(true);
+                                else {
+                                    //As response consist of one array element JSONObject uses first element of JSON array
+                                    final JSONObject recordObj = result.getJSONObject(0);
+                                    //Assign response to local variables
+                                    final String firstRecord = recordObj.getString("firstDate");
+                                    final String lastRecord = recordObj.getString("lastDate");
 
-                                builder1.setPositiveButton(
-                                        "Ok",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                dialog.cancel();
-                                            }
-                                        });
+                                    //Show dates
+                                    AlertDialog.Builder builder1 = new AlertDialog.Builder(BarChartItem.this);
+                                    builder1.setMessage(
+                                            "Your First record was found on: " + firstRecord + "\n\n" +
+                                                    "Your Last record was found on: " + lastRecord);
+                                    builder1.setCancelable(true);
 
-                                AlertDialog alert11 = builder1.create();
-                                alert11.show();
+                                    builder1.setPositiveButton(
+                                            "Ok",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    dialog.cancel();
+                                                }
+                                            });
 
+                                    AlertDialog alert11 = builder1.create();
+                                    alert11.show();
+                                }
                             } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -1135,7 +1148,7 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.action_settings:
-                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
+                changeActivity(Settings.class);
                 break;
             case R.id.action_contact:
                 finish();
@@ -1157,6 +1170,12 @@ public class BarChartItem extends AppCompatActivity implements View.OnClickListe
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    public void changeActivity(Class activity) {
+        finish();
+        Intent intent = new Intent(this, activity);
+        startActivity(intent);
     }
 
     //Function to show Loading dialog

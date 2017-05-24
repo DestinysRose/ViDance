@@ -34,6 +34,7 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.sample.vidance.Login;
 import com.sample.vidance.MenuItems;
 import com.sample.vidance.R;
+import com.sample.vidance.Settings;
 import com.sample.vidance.app.AppConfig;
 import com.sample.vidance.app.Colors;
 import com.sample.vidance.helper.SQLiteHandler;
@@ -635,7 +636,7 @@ public class PieChartItem extends AppCompatActivity{
                 Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.action_settings:
-                Toast.makeText(getApplicationContext(), "Currently unavailable!", Toast.LENGTH_SHORT).show();
+                changeActivity(Settings.class);
                 break;
             case R.id.action_contact:
                 finish();
@@ -657,6 +658,12 @@ public class PieChartItem extends AppCompatActivity{
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    public void changeActivity(Class activity) {
+        finish();
+        Intent intent = new Intent(this, activity);
+        startActivity(intent);
     }
 
     private void showDialog() {

@@ -9,11 +9,14 @@
     android:orientation="vertical"
     android:padding="10dp"
     tools:context=".Register">
-
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:orientation="vertical"
         android:paddingLeft="20dp"
         android:paddingRight="20dp">
@@ -93,6 +96,7 @@
             android:background="#958ed2"
             android:hint="@string/hint_email"
             android:padding="10dp"
+            android:inputType="textEmailAddress"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
             android:inputType="textEmailAddress" />
@@ -122,5 +126,6 @@
             android:layout_marginTop="5dp"
             android:textSize="14dp" />
     </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>
