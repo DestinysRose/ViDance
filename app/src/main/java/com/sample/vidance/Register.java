@@ -117,11 +117,16 @@ public class Register extends Activity {
                 if (!username.isEmpty() && !fullname.isEmpty() && !password.isEmpty() && !cfmpassword.isEmpty() && !email.isEmpty()) {
                     if(username.length() >= 4 && username.length() <= 16) {
                         if(password.length() >= 6 && password.length() <= 20) {
-                            if(email.contains("@") && email.contains(".")) {
-                                registerUser(username, fullname, password, email);
+                            if(password.equals(cfmpassword)) {
+                                if(email.contains("@") && email.contains(".")) {
+                                    registerUser(username, fullname, password, email);
+                                }
+                                else {
+                                    Toast.makeText(getApplication(), "Please enter a valid e-mail address", Toast.LENGTH_LONG).show();
+                                }
                             }
                             else {
-                                Toast.makeText(getApplication(), "Please enter a valid e-mail address", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplication(), "Passwords do not match", Toast.LENGTH_LONG).show();
                             }
                         }
                         else {
@@ -129,7 +134,7 @@ public class Register extends Activity {
                         }
                     }
                     else {
-                        Toast.makeText(getApplication(), "Please enter a valid password between 4 and 16 characters long", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplication(), "Please enter a valid username between 4 and 16 characters long", Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(getApplicationContext(), "Please fill in all information!", Toast.LENGTH_LONG).show();
