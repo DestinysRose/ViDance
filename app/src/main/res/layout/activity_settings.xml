@@ -33,7 +33,7 @@
             android:clickable="true"
             android:gravity="center"
             android:padding="10dp"
-            android:text="No child Selected"
+            android:text="No Child Selected"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="20sp" />
 

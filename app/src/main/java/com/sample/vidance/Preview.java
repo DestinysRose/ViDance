@@ -1,13 +1,11 @@
 package com.sample.vidance;
 
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -20,10 +18,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.sample.vidance.helper.SQLiteHandler;
-import com.sample.vidance.helper.SessionManager;
-
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -44,16 +38,6 @@ public class Preview extends AppCompatActivity {
         new DownloadImageFromInternet((ImageView) findViewById(R.id.imageView)).execute(getIntent().getStringExtra("IMAGE"));
         uriImage = Uri.parse(getIntent().getStringExtra("IMAGE"));
         uriAudio = Uri.parse(getIntent().getStringExtra("AUDIO"));
-       /* mediaPlayer = MediaPlayer.create(getApplicationContext(), uriAudio);
-        mediaPlayer.reset();
-        try {
-            mediaPlayer.setDataSource(this, uriAudio);
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-        }catch (IOException io) {
-            io.printStackTrace();
-        }
-        */
 
         String title = getIntent().getStringExtra("FOLDER");;
 
@@ -77,34 +61,6 @@ public class Preview extends AppCompatActivity {
 
         buttonPress();
     }
-    /*
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (mediaPlayer!= null && mediaPlayer.isPlaying()) {
-            mediaPlayer.pause();
-        }
-        else {
-            mediaPlayer.reset();
-            try {
-                mediaPlayer.setDataSource(this, uriAudio);
-                mediaPlayer.prepare();
-                mediaPlayer.start();
-            }catch (IOException io) {
-                io.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (mediaPlayer!= null && mediaPlayer.isPlaying()) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
-    } */
 
 
     private class DownloadImageFromInternet extends AsyncTask<String, Void, Bitmap> {

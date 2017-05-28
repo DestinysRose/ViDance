@@ -20,8 +20,6 @@ public class MenuItems extends AppCompatActivity {
 
     private TextView title, text;
     private Button btnSend;
-    private SQLiteHandler db;
-    private SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.android.volley.Request;
 import com.android.volley.Request.Method;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -23,11 +22,9 @@ import com.sample.vidance.helper.SessionManager;
 import com.sample.vidance.app.AppController;
 import com.sample.vidance.helper.SQLiteHandler;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +37,7 @@ public class Login extends Activity {
     private static final int TIME_LIMIT = 1500;
     private static long backPressed;
     private static final String TAG = Register.class.getSimpleName();
-    private Button btnLogin, btnLinkToRegister, btnButtonToSkip;
+    private Button btnLogin, btnLinkToRegister;
     private EditText inputFullName, inputPassword;
     private ProgressDialog pDialog;
     private SessionManager session;
