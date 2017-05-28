@@ -18,7 +18,7 @@ import java.net.URL;
 
 public class Upload {
 
-    public static final String UPLOAD_URL = "http://thevidance.com/zid/pages/upload.php";
+    public static final String UPLOAD_URL = "http://thevidance.com/upload.php";
 
     private int serverResponseCode;
 

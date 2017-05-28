@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -20,31 +19,15 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.sample.vidance.app.AppConfig;
-import com.sample.vidance.helper.HttpHandler;
+import com.sample.vidance.app.AppController;
 import com.sample.vidance.helper.SQLiteHandler;
 import com.sample.vidance.helper.SessionManager;
-import com.sample.vidance.app.AppController;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedWriter;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-
-import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Created by Danil on 27.03.2017.
@@ -117,19 +100,25 @@ public class Register extends Activity {
                 if (!username.isEmpty() && !fullname.isEmpty() && !password.isEmpty() && !cfmpassword.isEmpty() && !email.isEmpty()) {
                     if(username.length() >= 4 && username.length() <= 16) {
                         if(password.length() >= 6 && password.length() <= 20) {
-                            if(email.contains("@") && email.contains(".")) {
-                                registerUser(username, fullname, password, email);
+                            if(password.equals(cfmpassword)) {
+                                if(email.contains("@") && email.contains(".")) {
+                                    registerUser(username, fullname, password, email);
+                                }
+                                else {
+                                    Toast.makeText(getApplication(), "Please enter a valid e-mail address", Toast.LENGTH_LONG).show();
+                                }
                             }
                             else {
-                                Toast.makeText(getApplication(), "Please enter a valid e-mail address", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplication(), "Passwords do not match", Toast.LENGTH_LONG).show();
                             }
+
                         }
                         else {
                             Toast.makeText(getApplication(), "Please enter a valid password between 6 and 20 characters long", Toast.LENGTH_LONG).show();
                         }
                     }
                     else {
-                        Toast.makeText(getApplication(), "Please enter a valid password between 4 and 16 characters long", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplication(), "Please enter a valid username between 4 and 16 characters long", Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(getApplicationContext(), "Please fill in all information!", Toast.LENGTH_LONG).show();

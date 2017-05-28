@@ -65,8 +65,8 @@ public class Gallery extends AppCompatActivity {
     private final static Uri MEDIA_EXTERNAL_CONTENT_URI = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
     private final static String _ID = MediaStore.Video.Media._ID;
     private final static String MEDIA_DATA = MediaStore.Video.Media.DATA;
-    public static final String STORIES_URL = "http://thevidance.com/zid/pages/showStories.php";
-    public static final String USERVID_URL = "http://thevidance.com/zid/pages/retrieve.php";
+    public static final String STORIES_URL = "http://thevidance.com/showStories.php";
+    public static final String USERVID_URL = "http://thevidance.com/retrieve.php";
     private String TAG = Gallery.class.getSimpleName();
     private SessionManager session;
     private SQLiteHandler db;
@@ -141,7 +141,7 @@ public class Gallery extends AppCompatActivity {
         // Button onclick events
         choiceSelect();
 
-        checkUser = "http://www.thevidance.com/zid/pages/videos/" + db.getUserID();
+        checkUser = "http://www.thevidance.com/videos/" + db.getUserID();
         userID = db.getUserID();
     }
 
@@ -500,7 +500,7 @@ public class Gallery extends AppCompatActivity {
                     // Get all values within the array
                     for (int i = 0; i < videos.length(); ++i) {
                         String video = videos.getString(i);
-                        if (video.substring(0,49).equals(checkUser)) {
+                        if (video.substring(0,39).equals(checkUser)) {
                             LinkedHashMap<String, String> videoURL = new LinkedHashMap<>(); // Assign to a LinkedHashMap
                             videoURL.put("videos", video);
                             videoMap.add(videoURL);

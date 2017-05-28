@@ -7,22 +7,22 @@ package com.sample.vidance.app;
 
 public class AppConfig {
     // URL to verify login
-    public static String URL_LOGIN = "http://thevidance.com/test/login.php";
+    public static String URL_LOGIN = "http://thevidance.com/login.php";
 
     // URL to register user
-    public static String URL_REGUSER = "http://thevidance.com/test/reg_user.php";
+    public static String URL_REGUSER = "http://thevidance.com/reg_user.php";
 
     // URL to register child
-    public static String URL_REGCHILD = "http://thevidance.com/zid/pages/reg_child.php";
+    public static String URL_REGCHILD = "http://thevidance.com/reg_child.php";
 
     // URL to get list of children registered under user
-    public static String URL_GETCHILD = "http://thevidance.com/test/get_child.php";
+    public static String URL_GETCHILD = "http://thevidance.com/get_child.php";
 
     // URL to get list of children registered under user
-    public static String URL_GETSTORY = "http://thevidance.com/zid/pages/get_stories.php";
+    public static String URL_GETSTORY = "http://thevidance.com/get_stories.php";
 
     // URL to get list of children registered under user
-    public static String URL_TEST = "http://thevidance.com/test/updateBehaviours.php";
+    public static String URL_TEST = "http://thevidance.com/updateBehaviours.php";
 
     // URL to get list of recorded updates by child to show current records and target
     public static String TARGET_WEEK = "http://thevidance.com/targetBehaviour.php";
